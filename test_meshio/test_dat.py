@@ -1,5 +1,5 @@
 import unittest
-import meshio
+import lnmmeshio
 import os
 import filecmp
 
@@ -12,7 +12,7 @@ class TestUM(unittest.TestCase):
  
     def test_read(self):
         # read dat file
-        mesh = meshio.read(os.path.join(script_dir, 'data', 'dummy.dat'))
+        mesh = lnmmeshio.read(os.path.join(script_dir, 'data', 'dummy.dat'))
 
         # check, whether all nodes are read correctly
         self.assertEqual( mesh._points.shape, (224,3))
@@ -25,10 +25,10 @@ class TestUM(unittest.TestCase):
 
     def test_write(self):
         # read dat file
-        mesh = meshio.read(os.path.join(script_dir, 'data', 'dummy.dat'))
+        mesh = lnmmeshio.read(os.path.join(script_dir, 'data', 'dummy.dat'))
 
         # write same dat file
-        meshio.write(os.path.join(script_dir, 'tmp', 'gen.dat'), mesh)
+        lnmmeshio.write(os.path.join(script_dir, 'tmp', 'gen.dat'), mesh)
 
         # check, whether both files are identical
         self.assertTrue(filecmp.cmp(os.path.join(script_dir, 'data', 'dummy.dat'),
