@@ -6,9 +6,9 @@ import pdb
 import numpy as np
 from .common import MeshObject, get_etype
 
-from read_ccarat import read_ccarat, write_ccarat
-from elements import readnodes, bcdictionary, collect_all_bc_top_nodes, elementtypes, surfaces
-from elements import surfaces as ele_surf
+from .read_ccarat import read_ccarat, write_ccarat
+from .elements import readnodes, bcdictionary, collect_all_bc_top_nodes, elementtypes, surfaces
+from .elements import surfaces as ele_surf_def
 
 
 ele_dic = {'FIBER1':'elefiber1',
@@ -21,7 +21,7 @@ node_dic = {'FIBER1':'nodfiber1',
 
 # add line to key in dic
 def add(d,k,l):
-    if d.has_key(k):
+    if k in d:
         d[k].append(l)
     else:
         d[k] = [l]
@@ -45,7 +45,7 @@ def find_vec(l,q):
 
 # convert dic entries to numpy arrays 
 def to_np(a):
-    for k,v in a.iteritems():
+    for k,v in a.items():
         a[k] = np.array(v)
 
 # Read Mesh function
@@ -55,16 +55,16 @@ def read(filename):
     _, _, surface_node_map, _ = bcdictionary(sections) 
     
     # process geometry
-    if sections.has_key('STRUCTURE ELEMENTS') and sections['STRUCTURE ELEMENTS']:
+    if 'STRUCTURE ELEMENTS' in sections and sections['STRUCTURE ELEMENTS']:
         used_section = sections['STRUCTURE ELEMENTS']
-    elif sections.has_key('TRANSPORT ELEMENTS') and sections['TRANSPORT ELEMENTS']:
+    elif 'TRANSPORT ELEMENTS' in sections and sections['TRANSPORT ELEMENTS']:
         used_section = sections['TRANSPORT ELEMENTS']
     
     # initialize empty mesh object
     mesh = MeshObject()
     
     # coordinates
-    mesh._points = np.asarray(nodemap.values())
+    mesh._points = np.asarray(list(nodemap.values()))
     
     if fiber1:
         mesh._point_data['fiber1'] = np.asarray(fiber1)
@@ -93,9 +93,10 @@ def read(filename):
 #             add(mesh._cell_data,g,find_vec(e,f))
     
     to_np(mesh._cells)
+
     
     # convert each TET10 to 8 TET4
-    if mesh._cells.has_key('tetra10'):
+    if 'tetra10' in mesh._cells:
         # list of node IDs of TET4 within TET10
         tets = [[0,4,6,7],
                 [4,1,5,8],
@@ -106,18 +107,22 @@ def read(filename):
                 [7,4,6,8],
                 [8,4,6,5]]
         
-        mesh._cells['tetra'] = np.vstack([np.column_stack([mesh._cells['tetra10'][:,i] for i in t]) for t in tets])
+        mesh._cells['tetra'] = np.append(mesh._cells['tetra'],
+            np.vstack([np.column_stack([mesh._cells['tetra10'][:,i] for i in t]) for t in tets]),
+            axis=0)
+        
         del mesh._cells['tetra10']
 
     # dict surface:nodes
-    mesh._surface_node_map = {key:np.asarray(list(value))-1 for key, value in surface_node_map.iteritems()}
+    mesh._surface_node_map = {key:np.asarray(list(value))-1 for key, value in surface_node_map.items()}
     
+
     # create triangle elements on surface
     # loop all 4 surface triangles of each tet
-    if mesh._cells.has_key('tetra'):
+    if 'tetra' in mesh._cells:
         
         # surface node oredring
-        ele_surf = np.asarray(ele_surf['TET4'])
+        ele_surf = np.asarray(ele_surf_def['TET4'])
     
         # reverse order so that it matches the definition of meshio
         ele_surf[:,[1,2]] = ele_surf[:,[2,1]]
@@ -146,15 +151,20 @@ def read(filename):
                 # save index of triangle
                 unique_nodes[t] = i
     
-        new_tri = np.asarray(nodes[unique_nodes.values()], int)
-        if mesh._cells.has_key('triangle'):
+        new_tri = np.asarray(nodes[list(unique_nodes.values())], int)
+        if 'triangle' in mesh._cells:
             mesh._cells['triangle'] = np.append(mesh._cells['triangle'], new_tri)
         else:
             mesh._cells['triangle'] = new_tri
     
+    # safety check
+    if 'hexahedron' in mesh._cells:
+        print('WARNING: HEX elements are not properly implemented yet! Be careful!')
+    
     # store for output
     mesh._section_names = section_names
     mesh._sections = sections
+
     return mesh
 
 
@@ -164,7 +174,7 @@ def write(filename, mesh):
         RuntimeError('You can only export .dat files if the input is .dat')
     
     # default: write cir,tan basis vectors and helix,transverse angles to nodes
-    if mesh._point_data.has_key('angle_helix'):
+    if 'angle_helix' in mesh._point_data:
         # loop all nodes
         for i,line in enumerate(mesh._sections['NODE COORDS']):
             line[0] = 'FNODE'
@@ -174,13 +184,13 @@ def write(filename, mesh):
             line += ['TRANS'] + [repr(mesh._point_data['angle_trans'][i])]
         
     # write fiber vector if exists
-#    elif mesh._point_data.has_key('vector_fiber'):
+#    elif 'vector_fiber' in mesh._point_data:
 #        for line, b in zip(mesh._sections['NODE COORDS'], mesh._point_data['vector_fiber']):
 #            line[0] = 'FNODE'
 #            line += ['FIBER1'] + [repr(b[i]) for i in range(3)]
     
     # write orthonormal basis as nodal fiber orientations if exists (only if no fiber vector present)
-    elif mesh._point_data.has_key('basis_cir'):
+    elif 'basis_cir' in mesh._point_data:
         basis = np.hstack((mesh._point_data['basis_cir'],
                            mesh._point_data['basis_tan'],
                            mesh._point_data['basis_rad']))
@@ -192,7 +202,7 @@ def write(filename, mesh):
                 # add basis vectors to node
                 line += ['FIBER' + repr(f+1)] + [repr(b[i]) for i in range(3*f,3*(f+1))]
     for id,a in enumerate(['helix', 'sheet']):
-        if mesh._point_data.has_key('vector_' + a):
+        if ('vector_' + a) in mesh._point_data:
             # loop all nodes
             for line, b in zip(mesh._sections['NODE COORDS'], mesh._point_data['vector_' + a]):
                 line[0] = 'FNODE'
@@ -200,7 +210,7 @@ def write(filename, mesh):
                 line += ['FIBER' + repr(id+1)] + [repr(b[i]) for i in range(3)]
      
  #   # write manifold system if exists
- #   if mesh._point_data.has_key('mani_cir'):
+ #   if 'mani_cir' in mesh._point_data:
  #       mani = np.vstack((mesh._point_data['mani_axi'],
  #                         mesh._point_data['mani_cir'])).T
  #        

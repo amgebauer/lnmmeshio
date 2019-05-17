@@ -13,7 +13,6 @@ import sys,os
 
 from . import common
 from . import msh_io
-from . import vtk_io
 from . import dat_io
 
 import numpy as np
@@ -100,14 +99,6 @@ def read(filename, file_format=None):
 #         return h5m_io.read(filename)
 #     elif file_format == 'off':
 #         return off_io.read(filename)
-    elif file_format == 'vtu':
-        return vtk_io.read('vtu', filename)
-    elif file_format == 'vtk':
-        return vtk_io.read('vtk', filename)
-    elif file_format == 'xdmf':
-        return vtk_io.read('xdmf', filename)
-    elif file_format == 'exodus':
-        return vtk_io.read('exodus', filename)
     elif file_format == 'baci':
         return dat_io.read(filename)
     else:
@@ -203,8 +194,6 @@ def write(filename, mesh):
         msh_io.write(filename, mesh)
     elif file_format == 'baci':
         dat_io.write(filename, mesh)
-    elif file_format == 'vtu':  # vtk xml format
-        vtk_io.write('vtu', filename, mesh)
     else:
         raise RuntimeError(
             'unknown file format \'%s\' of \'%s\'.' % (file_format, filename)

@@ -17,8 +17,8 @@ SECTIONS_CHANGE_NOT_2_STYLE = ['ARTERY ELEMENTS', 'ALE ELEMENTS','CURVE1','CURVE
 def myprint(myfile, mymessage):
     try:
         for i in range(len(mymessage)-1):
-            print >> myfile, mymessage[i],
-        print >>  myfile, mymessage[-1]
+            print(mymessage[i], file=myfile, end=' ')
+        print(mymessage[-1], file=myfile)
     except TypeError:
         raise Exception('In the following line exist a non-string element\n{0}'.format(mymessage))
 
@@ -58,12 +58,12 @@ def read_ccarat(filename, ig_comm=True, ig_head=True):
 
 def write_ccarat(filename, section_names, sections):
     with open(filename, 'w') as f:
-        if sections.has_key('header'):
+        if 'header' in sections:
             for line in sections['header']:
-                print >>f, " ".join(line)
+                print(" ".join(line), file=f)
     
         for name in section_names:
-            print >> f, "-"*(76-len(name)) + name
+            print("-"*(76-len(name)) + name, file=f)
             sec = sections[name]
             for line in sec:
 
@@ -109,7 +109,7 @@ def setparam(section,name,value):
 def Update_PROBLEM_SIZE(sections):
     max_ele = 0
     for field in ['TRANSPORT ELEMENTS', 'STRUCTURE ELEMENTS']:
-        if sections.has_key(field):
+        if field in sections:
             max_ele = max_ele + len(sections[field])
 
     setparam(sections['PROBLEM SIZE'], 'ELEMENTS', max_ele )
@@ -119,7 +119,7 @@ def Update_DESIGN_DESCRIPTION(sections):
     for top, name in zip( ['DNODE-NODE TOPOLOGY', 'DLINE-NODE TOPOLOGY', 'DSURF-NODE TOPOLOGY', 'DVOL-NODE TOPOLOGY'],
                           ['NDPOINT'            , 'NDLINE'             , 'NDSURF'             , 'NDVOL'             ]
                           ):
-        if sections.has_key(top):
+        if top in sections:
             setparam(sections['DESIGN DESCRIPTION'], name, repr(len(sections[top])) )
 
 if __name__ == '__main__':

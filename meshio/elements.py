@@ -732,7 +732,7 @@ def bcdictionary(sections):
 
     node_dic = {}
     # Check if section has topology
-    if sections.has_key('DNODE-NODE TOPOLOGY'):
+    if 'DNODE-NODE TOPOLOGY' in sections:
         # Check if section is not empty
         if sections['DNODE-NODE TOPOLOGY']:
             for line in Bar('Extract node bc').iter(sections['DNODE-NODE TOPOLOGY']):
@@ -746,7 +746,7 @@ def bcdictionary(sections):
 
     line_dic = {}
     # Check if section has topology
-    if sections.has_key('DLINE-NODE TOPOLOGY'):
+    if 'DLINE-NODE TOPOLOGY' in sections:
         # Check if section is not empty
         if sections['DLINE-NODE TOPOLOGY']:
             for line in Bar('Extract line bc').iter(sections['DLINE-NODE TOPOLOGY']):
@@ -759,7 +759,7 @@ def bcdictionary(sections):
                     line_dic[lineID] = set([nodeID])
 
     surf_dic = {}
-    if sections.has_key('DSURF-NODE TOPOLOGY'):
+    if 'DSURF-NODE TOPOLOGY' in sections:
         # Check if section is not empty
         if sections['DSURF-NODE TOPOLOGY']:
             for line in Bar('Extract surf bc').iter(sections['DSURF-NODE TOPOLOGY']):
@@ -771,7 +771,7 @@ def bcdictionary(sections):
                     surf_dic[surfID] = set([nodeID])
 
     vol_dic = {}
-    if sections.has_key('DVOL-NODE TOPOLOGY'):
+    if 'DVOL-NODE TOPOLOGY' in sections:
         # Check if section is not empty
         if sections['DVOL-NODE TOPOLOGY']:
             for line in Bar('Extract vol bc').iter(sections['DVOL-NODE TOPOLOGY']):
