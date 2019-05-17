@@ -2,3 +2,5 @@
 venv
 *.pyc
 test_meshio/tmp
+lnmmeshio.egg-info
+dist

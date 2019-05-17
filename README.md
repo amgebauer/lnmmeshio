@@ -6,4 +6,15 @@ Forked from https://github.com/nschloe/meshio with major adaptions by Martin Pfa
 
 See https://github.com/nschloe/meshio
 
-# ToDo: Add unit tests!
+# Make changes and upgrade
+
+* Make your changes and test changes.
+* Adapt version number in `setup.py`
+* Push changes to Gitlab and set Tag to version number
+* Create release using `python setup.py sdist`
+* Copy the newly created .tar.gz file in the PyPI directory
+
+
+# ToDo
+
+* Add more unit tests. Currently only a small subpart of dat io is tested!
