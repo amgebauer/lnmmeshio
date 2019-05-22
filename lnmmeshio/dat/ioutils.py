@@ -32,7 +32,7 @@ def read_dat_sections(origin):
     
     return content
 
-def read_option(line: str, option: str, num: int = 1):
+def read_option_item(line: str, option: str, num: int = 1):
     regex = re.compile('(^| ){0}{1}\\s'.format(re.escape(option), num*'[ ]+([\\S]+)'))
 
     # split comment
@@ -68,42 +68,50 @@ def read_next_option(line: str, num: int = 1):
 
     return line, match.group(1), [match.group(i) for i in range(2, num+2)]
 
-def text_fill(text: str, len: int, chr=' ', min=1):
-    return '{0}{2}'.format(text, *max(min, len-len(text)))
+def text_fill(text: str, length: int, chr=' ', minimum=1, fill_left: bool = False):
+    fill_str: str = chr*max(minimum, length-len(text))
+
+    if fill_left:
+        return '{1}{0}'.format(text, fill_str)
+    else:
+        return '{0}{1}'.format(text, fill_str)
 
 def write_title(dest, title: str, newline = True):
-    dest.write('{0}{1}'.format(text_fill(title, 73, chr='-', min=3), '\n' if newline else ''))
+    dest.write('{0}{1}'.format(text_fill(title, 73, chr='-', minimum=3, fill_left=True), '\n' if newline else ''))
 
 def write_option(dest, key: str, value, comment: str = None, newline = True):
 
     if comment is not None:
         dest.write('{0}{1}// {2}{3}'.format(
             text_fill(key, 32, chr=' '),
-            text_fill(repr(value), 32, chr=' '),
+            text_fill(str(value), 32, chr=' '),
             comment,
             '\n' if newline else ''
         ))
     else:
         dest.write('{0}{1}{2}'.format(
             text_fill(key, 32, chr=' '),
-            repr(value),
+            str(value),
             '\n' if newline else ''
         ))
 
-def write_option_list(dest, list: OrderedDict):
+def write_option_list(dest, list: OrderedDict, newline=True):
 
     first_entry: bool = True
-    for key, value in list:
+    for key, value in list.items():
         if not first_entry:
             dest.write(' ')
         first_entry = False
 
-        if hasattr(value, '__iter__'):
-            val_str = ' '.join([repr(i) for i in value])
+        if hasattr(value, '__iter__') and not isinstance(value, str):
+            val_str = ' '.join([str(i) for i in value])
         else:
             val_str = value
 
         dest.write('{0} {1}'.format(key, val_str))
+    
+    if newline:
+        dest.write('\n')
 
 def write_comment(dest, comment, newline = True):
     dest.write('// {0}{1}'.format(comment, '\n' if newline else ''))

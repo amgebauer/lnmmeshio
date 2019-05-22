@@ -1,6 +1,6 @@
 import numpy as np
 from typing import List, Dict
-from .ioutils import write_title, write_option_list, write_option, read_option, read_next_option
+from .ioutils import write_title, write_option_list, write_option, read_option_item, read_next_option
 from collections import OrderedDict
 import re
 
@@ -18,8 +18,8 @@ class Discretization:
             node.id = id
             id += 1
         
+        id: int = 1
         for ele_i in self.elements.values():
-            id: int = 1
             for ele in ele_i:
                 ele.id = id
                 id += 1
@@ -35,9 +35,15 @@ class Discretization:
 
     def write(self, dest):
 
+        self.compute_ids()
+
         # write problem size
+        num_ele = 0
+        for elelist in self.elements.values():
+            num_ele += len(elelist)
+        
         write_title(dest, 'PROBLEM SIZE')
-        write_option(dest, 'ELEMENTS', len(self.elements))
+        write_option(dest, 'ELEMENTS', num_ele)
         write_option(dest, 'NODES', len(self.nodes))
         write_option(dest, 'DIM', 3)
         write_option(dest, 'MATERIALS', 9999) # Write dummy value
@@ -60,25 +66,25 @@ class Discretization:
             write_title(dest, 'DNODE-NODE TOPOLOGY')
             for topoid, nodelist in topo_point.items():
                 for nodeid in nodelist:
-                    dest.write('NODE {0} DNODE {1}\n'.format(topoid, nodeid))
+                    dest.write('NODE {0} DNODE {1}\n'.format(nodeid, topoid))
 
         if len(topo_line) > 0:
             write_title(dest, 'DLINE-NODE TOPOLOGY')
             for topoid, nodelist in topo_line.items():
                 for nodeid in nodelist:
-                    dest.write('NODE {0} DLINE {1}\n'.format(topoid, nodeid))
+                    dest.write('NODE {0} DLINE {1}\n'.format(nodeid, topoid))
 
         if len(topo_surf) > 0:
             write_title(dest, 'DSURF-NODE TOPOLOGY')
             for topoid, nodelist in topo_surf.items():
                 for nodeid in nodelist:
-                    dest.write('NODE {0} DSURF {1}\n'.format(topoid, nodeid))
+                    dest.write('NODE {0} DSURFACE {1}\n'.format(nodeid, topoid))
 
         if len(topo_vol) > 0:
             write_title(dest, 'DVOL-NODE TOPOLOGY')
             for topoid, nodelist in topo_vol.items():
                 for nodeid in nodelist:
-                    dest.write('NODE {0} DVOL {1}\n'.format(topoid, nodeid))
+                    dest.write('NODE {0} DVOLUME {1}\n'.format(nodeid, topoid))
 
         # write nodes
         write_title(dest, 'NODE COORDS')
@@ -118,15 +124,14 @@ class Discretization:
             if node.id is None:
                 raise RuntimeError('You have to compute ids before generating topology')
 
-
-            for dp in node.getattr(topotype):
+            for dp in getattr(node, topotype):
                 if dp not in topo:
                     topo[dp] = []
                 
                 topo[dp].append(node.id)
 
         # check integrity
-        if topo.keys != list(range(1, len(topo)+1)):
+        if sorted(list(topo.keys())) != list(range(1, len(topo)+1)):
             raise RuntimeError('Topology contains empty nodesets!')
 
         return topo
@@ -139,16 +144,16 @@ class Discretization:
         for line in sections['NODE COORDS']:
             if 'FNODE' in line:
                 # this is a fiber node
-                nodeid, _ = read_option(line, 'FNODE')
+                nodeid, _ = read_option_item(line, 'FNODE')
             else:
-                nodeid, _ = read_option(line, 'NODE')
+                nodeid, _ = read_option_item(line, 'NODE')
             
 
             if nodeid is None or nodeid == '':
                 # this is not a node, probably a comment
                 continue
             
-            coords_str, _ = read_option(line, 'COORD', num=3)
+            coords_str, _ = read_option_item(line, 'COORD', num=3)
 
             coords = np.array([float(i) for i in coords_str])
 
@@ -160,38 +165,38 @@ class Discretization:
                 raise RuntimeError('Node ids in dat file have a gap at {0} != {1}!'.format(nodeid, len(disc.nodes)))
             
             if 'FIBER1' in line:
-                node.fiber1 = np.array([float(i) for i in read_option(line, 'FIBER1', num=3)[0]])
+                node.fiber1 = np.array([float(i) for i in read_option_item(line, 'FIBER1', num=3)[0]])
             
             if 'FIBER2' in line:
-                node.fiber2 = np.array([float(i) for i in read_option(line, 'FIBER2', num=3)[0]])
+                node.fiber2 = np.array([float(i) for i in read_option_item(line, 'FIBER2', num=3)[0]])
             
             if 'CIR' in line:
-                node.fiber_cir = np.array([float(i) for i in read_option(line, 'CIR', num=3)[0]])
+                node.fiber_cir = np.array([float(i) for i in read_option_item(line, 'CIR', num=3)[0]])
             
             if 'TAN' in line:
-                node.fiber_tan = np.array([float(i) for i in read_option(line, 'TAN', num=3)[0]])
+                node.fiber_tan = np.array([float(i) for i in read_option_item(line, 'TAN', num=3)[0]])
             
             if 'HELIX' in line:
-                node.fiber_helix = np.array([float(i) for i in read_option(line, 'HELIX', num=3)[0]])
+                node.fiber_helix = np.array([float(i) for i in read_option_item(line, 'HELIX', num=3)[0]])
             
             if 'TRANS' in line:
-                node.fiber_trans = np.array([float(i) for i in read_option(line, 'TRANS', num=3)[0]])
+                node.fiber_trans = np.array([float(i) for i in read_option_item(line, 'TRANS', num=3)[0]])
 
 
         # read DPOINT topology
-        if 'DPOINT-NODE TOPOLOGY' in sections:
-            for line in sections['DPOINT-NODE TOPOLOGY']:
-                nodeid_str, _ = read_option(line, 'NODE')
+        if 'DNODE-NODE TOPOLOGY' in sections:
+            for line in sections['DNODE-NODE TOPOLOGY']:
+                nodeid_str, _ = read_option_item(line, 'NODE')
                 
                 if nodeid_str is None or nodeid_str == '':
                     # this is not a node, probably a comment
                     continue
                 
                 nodeid = int(nodeid_str)
-                dpoint, _ = read_option(line, 'DPOINT')
+                dpoint, _ = read_option_item(line, 'DNODE')
 
                 if dpoint is None:
-                    raise RuntimeError('Couldn\'t find DPIONT option for node {0}'.format(nodeid))
+                    raise RuntimeError('Couldn\'t find DNODE option for node {0}'.format(nodeid))
                 
                 disc.nodes[nodeid-1].dpoint.append(int(dpoint))
 
@@ -199,14 +204,14 @@ class Discretization:
         # read DLINE topology
         if 'DLINE-NODE TOPOLOGY' in sections:
             for line in sections['DLINE-NODE TOPOLOGY']:
-                nodeid_str, _ = read_option(line, 'NODE')
+                nodeid_str, _ = read_option_item(line, 'NODE')
                 
                 if nodeid_str is None or nodeid_str == '':
                     # this is not a node, probably a comment
                     continue
                 
                 nodeid = int(nodeid_str)
-                dline, _ = read_option(line, 'DLINE')
+                dline, _ = read_option_item(line, 'DLINE')
 
                 if dline is None:
                     raise RuntimeError('Couldn\'t find DLINE option for node {0}'.format(nodeid))
@@ -217,14 +222,14 @@ class Discretization:
         # read DSURF topology
         if 'DSURF-NODE TOPOLOGY' in sections:
             for line in sections['DSURF-NODE TOPOLOGY']:
-                nodeid_str, _ = read_option(line, 'NODE')
+                nodeid_str, _ = read_option_item(line, 'NODE')
                 
                 if nodeid_str is None or nodeid_str == '':
                     # this is not a node, probably a comment
                     continue
                 
                 nodeid = int(nodeid_str)
-                dsurf, _ = read_option(line, 'DSURFACE')
+                dsurf, _ = read_option_item(line, 'DSURFACE')
 
                 if dsurf is None:
                     raise RuntimeError('Couldn\'t find DSURF option for node {0}'.format(nodeid))
@@ -235,14 +240,14 @@ class Discretization:
         # read DVOL topology
         if 'DVOL-NODE TOPOLOGY' in sections:
             for line in sections['DVOL-NODE TOPOLOGY']:
-                nodeid_str, _ = read_option(line, 'NODE')
+                nodeid_str, _ = read_option_item(line, 'NODE')
                 
                 if nodeid_str is None or nodeid_str == '':
                     # this is not a node, probably a comment
                     continue
                 
                 nodeid = int(nodeid_str)
-                dvol, _ = read_option(line, 'DVOL')
+                dvol, _ = read_option_item(line, 'DVOLUME')
 
                 if dvol is None:
                     raise RuntimeError('Couldn\'t find DVOL option for node {0}'.format(nodeid))
@@ -250,11 +255,20 @@ class Discretization:
                 disc.nodes[nodeid-1].dvol.append(int(dvol))
 
         # read elements
-        disc.elements[Element.FieldTypeStructure] = Discretization.read_elements(disc.nodes, sections['STRUCTURE ELEMENTS'])
-        disc.elements[Element.FieldTypeFluid] = Discretization.read_elements(disc.nodes, sections['FLUID ELEMENTS'])
-        disc.elements[Element.FieldTypeALE] = Discretization.read_elements(disc.nodes, sections['ALE ELEMENTS'])
-        disc.elements[Element.FieldTypeTransport] = Discretization.read_elements(disc.nodes, sections['TRANSPORT ELEMENTS'])
-        disc.elements[Element.FieldTypeThermo] = Discretization.read_elements(disc.nodes, sections['THERMO ELEMENTS'])
+        if 'STRUCTURE ELEMENTS' in sections:
+            disc.elements[Element.FieldTypeStructure] = Discretization.read_elements(disc.nodes, sections['STRUCTURE ELEMENTS'])
+        
+        if 'FLUID ELEMENTS' in sections:
+            disc.elements[Element.FieldTypeFluid] = Discretization.read_elements(disc.nodes, sections['FLUID ELEMENTS'])
+        
+        if 'ALE ELEMENTS' in sections:
+            disc.elements[Element.FieldTypeALE] = Discretization.read_elements(disc.nodes, sections['ALE ELEMENTS'])
+        
+        if 'TRANSPORT ELEMENTS' in sections:
+            disc.elements[Element.FieldTypeTransport] = Discretization.read_elements(disc.nodes, sections['TRANSPORT ELEMENTS'])
+        
+        if 'THERMO ELEMENTS' in sections:
+            disc.elements[Element.FieldTypeThermo] = Discretization.read_elements(disc.nodes, sections['THERMO ELEMENTS'])
 
 
         return disc
@@ -275,7 +289,7 @@ class Discretization:
             ele_type = ele_match.group(2)
             ele_shape = ele_match.group(3)
             
-            node_ids_str, span = read_option(line, ele_shape, Element.get_num_nodes(ele_shape))
+            node_ids_str, span = read_option_item(line, ele_shape, Element.get_num_nodes(ele_shape))
             node_ids = [int(i) for i in node_ids_str]
 
             ele = Element(ele_type, ele_shape,
@@ -297,6 +311,7 @@ class Discretization:
                     break
                 
                 ele.options[key] = value
+            
         
         return eles
 
@@ -348,7 +363,8 @@ class Node:
         
         if len(options) > 0:
             dest.write(' ')
-            write_option_list(dest, options)
+            write_option_list(dest, options, newline=False)
+        dest.write('\n')
 
 
 class Element:
