@@ -4,7 +4,7 @@
 
 import sys,os
 
-import meshio
+from meshio import Mesh, read as _meshioread, write as _meshiowrite
 from . import meshio_to_discretization
 from .discretization import Element, Discretization, Node
 from . import ioutils
@@ -45,7 +45,7 @@ def read(filename, file_format=None):
     else:
         # this maybe is a file format supported by meshio
         return meshio_to_discretization.mesh2Discretization(
-            meshio.read(filename, file_format=file_format)
+            _meshioread(filename, file_format=file_format)
         )
 
 def read_baci(input_stream):
@@ -86,7 +86,7 @@ def read_mesh(filename, file_format=None):
         file_format: The file format of the file
     
     Returns:
-        meshio.Mesh: Returns the discretization in BACI format
+        Mesh: Returns the discretization in BACI format
     """
     assert isinstance(filename, str)
 
@@ -98,7 +98,7 @@ def read_mesh(filename, file_format=None):
         return meshio_to_discretization.discretization2mesh(read(filename, file_format=file_format))
     else:
         # this maybe is a file format supported by meshio
-        return meshio.read(filename, file_format=file_format)
+        return _meshioread(filename, file_format=file_format)
 
 def write_mesh(filename, mesh, file_format=None, **kwargs):
     """
@@ -117,7 +117,7 @@ def write_mesh(filename, mesh, file_format=None, **kwargs):
         write(filename, meshio_to_discretization.mesh2Discretization(mesh), file_format=file_format)
 
     else:
-        meshio.write(filename, mesh, file_format, **kwargs)
+        _meshiowrite(filename, mesh, file_format, **kwargs)
 
 def read_sections(filename):
     """
