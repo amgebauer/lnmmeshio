@@ -11,14 +11,14 @@ class Discretization:
         self.nodes = []
         self.elements = {}
     
-    def compute_ids(self):
+    def compute_ids(self, zero_based: bool = False):
         
-        id: int = 1
+        id: int = 0 if zero_based else 1
         for node in self.nodes:
             node.id = id
             id += 1
         
-        id: int = 1
+        id: int = 0 if zero_based else 1
         for ele_i in self.elements.values():
             for ele in ele_i:
                 ele.id = id
@@ -32,6 +32,15 @@ class Discretization:
             for ele in ele_i:
                 ele.reset()
 
+    def get_node_coords(self):
+        arr: np.array = np.zeros((len(self.nodes), 3))
+
+        i: int = 0
+        for node in self.nodes:
+            arr[i,:] = node.coords
+            i += 1
+        
+        return arr
 
     def write(self, dest):
 
@@ -64,25 +73,25 @@ class Discretization:
         # write topology
         if len(topo_point) > 0:
             write_title(dest, 'DNODE-NODE TOPOLOGY')
-            for topoid, nodelist in topo_point.items():
+            for topoid, nodelist in sorted(topo_point.items()):
                 for nodeid in nodelist:
                     dest.write('NODE {0} DNODE {1}\n'.format(nodeid, topoid))
 
         if len(topo_line) > 0:
             write_title(dest, 'DLINE-NODE TOPOLOGY')
-            for topoid, nodelist in topo_line.items():
+            for topoid, nodelist in sorted(topo_line.items()):
                 for nodeid in nodelist:
                     dest.write('NODE {0} DLINE {1}\n'.format(nodeid, topoid))
 
         if len(topo_surf) > 0:
             write_title(dest, 'DSURF-NODE TOPOLOGY')
-            for topoid, nodelist in topo_surf.items():
+            for topoid, nodelist in sorted(topo_surf.items()):
                 for nodeid in nodelist:
                     dest.write('NODE {0} DSURFACE {1}\n'.format(nodeid, topoid))
 
         if len(topo_vol) > 0:
             write_title(dest, 'DVOL-NODE TOPOLOGY')
-            for topoid, nodelist in topo_vol.items():
+            for topoid, nodelist in sorted(topo_vol.items()):
                 for nodeid in nodelist:
                     dest.write('NODE {0} DVOLUME {1}\n'.format(nodeid, topoid))
 
@@ -97,14 +106,14 @@ class Discretization:
             for ele in self.elements[Element.FieldTypeStructure]:
                 ele.write(dest)
 
-        if Element.FieldTypeALE in self.elements:
-            write_title(dest, 'ALE ELEMENTS')
-            for ele in self.elements[Element.FieldTypeALE]:
-                ele.write(dest)
-
         if Element.FieldTypeFluid in self.elements:
             write_title(dest, 'FLUID ELEMENTS')
             for ele in self.elements[Element.FieldTypeFluid]:
+                ele.write(dest)
+
+        if Element.FieldTypeALE in self.elements:
+            write_title(dest, 'ALE ELEMENTS')
+            for ele in self.elements[Element.FieldTypeALE]:
                 ele.write(dest)
 
         if Element.FieldTypeTransport in self.elements:
@@ -116,6 +125,8 @@ class Discretization:
             write_title(dest, 'THERMO ELEMENTS')
             for ele in self.elements[Element.FieldTypeThermo]:
                 ele.write(dest)
+        
+        write_title(dest, 'END')
 
     def get_topology(self, topotype: str):
         topo = {}
@@ -374,16 +385,39 @@ class Element:
     FieldTypeTransport: str = 'transport'
     FieldTypeThermo: str = 'thermo'
 
+    ElementEdges: dict = {
+        'HEX8': [[0, 1], [1, 2], [2, 3], [3, 0], [0, 4], [1, 5], [2, 6], [3, 7], [4, 5], [5, 6], [6, 7], [7, 4]],
+        'TET4': [[0, 1], [1, 2], [2, 0], [0, 3], [1, 3], [2, 3]],
+        'TET10': [[0, 1, 4], [1, 2, 5], [2, 0, 6], [0, 3, 7], [1, 3, 8], [2, 3, 9]]
+        # TODO: Need to add more here if necessary
+    }
+    ElementFaces: dict = {
+        'HEX8': [[0, 1, 2, 3], [0, 1, 5, 4], [1, 2, 6, 5], [2, 3, 7, 6], [3, 0, 4, 7], [4, 5, 6, 7]],
+        'TET4': [[0, 1, 3], [1, 2, 3], [2, 0, 3], [0, 2, 1]],
+        'TET10': [[0, 1, 3, 4, 8, 7], [1, 2, 3, 5, 9, 8], [2, 0, 3, 6, 7, 9], [0, 2, 1, 6, 5, 4]]
+    }
+
     def __init__(self, el_type: str, shape: str, nodes: List[Node],
-            options: OrderedDict = OrderedDict()):
+            options: OrderedDict = None):
         self.id = None
         self.type = el_type
         self.shape = shape
         self.nodes = nodes
-        self.options = options
+        self.options = options if options is not None else OrderedDict()
     
     def reset(self):
         self.id = None
+    
+    def get_node_ids(self):
+        arr: np.array = np.zeros((len(self.nodes)))
+
+        for i, node in enumerate(self.nodes, start=0):
+            if node.id is None:
+                raise RuntimeError('You need to compute ids first')
+            arr[i] = node.id
+        
+        return arr
+
     
     def write(self, dest):
         if self.id is None:
