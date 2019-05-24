@@ -186,7 +186,7 @@ def discretization2mesh(dis: Discretization) -> meshio.Mesh:
             # store material id
             if 'MAT' in ele.options:
                 for name in _cell_data_id_names:
-                    cell_data[celltype][name] = np.append(cell_data[celltype][name], ele.options['MAT'])
+                    cell_data[celltype][name] = np.append(cell_data[celltype][name], int(ele.options['MAT']))
             
             # go over element faces
             for face in Element.ElementFaces[ele.shape]:
@@ -289,7 +289,6 @@ def discretization2mesh(dis: Discretization) -> meshio.Mesh:
                 }
 
             cells['vertex'] = np.append(cells['vertex'], node.id)
-            
             for name in _cell_data_id_names:
                 cell_data['vertex'][name] = np.append(cell_data[celltype][name], dp)
 
