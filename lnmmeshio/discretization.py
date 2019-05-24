@@ -409,7 +409,7 @@ class Element:
         self.id = None
     
     def get_node_ids(self):
-        arr: np.array = np.zeros((len(self.nodes)))
+        arr: np.array = np.zeros((len(self.nodes)), dtype=int)
 
         for i, node in enumerate(self.nodes, start=0):
             if node.id is None:

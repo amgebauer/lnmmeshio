@@ -19,7 +19,8 @@ cell_nodes = {
     'hexahedron27': 27,
     'wedge': 6,
     'quad': 4,
-    'quad9': 9
+    'quad9': 9,
+    'vertex': 1
 }
 
 cell_disc_eles = {
@@ -117,6 +118,10 @@ def mesh2Discretization(mesh: meshio.Mesh) -> Discretization:
         for cell in cells:
             # read nodes that belong to the cells
             nodes = []
+
+            # in case of a vertex, cell is just an integer
+            cell = np.array(cell).reshape((-1))
+
             for nodeids in cell:
                 nodes.append(disc.nodes[nodeids])
 
@@ -142,7 +147,7 @@ def mesh2Discretization(mesh: meshio.Mesh) -> Discretization:
                 # treat as surface-, line- or point-nodeset definition
                 
                 # extract nodeset info from cell data
-                nsid: int = _get_id_from_cell_data(mesh.cell_data[celltype])[cellindex]
+                nsid: int = int(_get_id_from_cell_data(mesh.cell_data[celltype])[cellindex])
 
                 for node in nodes:
                     if eledim == 0:
@@ -172,11 +177,10 @@ def discretization2mesh(dis: Discretization) -> meshio.Mesh:
             celltype = disc_shape_cell[ele.shape]
 
             if celltype not in cells:
-                cells[celltype] = np.zeros((0, cell_nodes[celltype]))
+                cells[celltype] = np.zeros((0, cell_nodes[celltype]), dtype=int)
                 cell_data[celltype] = {
-                    name: np.zeros((0)) for name in _cell_data_id_names
+                    name: np.zeros((0), dtype=int) for name in _cell_data_id_names
                 }
-            
             cells[celltype] = np.append(cells[celltype], ele.get_node_ids().reshape((1,-1)), axis=0)
 
             # store material id
@@ -192,7 +196,7 @@ def discretization2mesh(dis: Discretization) -> meshio.Mesh:
                     if union_set is None:
                         union_set = set(ele.nodes[nodepos].dsurf)
                     else:
-                        union_set = union_set.union(set(ele.nodes[nodepos].dsurf))
+                        union_set = union_set.intersection(set(ele.nodes[nodepos].dsurf))
                 
                 for dsurfid in union_set:
                     # create surface cells with id dsurfid
@@ -216,9 +220,9 @@ def discretization2mesh(dis: Discretization) -> meshio.Mesh:
 
                     # check, whether there is already an array created
                     if facetype not in cells:
-                        cells[facetype] = np.zeros((0, len(face)))
+                        cells[facetype] = np.zeros((0, len(face)), dtype=int)
                         cell_data[facetype] = {
-                            name: np.zeros((0)) for name in _cell_data_id_names
+                            name: np.zeros((0), dtype=int) for name in _cell_data_id_names
                         }
                     surfnodes = np.array([ele.nodes[n].id for n in face])
                     
@@ -237,7 +241,7 @@ def discretization2mesh(dis: Discretization) -> meshio.Mesh:
                     if union_set is None:
                         union_set = set(ele.nodes[nodepos].dline)
                     else:
-                        union_set = union_set.union(set(ele.nodes[nodepos].dline))
+                        union_set = union_set.intersection(set(ele.nodes[nodepos].dline))
                 
                 for dlineid in union_set:
                     # create line cells with id dlineid
@@ -261,14 +265,14 @@ def discretization2mesh(dis: Discretization) -> meshio.Mesh:
 
                     # check, whether there is already an array created
                     if linetype not in cells:
-                        cells[linetype] = np.zeros((0, 3))
+                        cells[linetype] = np.zeros((0, len(edge)), dtype=int)
                         cell_data[linetype] = {
-                            name: np.zeros((0)) for name in _cell_data_id_names
+                            name: np.zeros((0), dtype=int) for name in _cell_data_id_names
                         }
                     edgenodes = np.array([ele.nodes[n].id for n in edge])
                     
                     # add edge to the cells
-                    cells[linetype] = np.append(cells[linetype], edgenodes, axis=0)
+                    cells[linetype] = np.append(cells[linetype], edgenodes.reshape((1, len(edge))), axis=0)
 
                     # add line ids
                     for name in _cell_data_id_names:
@@ -279,15 +283,15 @@ def discretization2mesh(dis: Discretization) -> meshio.Mesh:
     for node in dis.nodes:
         for dp in node.dpoint:
             if 'vertex' not in cells:
-                cells['vertex'] = np.zeros((0, 1))
+                cells['vertex'] = np.zeros((0, 1), dtype=int)
                 cell_data['vertex'] = {
-                    name: np.zeros((0)) for name in _cell_data_id_names
+                    name: np.zeros((0), dtype=int) for name in _cell_data_id_names
                 }
 
             cells['vertex'] = np.append(cells['vertex'], node.id)
             
             for name in _cell_data_id_names:
-                cell_data['vertex'][name] = np.append(cells[celltype][name], dp)
+                cell_data['vertex'][name] = np.append(cell_data[celltype][name], dp)
 
 
     mesh: meshio.Mesh = meshio.Mesh(points, cells, cell_data=cell_data)
