@@ -22,9 +22,9 @@ class TestDat(unittest.TestCase):
         # check, whether all tet elements were read correctly
         self.assertEqual(mesh.cells['tetra'].shape, (12, 4))
         self.assertEqual(mesh.cells['tetra10'].shape, (12, 10))
-        self.assertEqual(mesh.cell_data['tetra']['medit:ref'][0], '4')
-        self.assertEqual(mesh.cell_data['tetra10']['medit:ref'][0], '5')
-        self.assertEqual(mesh.cell_data['hexahedron']['medit:ref'][0], '1')
+        self.assertEqual(mesh.cell_data['tetra']['medit:ref'][0], 4)
+        self.assertEqual(mesh.cell_data['tetra10']['medit:ref'][0], 5)
+        self.assertEqual(mesh.cell_data['hexahedron']['medit:ref'][0], 1)
 
         # check, whether all hex elements were read correctly
         self.assertEqual(mesh.cells['hexahedron'].shape, (65,8))

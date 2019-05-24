@@ -47,12 +47,6 @@ class TestMeshio2Discretization(unittest.TestCase):
             self.assertListEqual(
                 sorted(node1.dsurf), sorted(node2.dsurf)
             )
-
-            # check, whether fiber nodes are the same
-            if node1.fiber1 is not None:
-                self.assertAlmostEqual(
-                    np.linalg.norm(node1.fiber1 - node2.fiber1), 0
-                )
         
         eletype_list1: List[str] = []
         eletype_list2: List[str] = []
