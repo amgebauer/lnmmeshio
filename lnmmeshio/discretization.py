@@ -1,6 +1,7 @@
 import numpy as np
 from typing import List, Dict
-from .ioutils import write_title, write_option_list, write_option, read_option_item, read_next_option
+from .ioutils import write_title, write_option_list, write_option, read_option_item, \
+    read_next_option, read_next_key, read_next_value
 from collections import OrderedDict
 import re
 
@@ -175,24 +176,8 @@ class Discretization:
             if int(nodeid) != len(disc.nodes):
                 raise RuntimeError('Node ids in dat file have a gap at {0} != {1}!'.format(nodeid, len(disc.nodes)))
             
-            if 'FIBER1' in line:
-                node.fiber1 = np.array([float(i) for i in read_option_item(line, 'FIBER1', num=3)[0]])
-            
-            if 'FIBER2' in line:
-                node.fiber2 = np.array([float(i) for i in read_option_item(line, 'FIBER2', num=3)[0]])
-            
-            if 'CIR' in line:
-                node.fiber_cir = np.array([float(i) for i in read_option_item(line, 'CIR', num=3)[0]])
-            
-            if 'TAN' in line:
-                node.fiber_tan = np.array([float(i) for i in read_option_item(line, 'TAN', num=3)[0]])
-            
-            if 'HELIX' in line:
-                node.fiber_helix = np.array([float(i) for i in read_option_item(line, 'HELIX', num=3)[0]])
-            
-            if 'TRANS' in line:
-                node.fiber_trans = np.array([float(i) for i in read_option_item(line, 'TRANS', num=3)[0]])
-
+            # read fibers
+            node.fibers = Fiber.parse_fibers(line)
 
         # read DPOINT topology
         if 'DNODE-NODE TOPOLOGY' in sections:
@@ -312,11 +297,22 @@ class Discretization:
             if int(ele_id) != len(eles):
                 raise RuntimeError('Element ids in dat file have a gap at {0}!={1}!'.format(ele_id, len(eles)))
             
+            # read fibers
+            ele.fibers = Fiber.parse_fibers(line)
+
             # read remaining options
             # assume only one value per option, which must not be the case in general
             line = line[span[1]:]
             while True:
-                line, key, value = read_next_option(line, num=1)
+                line, key = read_next_key(line)
+                if line is None:
+                    break
+
+                num = 1
+                if Fiber.get_fiber_type(key) is not None:
+                    num = 3
+
+                line, value = read_next_value(line, num=num)
 
                 if line is None:
                     break
@@ -331,12 +327,7 @@ class Node:
     def __init__(self, coords: np.array = np.zeros((3))):
         self.id = None
         self.coords: np.array = coords
-        self.fiber1: np.array = None
-        self.fiber2: np.array = None
-        self.fiber_cir: np.array = None
-        self.fiber_tan: np.array = None
-        self.fiber_helix: np.array = None
-        self.fiber_trans: np.array = None
+        self.fibers: Dict[str, Fiber] = {}
         self.dpoint = []
         self.dline = []
         self.dsurf = []
@@ -346,9 +337,7 @@ class Node:
         self.id = None
     
     def write(self, dest):
-        if self.fiber1 is not None or self.fiber2 is not None \
-                or self.fiber_cir is not None or self.fiber_tan is not None \
-                or self.fiber_helix is not None or self.fiber_trans is not None:
+        if len(self.fibers) > 0:
             dest.write('FNODE')
         else:
             dest.write('NODE')
@@ -357,26 +346,85 @@ class Node:
             raise RuntimeError('You have to compute ids before writing')
         
         dest.write(' {0} COORD {1}'.format(self.id, ' '.join([repr(i) for i in self.coords])))
-    
-        options: OrderedDict = OrderedDict()
-        if self.fiber1 is not None:
-            options['FIBER1'] = self.fiber1
-        if self.fiber2 is not None:
-            options['FIBER2'] = self.fiber2
-        if self.fiber_cir is not None:
-            options['CIR'] = self.fiber_cir
-        if self.fiber_tan is not None:
-            options['TAN'] = self.fiber_tan
-        if self.fiber_helix is not None:
-            options['HELIX'] = self.fiber_helix
-        if self.fiber_trans is not None:
-            options['TRANS'] = self.fiber_trans
         
-        if len(options) > 0:
+        for k, f in self.fibers.items():
             dest.write(' ')
-            write_option_list(dest, options, newline=False)
+            f.write(dest, k)
+
         dest.write('\n')
 
+class Fiber:
+    TypeFiber1: str = 'fiber1'
+    TypeFiber2: str = 'fiber2'
+    TypeCir: str = 'cir'
+    TypeTan: str = 'tan'
+    TypeHelix: str = 'helix'
+    TypeTrans: str = 'trans'
+
+    def __init__(self, fib: np.array):
+        self.fiber = fib
+
+    def write(self, dest, inp_type):
+        ftype = None
+
+        if inp_type == Fiber.TypeFiber1:
+            ftype = "FIBER1"
+        elif inp_type == Fiber.TypeFiber2:
+            ftype = "FIBER2"
+        elif inp_type == Fiber.TypeCir:
+            ftype = "CIR"
+        elif inp_type == Fiber.TypeTan:
+            ftype = "TAN"
+        elif inp_type == Fiber.TypeHelix:
+            ftype = "HELIX"
+        elif inp_type == Fiber.TypeTrans:
+            ftype = "TRANS"
+        else:
+            raise ValueError('Unknown fiber type {0}'.format(inp_type))
+
+        write_option_list(dest, {
+            ftype: self.fiber
+        }, newline=False)
+    
+    @staticmethod
+    def get_fiber_type(fstr: str):
+        if fstr == 'FIBER1':
+            return Fiber.TypeFiber1
+        elif fstr == 'FIBER2':
+            return Fiber.TypeFiber2
+        elif fstr == 'CIR':
+            return Fiber.TypeCir
+        elif fstr == 'TAN':
+            return Fiber.TypeTan
+        elif fstr == 'HELIX':
+            return Fiber.TypeHelix
+        elif fstr == 'TRANS':
+            return Fiber.TypeTrans
+        else:
+            return None
+
+    @staticmethod
+    def parse_fibers(line: str) -> list:
+        fibs: list = {}
+        if 'FIBER1' in line:
+            fibs[Fiber.TypeFiber1] = Fiber(np.array([float(i) for i in read_option_item(line, 'FIBER1', num=3)[0]]))
+
+        if 'FIBER2' in line:
+            fibs[Fiber.TypeFiber2] = Fiber(np.array([float(i) for i in read_option_item(line, 'FIBER2', num=3)[0]]))
+
+        if 'CIR' in line:
+            fibs[Fiber.TypeCir] = Fiber(np.array([float(i) for i in read_option_item(line, 'CIR', num=3)[0]]))
+
+        if 'TAN' in line:
+            fibs[Fiber.TypeTan] = Fiber(np.array([float(i) for i in read_option_item(line, 'TAN', num=3)[0]]))
+
+        if 'HELIX' in line:
+            fibs[Fiber.TypeHelix] = Fiber(np.array([float(i) for i in read_option_item(line, 'HELIX', num=3)[0]]))
+
+        if 'TRANS' in line:
+            fibs[Fiber.TypeTrans] = Fiber(np.array([float(i) for i in read_option_item(line, 'TRANS', num=3)[0]]))
+
+        return fibs
 
 class Element:
     FieldTypeStructure: str = 'structure'
@@ -404,6 +452,7 @@ class Element:
         self.shape = shape
         self.nodes = nodes
         self.options = options if options is not None else OrderedDict()
+        self.fibers = {}
     
     def reset(self):
         self.id = None
@@ -429,7 +478,12 @@ class Element:
         options[self.shape] = [i.id for i in self.nodes]
         options.update(self.options)
 
-        write_option_list(dest, options)
+        write_option_list(dest, options, newline=False)
+
+        for f in self.fibers:
+            f.write(dest)
+
+        dest.write('\n')
 
 
     @staticmethod

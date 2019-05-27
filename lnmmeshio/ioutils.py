@@ -49,6 +49,40 @@ def read_option_item(line: str, option: str, num: int = 1):
     else:
         return [match.group(i) for i in range(2, num+2)], match.span(0)
 
+def read_next_key(line):
+    regex = re.compile(r'^[ ]*(\S+)\s*')
+
+    # split comment
+    line = line.split('//', 1)[0]
+
+    # read option
+    match = regex.search(line)
+
+    if not match:
+        return None, None
+    
+    # shorten line by parsed option
+    line = line[match.span(0)[1]:]
+    return line, match.group(1)
+
+def read_next_value(line, num: int = 1):
+    regex = re.compile('^[ ]*{0}\\s*'.format('[ ]+'.join(['([\\S]+)' for i in range(0, num)])))
+
+    # split comment
+    line = line.split('//', 1)[0]
+
+    # read option
+    match = regex.search(line)
+
+    if not match:
+        return None, None, None
+    
+    # shorten line by parsed option
+    line = line[match.span(0)[1]:]
+
+    return line, [match.group(i) for i in range(1, num+1)]
+
+
 def read_next_option(line: str, num: int = 1):
     regex = re.compile('^[ ]*(\\S+){0}\\s*'.format(num*'[ ]+([\\S]+)'))
 

@@ -6,7 +6,7 @@ import sys,os
 
 from meshio import Mesh, read as _meshioread, write as _meshiowrite
 from . import meshio_to_discretization
-from .discretization import Element, Discretization, Node
+from .discretization import Element, Discretization, Node, Fiber
 from . import ioutils
 
 import numpy as np

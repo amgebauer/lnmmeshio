@@ -63,8 +63,8 @@ class TestDat(unittest.TestCase):
             lnmmeshio.Node(np.array([0.0, 0.0, 1.0]))
         ]
         for i in range(0, 4):
-            d.nodes[i].fiber1 = np.array([1.0, 0.0, 0.0])
-            d.nodes[i].fiber2 = np.array([0.0, 1.0, 0.0])
+            d.nodes[i].fibers[lnmmeshio.Fiber.TypeFiber1] = lnmmeshio.Fiber(np.array([1.0, 0.0, 0.0]))
+            d.nodes[i].fibers[lnmmeshio.Fiber.TypeFiber2] = lnmmeshio.Fiber(np.array([0.0, 1.0, 0.0]))
         
         d.nodes[0].dpoint = [1]
 
@@ -103,8 +103,8 @@ class TestDat(unittest.TestCase):
         self.assertAlmostEqual(np.linalg.norm(d_new.nodes[3].coords-np.array([0, 0, 1])), 0.0)
 
         for i in range(0,4):
-            self.assertAlmostEqual(np.linalg.norm(d_new.nodes[i].fiber1-np.array([1, 0, 0])), 0.0)
-            self.assertAlmostEqual(np.linalg.norm(d_new.nodes[i].fiber2-np.array([0, 1, 0])), 0.0)
+            self.assertAlmostEqual(np.linalg.norm(d_new.nodes[i].fibers[lnmmeshio.Fiber.TypeFiber1].fiber-np.array([1, 0, 0])), 0.0)
+            self.assertAlmostEqual(np.linalg.norm(d_new.nodes[i].fibers[lnmmeshio.Fiber.TypeFiber2].fiber-np.array([0, 1, 0])), 0.0)
         
         self.assertListEqual(d_new.nodes[0].dpoint, [1])
         self.assertListEqual(d_new.nodes[1].dpoint, [])
