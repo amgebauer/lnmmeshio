@@ -16,11 +16,9 @@ cache:
     - venv/
 
 before_script:
-  - alias python=/home/gebauer/share/anaconda3/bin/python
-  - alias pip=/home/gebauer/share/anaconda3/bin/pip
-  - python -V # Print out python version for debugging
-  - pip install virtualenv
-  - virtualenv venv
+  - /home/gebauer/share/anaconda3/bin/python -V # Print out python version for debugging
+  - /home/gebauer/share/anaconda3/bin/pip install virtualenv
+  - /home/gebauer/share/anaconda3/bin/python -m virtualenv venv
   - source venv/bin/activate
   - pip install -r requirements.txt --index-url=https://pypi.python.org/simple/
 
