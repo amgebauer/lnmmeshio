@@ -24,4 +24,6 @@ before_script:
 
 test:
   script:
-  - python -m unittest discover test_meshio
+  - coverage run -m unittest discover test_meshio
+  - coverage report -m
+  coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
