@@ -33,6 +33,9 @@ class TestDat(unittest.TestCase):
         # read dat file
         mesh = lnmmeshio.read(os.path.join(script_dir, 'data', 'dummy.dat'))
 
+        if not os.path.isdir(os.path.join(script_dir, 'tmp')):
+            os.makedirs(os.path.join(script_dir, 'tmp'))
+
         # write same dat file
         lnmmeshio.write(os.path.join(script_dir, 'tmp', 'gen.dat'), mesh)
 
