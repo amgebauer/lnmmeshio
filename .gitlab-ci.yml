@@ -27,7 +27,7 @@ test:
   script:
   - coverage run -m unittest discover test_meshio
   - coverage html
-  - ll
+  - ls -lh
   - coverage report -m
   coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
 
