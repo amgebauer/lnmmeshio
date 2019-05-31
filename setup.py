@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='lnmmeshio',
-    version='2.1.0',
+    version='2.1.1',
     packages=['lnmmeshio',],
     license='unlicensed. All rights reserved.',
     long_description=open('README.md').read(),
