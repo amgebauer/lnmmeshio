@@ -2,7 +2,7 @@
 ![coverage](https://gitlab.lrz.de/lnm-heartgroup/meshio/badges/master/pipeline.svg)
 ![build](https://gitlab.lrz.de/lnm-heartgroup/meshio/badges/master/coverage.svg)
 
-Forked from https://github.com/nschloe/meshio with major adaptions by Martin Pfaller
+Forked from https://github.com/nschloe/meshio
 
 # Documentation
 

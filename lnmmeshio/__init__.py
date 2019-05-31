@@ -74,7 +74,6 @@ def write(filename: str, discretization: Discretization, file_format=None):
             discretization.write(f)
 
     else:
-        print('This branch is experimental. Please double check the result!')
         write_mesh(filename, meshio_to_discretization.discretization2mesh(discretization), file_format=file_format)
 
 def read_mesh(filename, file_format=None):
@@ -94,7 +93,6 @@ def read_mesh(filename, file_format=None):
 
     if is_baci:
         # this is a BACI file format
-        print('This branch is experimental. Please double check the result!')
         return meshio_to_discretization.discretization2mesh(read(filename, file_format=file_format))
     else:
         # this maybe is a file format supported by meshio

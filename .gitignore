@@ -4,3 +4,5 @@ venv
 test_meshio/tmp
 lnmmeshio.egg-info
 dist
+htmlcov
+.coverage
