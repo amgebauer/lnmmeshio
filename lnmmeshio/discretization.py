@@ -148,39 +148,43 @@ class Discretization:
 
         return topo
 
-    def get_nodes_by_dnode(self, dnode: int):
+    def get_nodes_by_dnode(self, dnodes: List[int]):
         nodes: list = []
 
         for n in self.nodes:
-            if dnode in n.dpoint:
-                nodes.append(n)
+            for dnode in dnodes:
+                if dnode in n.dpoint:
+                    nodes.append(n)
 
         return nodes
     
-    def get_nodes_by_dline(self, dline: int):
+    def get_nodes_by_dline(self, dlines: List[int]):
         nodes: list = []
 
         for n in self.nodes:
-            if dline in n.dline:
-                nodes.append(n)
+            for dline in dlines:
+                if dline in n.dline:
+                    nodes.append(n)
 
         return nodes
     
-    def get_nodes_by_dsurf(self, dsurf: int):
+    def get_nodes_by_dsurf(self, dsurfs: List[int]):
         nodes: list = []
 
         for n in self.nodes:
-            if dsurf in n.dsurf:
-                nodes.append(n)
+            for dsurf in dsurfs:
+                if dsurf in n.dsurf:
+                    nodes.append(n)
 
         return nodes
 
-    def get_nodes_by_dvol(self, dvol: int):
+    def get_nodes_by_dvol(self, dvols: List[int]):
         nodes: list = []
 
         for n in self.nodes:
-            if dvol in n.dvol:
-                nodes.append(n)
+            for dvol in dvols:
+                if dvol in n.dvol:
+                    nodes.append(n)
 
         return nodes
 
