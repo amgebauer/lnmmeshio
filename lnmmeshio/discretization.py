@@ -149,6 +149,9 @@ class Discretization:
         return topo
 
     def get_nodes_by_dnode(self, dnodes: List[int]):
+        if not hasattr(dnodes, '__iter__'):
+            dnodes = [dnodes]
+
         nodes: list = []
 
         for n in self.nodes:
@@ -159,6 +162,8 @@ class Discretization:
         return nodes
     
     def get_nodes_by_dline(self, dlines: List[int]):
+        if not hasattr(dlines, '__iter__'):
+            dlines = [dlines]
         nodes: list = []
 
         for n in self.nodes:
@@ -169,6 +174,8 @@ class Discretization:
         return nodes
     
     def get_nodes_by_dsurf(self, dsurfs: List[int]):
+        if not hasattr(dsurfs, '__iter__'):
+            dsurfs = [dsurfs]
         nodes: list = []
 
         for n in self.nodes:
@@ -179,6 +186,8 @@ class Discretization:
         return nodes
 
     def get_nodes_by_dvol(self, dvols: List[int]):
+        if not hasattr(dvols, '__iter__'):
+            dvols = [dvols]
         nodes: list = []
 
         for n in self.nodes:
