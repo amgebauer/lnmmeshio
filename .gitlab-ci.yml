@@ -36,7 +36,7 @@ pages:
   dependencies:
     - test
   script:
-    - coverage run -m unittest discover test_meshio
+    - coverage run --source=lnmmeshio -m unittest discover test_meshio
     - coverage html
     - mv htmlcov/ public/
   artifacts:

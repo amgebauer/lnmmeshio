@@ -148,6 +148,42 @@ class Discretization:
 
         return topo
 
+    def get_nodes_by_dnode(self, dnode: int):
+        nodes: list = []
+
+        for n in self.nodes:
+            if dnode in n.dpoint:
+                nodes.append(n)
+
+        return nodes
+    
+    def get_nodes_by_dline(self, dline: int):
+        nodes: list = []
+
+        for n in self.nodes:
+            if dline in n.dline:
+                nodes.append(n)
+
+        return nodes
+    
+    def get_nodes_by_dsurf(self, dsurf: int):
+        nodes: list = []
+
+        for n in self.nodes:
+            if dsurf in n.dsurf:
+                nodes.append(n)
+
+        return nodes
+
+    def get_nodes_by_dvol(self, dvol: int):
+        nodes: list = []
+
+        for n in self.nodes:
+            if dvol in n.dvol:
+                nodes.append(n)
+
+        return nodes
+
     @staticmethod
     def read(sections: Dict[str, List[str]]) -> 'Discretization':
         disc = Discretization()
@@ -321,6 +357,7 @@ class Discretization:
             
         
         return eles
+
 
 class Node:
 
