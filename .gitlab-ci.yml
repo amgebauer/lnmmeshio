@@ -34,7 +34,7 @@ pages:
   dependencies:
     - test
   script:
-    -nv htmlcov/ public/
+    - mv htmlcov/ public/
   artifacts:
     paths:
       - public
