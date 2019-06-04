@@ -11,7 +11,11 @@ from . import ioutils
 
 import numpy as np
 
-def _is_baci(filename, file_format=None) -> bool:
+__TYPE_BACI = 1
+__TYPE_CASE = 2
+__TYPE_OTHER = 0
+
+def _get_type(filename, file_format=None) -> bool:
     if not file_format:
         # deduct file format from extension
         _, extension = os.path.splitext(filename)
@@ -36,12 +40,15 @@ def read(filename, file_format=None):
     """
     assert isinstance(filename, str)
 
-    is_baci: bool = _is_baci(filename, file_format=file_format)
+    ftype: int = _get_type(filename, file_format=file_format)
 
-    if is_baci:
+    if ftype == __TYPE_BACI:
         # this is a BACI file format
         with open(filename, 'r') as f:
             return read_baci(f)
+    elif ftype == __TYPE_CASE:
+        # this is ensight gold file format
+        raise NotImplementedError('Case file reading is not implemented yet')
     else:
         # this maybe is a file format supported by meshio
         return meshio_to_discretization.mesh2Discretization(
@@ -66,13 +73,15 @@ def write(filename: str, discretization: Discretization, file_format=None):
     """
     assert isinstance(filename, str)
 
-    is_baci: bool = _is_baci(filename, file_format=file_format)
+    ftype: int = _get_type(filename, file_format=file_format)
 
-    if is_baci:
+    if ftype == __TYPE_BACI:
         # this is a BACI file format
         with open(filename, 'w') as f:
             discretization.write(f)
-
+    elif ftype == __TYPE_CASE:
+        # this is ensight gold file format
+        raise NotImplementedError('Case file writing is not implemented yet')
     else:
         write_mesh(filename, meshio_to_discretization.discretization2mesh(discretization), file_format=file_format)
 
@@ -89,11 +98,14 @@ def read_mesh(filename, file_format=None):
     """
     assert isinstance(filename, str)
 
-    is_baci: bool = _is_baci(filename, file_format=file_format)
+    ftype: int = _get_type(filename, file_format=file_format)
 
-    if is_baci:
+    if ftype == __TYPE_BACI:
         # this is a BACI file format
         return meshio_to_discretization.discretization2mesh(read(filename, file_format=file_format))
+    elif ftype == __TYPE_CASE:
+        # this is ensight gold file format
+        raise NotImplementedError('Case file reading into mesh is not implemented yet')
     else:
         # this maybe is a file format supported by meshio
         return _meshioread(filename, file_format=file_format)
@@ -109,11 +121,13 @@ def write_mesh(filename, mesh, file_format=None, **kwargs):
     """
     assert isinstance(filename, str)
 
-    is_baci: bool = _is_baci(filename, file_format=file_format)
+    ftype: int = _get_type(filename, file_format=file_format)
 
-    if is_baci:
+    if ftype == __TYPE_BACI:
         write(filename, meshio_to_discretization.mesh2Discretization(mesh), file_format=file_format)
-
+    elif ftype == __TYPE_CASE:
+        # this is ensight gold file format
+        raise NotImplementedError('Case file writing into mesh is not implemented yet')
     else:
         _meshiowrite(filename, mesh, file_format, **kwargs)
 

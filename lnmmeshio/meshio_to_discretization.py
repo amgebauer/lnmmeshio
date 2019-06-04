@@ -99,9 +99,14 @@ def mesh2Discretization(mesh: meshio.Mesh) -> Discretization:
     # node_sets -> are stored in disc.nodes
 
     # create Nodes from points
-    for coord in mesh.points:
+    for i, coord in enumerate(mesh.points):
+        n = Node(coord)
+
+        for key, v in mesh.point_data.items():
+            n.data[key] = v[i]
+
         disc.nodes.append(
-            Node(coord)
+            n
         )
 
     # get the maximum element dimension, which is the dimension of the mesh
@@ -142,6 +147,11 @@ def mesh2Discretization(mesh: meshio.Mesh) -> Discretization:
                 matid: int = _get_id_from_cell_data(mesh.cell_data[celltype])[cellindex]
                 ele.options['MAT'] = matid
 
+                # extract cell data
+                for key, value in mesh.cell_data[celltype].items():
+                    ele.data[key] = value[cellindex]
+
+
             else:
                 # this is a lower-dimensional element
                 # treat as surface-, line- or point-nodeset definition
@@ -161,13 +171,28 @@ def mesh2Discretization(mesh: meshio.Mesh) -> Discretization:
                             node.dsurf.append(nsid)
             
             cellindex += 1
-    
+
+
+
+    # copy element data
+    for celltype, cells in mesh.cells.items():
+        pass
     return disc
 
 def discretization2mesh(dis: Discretization) -> meshio.Mesh:
     dis.compute_ids(zero_based=True)
 
     points = dis.get_node_coords()
+
+    point_data = {}
+
+    for i, n in enumerate(dis.nodes):
+
+        for k, v in n.data.items():
+            if k not in point_data:
+                point_data[k] = np.zeros(tuple([len(dis.nodes)]+list(v.shape)))
+            
+            point_data[k][i] = v
 
     cells = {}
     cell_data = {}
@@ -182,6 +207,12 @@ def discretization2mesh(dis: Discretization) -> meshio.Mesh:
                     name: np.zeros((0), dtype=int) for name in _cell_data_id_names
                 }
             cells[celltype] = np.append(cells[celltype], ele.get_node_ids().reshape((1,-1)), axis=0)
+
+            for key, value in ele.data:
+                if key not in cell_data[celltype]:
+                    cell_data[celltype][key] = value.reshape(tuple([1]+list(value.shape)))
+                else:
+                    cell_data[celltype][key] = np.append(cell_data[celltype][key], value.reshape(tuple([1]+list(value.shape))), axis=0)
 
             # store material id
             if 'MAT' in ele.options:
@@ -293,7 +324,7 @@ def discretization2mesh(dis: Discretization) -> meshio.Mesh:
                 cell_data['vertex'][name] = np.append(cell_data[celltype][name], dp)
 
 
-    mesh: meshio.Mesh = meshio.Mesh(points, cells, cell_data=cell_data)
+    mesh: meshio.Mesh = meshio.Mesh(points, cells, cell_data=cell_data, point_data=point_data)
 
     dis.reset()
 

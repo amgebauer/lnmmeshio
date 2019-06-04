@@ -382,6 +382,7 @@ class Node:
         self.dline = []
         self.dsurf = []
         self.dvol = []
+        self.data = {}
     
     def reset(self):
         self.id = None
@@ -503,6 +504,7 @@ class Element:
         self.nodes = nodes
         self.options = options if options is not None else OrderedDict()
         self.fibers = {}
+        self.data = {}
     
     def reset(self):
         self.id = None
