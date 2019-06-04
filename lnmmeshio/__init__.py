@@ -8,6 +8,7 @@ from meshio import Mesh, read as _meshioread, write as _meshiowrite
 from . import meshio_to_discretization
 from .discretization import Element, Discretization, Node, Fiber
 from . import ioutils
+from . import ensightio
 
 import numpy as np
 
@@ -21,11 +22,15 @@ def _get_type(filename, file_format=None) -> bool:
         _, extension = os.path.splitext(filename)
 
         if extension == '.dat' or extension == '.dis':
-            return True
+            return __TYPE_BACI
+        elif extension == '.case':
+            return __TYPE_CASE
     elif file_format == 'dat' or file_format == 'dis':
-        return True
+        return __TYPE_BACI
+    elif file_format == 'case' or file_format == 'ensight':
+        return __TYPE_CASE
     
-    return False
+    return __TYPE_OTHER
 
 def read(filename, file_format=None):
     """
@@ -81,7 +86,7 @@ def write(filename: str, discretization: Discretization, file_format=None):
             discretization.write(f)
     elif ftype == __TYPE_CASE:
         # this is ensight gold file format
-        raise NotImplementedError('Case file writing is not implemented yet')
+        ensightio.write_case(filename, discretization)
     else:
         write_mesh(filename, meshio_to_discretization.discretization2mesh(discretization), file_format=file_format)
 

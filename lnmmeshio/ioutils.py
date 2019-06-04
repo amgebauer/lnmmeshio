@@ -1,5 +1,7 @@
 from collections import OrderedDict
 import re
+import numpy as np
+import struct
 
 def read_dat_sections(origin):
     """
@@ -149,3 +151,52 @@ def write_option_list(dest, list: OrderedDict, newline=True):
 
 def write_comment(dest, comment, newline = True):
     dest.write('// {0}{1}'.format(comment, '\n' if newline else ''))
+
+def ens_write_floats(file_handle, arr: np.array, binary=True):
+    """reads array of length floats"""
+    if binary:
+        np.ravel(arr, 'F').astype('<f').tofile(file_handle)
+    else:
+        for f in np.ravel(arr, 'F').astype('<f'):
+            ens_write_float(file_handle, f, binary)
+
+def ens_write_ints(file_handle, arr: np.array, binary=True):
+    if binary:
+        np.ravel(arr).astype('<i').tofile(file_handle)
+    else:
+        if len(arr.shape) == 2:
+            for i in range(arr.shape[0]):
+                for j in range(arr.shape[1]):
+                    ens_write_int(file_handle, int(arr[i,j]), binary=binary, newline=False)
+                ens_write_string(file_handle, '', False)
+        else:
+            for i in np.ravel(arr, 'F').astype('<i'):
+                ens_write_int(file_handle, i, binary=binary)
+
+def ens_write_int(file_handle, i, binary=True, newline=True):
+    if binary:
+        file_handle.write(struct.pack("i",i))
+    else:
+        s = str(i)
+        file_handle.write(" "*(10-len(s))+s+'{0}'.format('\n' if newline else ''))
+
+def ens_write_float(file_handle, v, binary=True):
+    if binary:
+        file_handle.write(struct.pack("f",v))
+    else:
+        if v >= 0:
+            file_handle.write(" ")
+        file_handle.write("{0:10.5e}\n".format(v))
+
+
+def ens_write_string(file_handle, s, binary=True):
+    ws = ''
+
+    if binary:
+        ws = s[:80]
+        ws = s + '\0'*(80-len(s))
+        ws = ws.encode('ascii')
+    else:
+        ws = s+'\n'
+    
+    file_handle.write(ws)
