@@ -158,6 +158,7 @@ class Discretization:
             for dnode in dnodes:
                 if dnode in n.dpoint:
                     nodes.append(n)
+                    break
 
         return nodes
     
@@ -170,6 +171,7 @@ class Discretization:
             for dline in dlines:
                 if dline in n.dline:
                     nodes.append(n)
+                    break
 
         return nodes
     
@@ -182,6 +184,7 @@ class Discretization:
             for dsurf in dsurfs:
                 if dsurf in n.dsurf:
                     nodes.append(n)
+                    break
 
         return nodes
 
@@ -194,6 +197,7 @@ class Discretization:
             for dvol in dvols:
                 if dvol in n.dvol:
                     nodes.append(n)
+                    break
 
         return nodes
 
