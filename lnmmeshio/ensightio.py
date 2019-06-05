@@ -186,7 +186,7 @@ def write_geometry(fstream, dis: Discretization, binary=True):
     io.ens_write_int(fstream, 1, binary=binary)
     io.ens_write_string(fstream, 'field', binary=binary)
     io.ens_write_string(fstream, 'coordinates', binary=binary)
-    io.ens_write_int(fstream, len(dis.nodes))
+    io.ens_write_int(fstream, len(dis.nodes), binary=binary)
     io.ens_write_ints(fstream, np.array([n.id for n in dis.nodes]), binary=binary)
     io.ens_write_floats(fstream, dis.get_node_coords(), binary=binary)
 
