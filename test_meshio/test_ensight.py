@@ -4,6 +4,7 @@ import os
 import filecmp
 import io
 import numpy as np
+import shutil
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
  
@@ -11,9 +12,13 @@ class TestEnsight(unittest.TestCase):
  
     def setUp(self):
         pass
+    
+    def tearDown(self):
+        # delete tmp folder
+        shutil.rmtree(os.path.join(script_dir, 'tmp'))
  
     def test_write_ensight(self):
-        dis: lnmmeshio.Discretization = lnmmeshio.read(os.path.join(script_dir, 'data', 'dummy2.dat'))
+        dis: lnmmeshio.Discretization = lnmmeshio.read(os.path.join(script_dir, 'data', 'dummy.dat'))
         dis.compute_ids()
 
         for elelist in dis.elements.values():
@@ -25,3 +30,5 @@ class TestEnsight(unittest.TestCase):
 
         # write ensight
         lnmmeshio.write(os.path.join(script_dir, 'tmp', 'ensight.case'), dis)
+
+        # how to check?

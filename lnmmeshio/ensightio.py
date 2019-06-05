@@ -68,7 +68,7 @@ def write_case(filename, dis: Discretization, binary=True):
                     for elt, eltc in ele_count.items():
                         ele_vars[varname][elt] = np.zeros(tuple([eltc]+list(data.shape)), dtype=data.dtype)
                 
-                ele_vars[varname][elt][ele_cur_count[eletype]] = data
+                ele_vars[varname][eletype][ele_cur_count[eletype]] = data
             
             ele_cur_count[eletype] += 1
 
