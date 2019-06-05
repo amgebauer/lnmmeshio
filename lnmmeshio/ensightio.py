@@ -63,6 +63,10 @@ def write_case(filename, dis: Discretization, binary=True):
 
             for varname, data in ele.data.items():
 
+                data = np.array(data)
+                if len(data.shape) == 0:
+                    data = data.reshape((1))
+                    
                 if varname not in ele_vars:
                     ele_vars[varname] = {}
                     for elt, eltc in ele_count.items():
@@ -88,6 +92,10 @@ def write_case(filename, dis: Discretization, binary=True):
     nodal_vars = {}
     for i, node in enumerate(dis.nodes):
         for varname, data in node.data.items():
+            # ensure that data is a np array
+            data = np.array(data)
+            if len(data.shape) == 0:
+                data = data.reshape((1))
             if varname not in nodal_vars:
                 nodal_vars[varname] = np.zeros(tuple([len(dis.nodes)]+list(data.shape)), dtype=data.dtype)
             
