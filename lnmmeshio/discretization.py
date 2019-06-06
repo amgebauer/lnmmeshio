@@ -497,7 +497,8 @@ class Element:
     ElementFaces: dict = {
         'HEX8': [[0, 1, 2, 3], [0, 1, 5, 4], [1, 2, 6, 5], [2, 3, 7, 6], [3, 0, 4, 7], [4, 5, 6, 7]],
         'TET4': [[0, 1, 3], [1, 2, 3], [2, 0, 3], [0, 2, 1]],
-        'TET10': [[0, 1, 3, 4, 8, 7], [1, 2, 3, 5, 9, 8], [2, 0, 3, 6, 7, 9], [0, 2, 1, 6, 5, 4]]
+        'TET10': [[0, 1, 3, 4, 8, 7], [1, 2, 3, 5, 9, 8], [2, 0, 3, 6, 7, 9], [0, 2, 1, 6, 5, 4]],
+        'TRI3': []
     }
 
     def __init__(self, el_type: str, shape: str, nodes: List[Node],
@@ -541,6 +542,16 @@ class Element:
 
         dest.write('\n')
 
+    def get_faces(self):
+        flist = []
+
+        if self.shape not in self.ElementFaces:
+            raise('This element is not implemented')
+
+        for f in self.ElementFaces[self.shape]:
+            flist.append([self.nodes[i] for i in f])
+
+        return flist
 
     @staticmethod
     def get_num_nodes(shape: str):
