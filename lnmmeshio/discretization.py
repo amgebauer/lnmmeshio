@@ -537,8 +537,9 @@ class Element:
 
         write_option_list(dest, options, newline=False)
 
-        for f in self.fibers:
-            f.write(dest)
+        for t, f in self.fibers.items():
+            dest.write(' ')
+            f.write(dest, t)
 
         dest.write('\n')
 
