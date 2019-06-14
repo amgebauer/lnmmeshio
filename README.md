@@ -10,22 +10,17 @@ Does only read the discretization and currently completely ignores all other sec
 
 lnmmeshio is currently only tested with STRUCTURE elements
 
-Read mesh into our Discretization format
+Read/write a mesh into/from the Discretization class
 ```
 import lnmmeshio
 
-lnmmeshio.read('pathtofile.ext')
-```
+# tested formats are Gmsh and .dat (only the discretization, all other sections are discarded)
+dis = lnmmeshio.read('pathtofile.ext')
 
-Write into any format
+# do what ever you want with dis (like add options to the elements or sth like that)
 
-```
-import lnmmeshio
-
-dis: lnmmeshio.Discretization = lnmmeshio.Discretization()
-# create discretization
-# ...
-
+# write discretization into an arbitrary format
+# the only format that is tested is .dat
 lnmmeshio.write('pathtofile.ext', dis)
 ```
 
@@ -36,10 +31,12 @@ See https://github.com/nschloe/meshio
 
 * Make your changes and test changes.
 * Adapt version number in `setup.py`
-* Push changes to Gitlab and set Tag to version number
+* Create a feature branch (best reference it with corresponding issue)
+* Create a merge request from feature branch
+* Push changes to Gitlab and wait for the pipeline to pass
+* ask the merge into master
 * Create release using `python setup.py sdist`
 * Copy the newly created .tar.gz file in the PyPI directory
-
 
 # ToDo
 
