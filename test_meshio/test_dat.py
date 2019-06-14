@@ -41,7 +41,7 @@ class TestDat(unittest.TestCase):
 
         # check, whether both files are identical
         self.assertTrue(filecmp.cmp(os.path.join(script_dir, 'data', 'dummy.dat'),
-            os.path.join(script_dir, 'tmp', 'gen.dat')))
+            os.path.join((script_dir), 'tmp', 'gen.dat')))
 
     def test_read_new(self):
         # read discretization

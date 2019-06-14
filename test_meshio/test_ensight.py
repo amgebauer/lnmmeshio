@@ -19,7 +19,7 @@ class TestEnsight(unittest.TestCase):
  
     def test_write_ensight(self):
         dis: lnmmeshio.Discretization = lnmmeshio.read(os.path.join(script_dir, 'data', 'dummy.dat'))
-        dis.compute_ids()
+        dis.compute_ids(zero_based=False)
 
         for elelist in dis.elements.values():
             for ele in elelist:

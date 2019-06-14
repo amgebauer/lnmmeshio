@@ -5,14 +5,26 @@ from .ioutils import write_title, write_option_list, write_option, read_option_i
 from collections import OrderedDict
 import re
 
-
+"""
+This class holds the discretization, consisting out of nodes and elements. The nodes and
+elements itself hold their data (coords, element type, ...)
+"""
 class Discretization:
 
+    """
+    Initialize Discretization class with empty nodes and zero elements
+    """
     def __init__(self):
         self.nodes = []
         self.elements = {}
     
-    def compute_ids(self, zero_based: bool = False):
+    """
+    Computes the ids of the elements and nodes. 
+
+    Args:
+        zero_based: If true, the first node id is 0, otherwise 1
+    """
+    def compute_ids(self, zero_based: bool):
         
         id: int = 0 if zero_based else 1
         for node in self.nodes:
@@ -25,6 +37,9 @@ class Discretization:
                 ele.id = id
                 id += 1
     
+    """
+    Resets the computed ids
+    """
     def reset(self):
         for node in self.nodes:
             node.reset()
@@ -33,6 +48,9 @@ class Discretization:
             for ele in ele_i:
                 ele.reset()
 
+    """
+    Returns an np.array((num_node, 3)) with the coordinates of each node
+    """
     def get_node_coords(self):
         arr: np.array = np.zeros((len(self.nodes), 3))
 
@@ -43,9 +61,15 @@ class Discretization:
         
         return arr
 
+    """
+    Writes the discretization related sections into the stream variable dest
+
+    Args:
+        dest: stream variable (could for example be: with open('file.dat', 'w') as dest: ...)
+    """
     def write(self, dest):
 
-        self.compute_ids()
+        self.compute_ids(zero_based=False)
 
         # write problem size
         num_ele = 0
@@ -129,6 +153,15 @@ class Discretization:
         
         write_title(dest, 'END')
 
+    """
+    Returns the node topology of a specific type (dpoint, dline, dsurf, dvol).
+
+    Args:
+        topotype: Type of the topology (dpoint, dline, dsurf, dvol)
+    
+    Returns:
+        Dictionary with nodeset as id and list of node ids as value
+    """
     def get_topology(self, topotype: str):
         topo = {}
         for node in self.nodes:
@@ -148,6 +181,15 @@ class Discretization:
 
         return topo
 
+    """
+    Returns all nodes that belong to one of the dpoint nodesets defined in dnodes
+
+    Args:
+        dnodes: single integer or List of integer of nodeset ids
+    
+    Returns:
+        List of nodes
+    """
     def get_nodes_by_dnode(self, dnodes: List[int]):
         if not hasattr(dnodes, '__iter__'):
             dnodes = [dnodes]
@@ -162,6 +204,15 @@ class Discretization:
 
         return nodes
     
+    """
+    Returns all nodes that belong to one of the dline nodesets defined in dlines
+
+    Args:
+        dlines: single integer or List of integer of nodeset ids
+    
+    Returns:
+        List of nodes
+    """
     def get_nodes_by_dline(self, dlines: List[int]):
         if not hasattr(dlines, '__iter__'):
             dlines = [dlines]
@@ -175,6 +226,15 @@ class Discretization:
 
         return nodes
     
+    """
+    Returns all nodes that belong to one of the dsurf nodesets defined in dsurfs
+
+    Args:
+        dsurfs: single integer or List of integer of nodeset ids
+    
+    Returns:
+        List of nodes
+    """
     def get_nodes_by_dsurf(self, dsurfs: List[int]):
         if not hasattr(dsurfs, '__iter__'):
             dsurfs = [dsurfs]
@@ -188,6 +248,15 @@ class Discretization:
 
         return nodes
 
+    """
+    Returns all nodes that belong to one of the dvol nodesets defined in dvols
+
+    Args:
+        dvols: single integer or List of integer of nodeset ids
+    
+    Returns:
+        List of nodes
+    """
     def get_nodes_by_dvol(self, dvols: List[int]):
         if not hasattr(dvols, '__iter__'):
             dvols = [dvols]
@@ -201,6 +270,15 @@ class Discretization:
 
         return nodes
 
+    """
+    Static method that creates the discretizations file from the input lines of a .dat file
+
+    Args:
+        sections: Dictionary with header titles as keys and list of lines as value
+    
+    Retuns:
+        Discretization object
+    """
     @staticmethod
     def read(sections: Dict[str, List[str]]) -> 'Discretization':
         disc = Discretization()
@@ -322,6 +400,16 @@ class Discretization:
 
         return disc
     
+    """
+    Static method that reads the list of elements
+
+    Args:
+        nodes: List of nodes (order is important: first node in list must be the one with id 1)
+        lines: List of string that represent the lines of the corresponding element section
+    
+    Returns:
+        List of elements
+    """
     @staticmethod
     def read_elements(nodes: List['Node'], lines: List[str]):
         eles = []
@@ -375,9 +463,17 @@ class Discretization:
         
         return eles
 
-
+"""
+Class that holds all information of nodes like coords, fibers, nodesets (and additional data)
+"""
 class Node:
 
+    """
+    Initialize node at the coordinades coords
+
+    Args:
+        coords: np.array((3)) Coordinates of the node
+    """
     def __init__(self, coords: np.array = np.zeros((3))):
         self.id = None
         self.coords: np.array = coords
@@ -388,9 +484,18 @@ class Node:
         self.dvol = []
         self.data = {}
     
+    """
+    Sets the id to None
+    """
     def reset(self):
         self.id = None
     
+    """
+    Writes the corresponding line in to the stream variable
+
+    Args:
+        dest: stream variable where to write the line
+    """
     def write(self, dest):
         if len(self.fibers) > 0:
             dest.write('FNODE')
@@ -408,17 +513,34 @@ class Node:
 
         dest.write('\n')
 
+
+"""
+Class that holds all information of fibers
+"""
 class Fiber:
+    # defintion of different fibers (add if more are necessary)
     TypeFiber1: str = 'fiber1'
     TypeFiber2: str = 'fiber2'
     TypeCir: str = 'cir'
     TypeTan: str = 'tan'
-    TypeHelix: str = 'helix'
-    TypeTrans: str = 'trans'
 
+
+    """
+    Initialize fiber vector in direction of fib
+
+    Args:
+        fib: Unit vector pointing in fiber direction np.array((3))
+    """
     def __init__(self, fib: np.array):
         self.fiber = fib
 
+    """
+    Writes the corresponding section in the dat file into the stream type variable dest
+
+    Args:
+        dest: stream variable where to write the fiber
+        inp_type: type of fiber (defined as static variable)
+    """
     def write(self, dest, inp_type):
         ftype = None
 
@@ -430,10 +552,6 @@ class Fiber:
             ftype = "CIR"
         elif inp_type == Fiber.TypeTan:
             ftype = "TAN"
-        elif inp_type == Fiber.TypeHelix:
-            ftype = "HELIX"
-        elif inp_type == Fiber.TypeTrans:
-            ftype = "TRANS"
         else:
             raise ValueError('Unknown fiber type {0}'.format(inp_type))
 
@@ -441,6 +559,15 @@ class Fiber:
             ftype: self.fiber
         }, newline=False)
     
+    """
+    Returns the corresponding fiber type enum from the definition in the dat file
+
+    Args:
+        fstr: Fiber name as defined in the dat file
+    
+    Returns:
+        Fiber enum as defined on top of the class
+    """
     @staticmethod
     def get_fiber_type(fstr: str):
         if fstr == 'FIBER1':
@@ -451,16 +578,21 @@ class Fiber:
             return Fiber.TypeCir
         elif fstr == 'TAN':
             return Fiber.TypeTan
-        elif fstr == 'HELIX':
-            return Fiber.TypeHelix
-        elif fstr == 'TRANS':
-            return Fiber.TypeTrans
         else:
             return None
 
+    """
+    Parses the fibers from the line and returns a dict of fiber objects
+
+    Args:
+        line: String of the line
+    
+    Returns:
+        dict with fiber type as key and fiber object as value
+    """
     @staticmethod
-    def parse_fibers(line: str) -> list:
-        fibs: list = {}
+    def parse_fibers(line: str) -> dict:
+        fibs: dict = {}
         if 'FIBER1' in line:
             fibs[Fiber.TypeFiber1] = Fiber(np.array([float(i) for i in read_option_item(line, 'FIBER1', num=3)[0]]))
 
@@ -473,14 +605,11 @@ class Fiber:
         if 'TAN' in line:
             fibs[Fiber.TypeTan] = Fiber(np.array([float(i) for i in read_option_item(line, 'TAN', num=3)[0]]))
 
-        if 'HELIX' in line:
-            fibs[Fiber.TypeHelix] = Fiber(np.array([float(i) for i in read_option_item(line, 'HELIX', num=3)[0]]))
-
-        if 'TRANS' in line:
-            fibs[Fiber.TypeTrans] = Fiber(np.array([float(i) for i in read_option_item(line, 'TRANS', num=3)[0]]))
-
         return fibs
 
+"""
+Class holding the data of one element
+"""
 class Element:
     FieldTypeStructure: str = 'structure'
     FieldTypeFluid: str = 'fluid'
@@ -501,6 +630,14 @@ class Element:
         'TRI3': []
     }
 
+    """
+    Creates a new element of type ele_type, shape with nodes defined in nodes
+
+    Args:
+        el_type: str of element type as used by BACI (e.g. SOHEX8)
+        shape: shape of the element as used by BACI (e.g. HEX8)
+        nodes: List of node objects
+    """
     def __init__(self, el_type: str, shape: str, nodes: List[Node],
             options: OrderedDict = None):
         self.id = None
@@ -511,9 +648,18 @@ class Element:
         self.fibers = {}
         self.data = {}
     
+    """
+    Sets the element id to None
+    """
     def reset(self):
         self.id = None
     
+    """
+    Returns the node ids as of each element as a numpy array of shape (num_ele, num_nod_per_ele)
+
+    Returns:
+        np.array with node ids of each element
+    """
     def get_node_ids(self):
         arr: np.array = np.zeros((len(self.nodes)), dtype=int)
 
@@ -525,6 +671,9 @@ class Element:
         return arr
 
     
+    """
+    Write the corresponding element line in the dat file
+    """
     def write(self, dest):
         if self.id is None:
             raise RuntimeError('You have to compute ids before writing')
@@ -537,11 +686,18 @@ class Element:
 
         write_option_list(dest, options, newline=False)
 
-        for f in self.fibers:
-            f.write(dest)
+        for t, f in self.fibers.items():
+            dest.write(' ')
+            f.write(dest, t)
 
         dest.write('\n')
 
+    """
+    Returns a list of the Faces of the element (The faces are a list of nodes)
+
+    Returns:
+        List[List[Node]] List of faces in baci order
+    """
     def get_faces(self):
         flist = []
 
@@ -553,6 +709,15 @@ class Element:
 
         return flist
 
+    """
+    Returns the number of nodes from the shapes
+
+    Args:
+        shape: shape as used in baci .dat file format
+    
+    Returngs:
+        int: number of nodes
+    """
     @staticmethod
     def get_num_nodes(shape: str):
         shape_dict = {
