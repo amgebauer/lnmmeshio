@@ -69,7 +69,7 @@ class Discretization:
     """
     def write(self, dest):
 
-        self.compute_ids(zero_based=True)
+        self.compute_ids(zero_based=False)
 
         # write problem size
         num_ele = 0

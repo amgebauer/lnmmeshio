@@ -30,8 +30,8 @@ class TestMeshio2Discretization(unittest.TestCase):
             lnmmeshio.meshio_to_discretization.discretization2mesh(dis)
         )
 
-        dis.compute_ids()
-        dis2.compute_ids()
+        dis.compute_ids(zero_based=True)
+        dis2.compute_ids(zero_based=True)
 
         # compare whether both discretizations are the same
         self.assertEqual(len(dis.nodes), len(dis2.nodes))
