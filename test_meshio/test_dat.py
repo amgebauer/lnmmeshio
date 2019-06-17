@@ -48,8 +48,8 @@ class TestDat(unittest.TestCase):
         disc = lnmmeshio.read(os.path.join(script_dir, 'data', 'dummy.dat'))
 
         self.assertEqual(len(disc.nodes), 224)
-        self.assertEqual(len(disc.elements[lnmmeshio.Element.FieldTypeStructure]), 89)
-        self.assertEqual(len(disc.elements[lnmmeshio.Element.FieldTypeTransport]), 0)
+        self.assertEqual(len(disc.elements.structure), 89)
+        self.assertEqual(len(disc.elements.transport), 0)
 
         self.assertListEqual(disc.nodes[0].dsurf, [1, 13])
         self.assertListEqual(disc.nodes[47].dsurf, [9])
@@ -83,10 +83,10 @@ class TestDat(unittest.TestCase):
         for i in range(0, 4):
             d.nodes[i].dvol = [1]
 
-        d.elements[lnmmeshio.Element.FieldTypeStructure] = [
+        d.elements.structure = [
             lnmmeshio.Element('SOLIDT4SCATRA', 'TET4', d.nodes)
         ]
-        d.elements[lnmmeshio.Element.FieldTypeStructure][0].options = {
+        d.elements.structure[0].options = {
             'MAT': 1, 'KINEM': 'nonlinear', 'TYPE': 'Std'
         }
 
@@ -98,7 +98,7 @@ class TestDat(unittest.TestCase):
         d_new = lnmmeshio.read_baci(dummy_file)
 
         self.assertEqual(len(d_new.nodes), 4)
-        self.assertEqual(len(d_new.elements[lnmmeshio.Element.FieldTypeStructure]), 1)
+        self.assertEqual(len(d_new.elements.structure), 1)
 
         self.assertAlmostEqual(np.linalg.norm(d_new.nodes[0].coords-np.array([0, 0, 0])), 0.0)
         self.assertAlmostEqual(np.linalg.norm(d_new.nodes[1].coords-np.array([1, 0, 0])), 0.0)
@@ -131,27 +131,27 @@ class TestDat(unittest.TestCase):
 
         
         self.assertEqual(
-            d_new.elements[lnmmeshio.Element.FieldTypeStructure][0].type,
+            d_new.elements.structure[0].type,
             'SOLIDT4SCATRA'
         )
         self.assertEqual(
-            d_new.elements[lnmmeshio.Element.FieldTypeStructure][0].shape,
+            d_new.elements.structure[0].shape,
             'TET4'
         )
         self.assertListEqual(
-            d_new.elements[lnmmeshio.Element.FieldTypeStructure][0].nodes,
+            d_new.elements.structure[0].nodes,
             d_new.nodes
         )
         self.assertListEqual(
-            d_new.elements[lnmmeshio.Element.FieldTypeStructure][0].options['MAT'],
+            d_new.elements.structure[0].options['MAT'],
             ['1']
         )
         self.assertListEqual(
-            d_new.elements[lnmmeshio.Element.FieldTypeStructure][0].options['KINEM'],
+            d_new.elements.structure[0].options['KINEM'],
             ['nonlinear']
         )
         self.assertListEqual(
-            d_new.elements[lnmmeshio.Element.FieldTypeStructure][0].options['TYPE'],
+            d_new.elements.structure[0].options['TYPE'],
             ['Std']
         )
 

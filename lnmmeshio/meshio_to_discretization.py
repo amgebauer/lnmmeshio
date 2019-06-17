@@ -8,6 +8,11 @@ import numpy as np
 import meshio
 from .discretization import Element, Discretization, Node
 from progress.bar import Bar
+from .element.line2 import Line2
+from .element.line3 import Line3
+from .element.tri3 import Tri3
+from .element.tri6 import Tri6
+from .element.quad4 import Quad4
 
 cell_nodes = {
     'line': 2,
@@ -114,7 +119,7 @@ def mesh2Discretization(mesh: meshio.Mesh) -> Discretization:
     maxdim = max([cell_to_dim[celltype] for celltype in mesh.cells.keys()])
     
     # create Elements from cells
-    disc.elements[Element.FieldTypeStructure] = []
+    disc.elements.structure = []
     for celltype, cells in mesh.cells.items():
 
         if celltype not in cell_nodes:
@@ -142,7 +147,7 @@ def mesh2Discretization(mesh: meshio.Mesh) -> Discretization:
                     # also need to reorder nodes in a few element types
                     [nodes[i] for i in ele_node_order_vtk2baci[cell_disc_shape[celltype]]]
                 )
-                disc.elements[Element.FieldTypeStructure].append(ele)
+                disc.elements.structure.append(ele)
 
                 # extract material info from cell data
                 matid: int = _get_id_from_cell_data(mesh.cell_data[celltype])[cellindex]
@@ -221,42 +226,34 @@ def discretization2mesh(dis: Discretization) -> meshio.Mesh:
                     cell_data[celltype][name] = np.append(cell_data[celltype][name], int(ele.options['MAT'][0]))
             
             # go over element faces
-            for face in Element.ElementFaces[ele.shape]:
-                # check, whether all nodes of this face belong to a same dline
-                union_set = None
-                for nodepos in face:
-                    if union_set is None:
-                        union_set = set(ele.nodes[nodepos].dsurf)
-                    else:
-                        union_set = union_set.intersection(set(ele.nodes[nodepos].dsurf))
+            for face in ele.get_faces():
+                # check, whether all nodes of this face belong to a same dsurf
+                union_set = face.get_dsurfs()
+
+                # create line cells with id dlineid
+                if face.shape == Tri3.ShapeName:
+                    facetype = 'triangle'
+                elif face.shape == Tri6.ShapeName:
+                    facetype = 'triangle6'
+                elif face.shape == Quad4.ShapeName:
+                    facetype = 'quad'
+                else:
+                    facetype = None
                 
+                # unimplemented face type -> throw error
+                if facetype is None:
+                    raise RuntimeError('This kind of face is not implemented yet! Face of {0} with {1} nodes (type {2})'.format(ele.shape, face.get_num_nodes(), face.shape))
+
                 for dsurfid in union_set:
                     # create surface cells with id dsurfid
-                    facetype: str = None
-                    if len(face) == 3 and ele.shape == 'TET4':
-                        # create triangle
-                        facetype: str = 'triangle'
-                    elif len(face) == 6 and ele.shape == 'TET10':
-                        # create triangle6
-                        facetype: str = 'triangle6'
-                    elif len(face) == 4 and ele.shape == 'HEX8':
-                        # create triangle6
-                        facetype: str = 'quad'
-                    elif len(face) == 9 and (ele.shape == 'HEX27' or ele.shape == 'HEX20'):
-                        # create triangle6
-                        facetype: str = 'quad9'
-
-                    # unimolemented face type -> throw error
-                    if facetype is None:
-                        raise RuntimeError('This kind of face is not implemented yet! Face of {0} with {1} nodes'.format(ele.shape, len(face)))
 
                     # check, whether there is already an array created
                     if facetype not in cells:
-                        cells[facetype] = np.zeros((0, len(face)), dtype=int)
+                        cells[facetype] = np.zeros((0, face.get_num_nodes()), dtype=int)
                         cell_data[facetype] = {
                             name: np.zeros((0), dtype=int) for name in _cell_data_id_names
                         }
-                    surfnodes = np.array([ele.nodes[n].id for n in face])
+                    surfnodes = np.array([n.id for n in face.get_nodes()])
                     
                     # add face to the cells
                     cells[facetype] = np.append(cells[facetype], surfnodes.reshape((1,-1)), axis=0)
@@ -266,45 +263,33 @@ def discretization2mesh(dis: Discretization) -> meshio.Mesh:
                         cell_data[facetype][name] = np.append(cell_data[facetype][name], dsurfid)
         
             # go over element edges
-            for edge in Element.ElementEdges[ele.shape]:
+            for edge in ele.get_edges():
                 # check, whether all nodes of this face belong to a same dline
-                union_set = None
-                for nodepos in edge:
-                    if union_set is None:
-                        union_set = set(ele.nodes[nodepos].dline)
-                    else:
-                        union_set = union_set.intersection(set(ele.nodes[nodepos].dline))
+                union_set = edge.get_dlines()
+
+                # create line cells with id dlineid
+                if edge.shape == Line2.ShapeName:
+                    linetype = 'line'
+                elif edge.shape == Line3.ShapeName:
+                    linetype = 'line3'
+                else:
+                    linetype = None
                 
                 for dlineid in union_set:
-                    # create line cells with id dlineid
-                    linetype: str = None
-                    if len(edge) == 2 and ele.shape == 'TET4':
-                        # create line
-                        linetype: str = 'line'
-                    elif len(edge) == 3 and ele.shape == 'TET10':
-                        # create triangle6
-                        linetype: str = 'line3'
-                    elif len(edge) == 2 and ele.shape == 'HEX8':
-                        # create line
-                        linetype: str = 'line'
-                    elif len(edge) == 3 and (ele.shape == 'HEX27' or ele.shape == 'HEX20'):
-                        # create line3
-                        linetype: str = 'line3'
-
-                    # unimolemented face type -> throw error
+                    # unimplemented face type -> throw error
                     if linetype is None:
-                        raise RuntimeError('This kind of edge is not implemented yet! Edge of {0} with {1} nodes'.format(ele.shape, len(edge)))
+                        raise RuntimeError('This kind of edge is not implemented yet! Edge of {0} with {1} nodes'.format(ele.shape, edge.get_num_nodes()))
 
                     # check, whether there is already an array created
                     if linetype not in cells:
-                        cells[linetype] = np.zeros((0, len(edge)), dtype=int)
+                        cells[linetype] = np.zeros((0, edge.get_num_nodes()), dtype=int)
                         cell_data[linetype] = {
                             name: np.zeros((0), dtype=int) for name in _cell_data_id_names
                         }
-                    edgenodes = np.array([ele.nodes[n].id for n in edge])
+                    edgenodes = np.array([n.id for n in edge.get_nodes()])
                     
                     # add edge to the cells
-                    cells[linetype] = np.append(cells[linetype], edgenodes.reshape((1, len(edge))), axis=0)
+                    cells[linetype] = np.append(cells[linetype], edgenodes.reshape((1, edge.get_num_nodes())), axis=0)
 
                     # add line ids
                     for name in _cell_data_id_names:
@@ -322,7 +307,7 @@ def discretization2mesh(dis: Discretization) -> meshio.Mesh:
 
             cells['vertex'] = np.append(cells['vertex'], node.id)
             for name in _cell_data_id_names:
-                cell_data['vertex'][name] = np.append(cell_data[celltype][name], dp)
+                cell_data['vertex'][name] = np.append(cell_data['vertex'][name], dp)
 
 
     mesh: meshio.Mesh = meshio.Mesh(points, cells, cell_data=cell_data, point_data=point_data)
