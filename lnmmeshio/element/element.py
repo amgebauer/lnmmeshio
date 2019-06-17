@@ -5,23 +5,11 @@ from ..ioutils import write_title, write_option_list, write_option, read_option_
 from collections import OrderedDict
 from ..node import Node
 
+
 """
 Class holding the data of one element
 """
 class Element:
-
-    ElementEdges: dict = {
-        'HEX8': [[0, 1], [1, 2], [2, 3], [3, 0], [0, 4], [1, 5], [2, 6], [3, 7], [4, 5], [5, 6], [6, 7], [7, 4]],
-        'TET4': [[0, 1], [1, 2], [2, 0], [0, 3], [1, 3], [2, 3]],
-        'TET10': [[0, 1, 4], [1, 2, 5], [2, 0, 6], [0, 3, 7], [1, 3, 8], [2, 3, 9]]
-        # TODO: Need to add more here if necessary
-    }
-    ElementFaces: dict = {
-        'HEX8': [[0, 1, 2, 3], [0, 1, 5, 4], [1, 2, 6, 5], [2, 3, 7, 6], [3, 0, 4, 7], [4, 5, 6, 7]],
-        'TET4': [[0, 1, 3], [1, 2, 3], [2, 0, 3], [0, 2, 1]],
-        'TET10': [[0, 1, 3, 4, 8, 7], [1, 2, 3, 5, 9, 8], [2, 0, 3, 6, 7, 9], [0, 2, 1, 6, 5, 4]],
-        'TRI3': []
-    }
 
     """
     Creates a new element of type ele_type, shape with nodes defined in nodes
@@ -47,6 +35,34 @@ class Element:
     def reset(self):
         self.id = None
     
+
+    """
+    Returns a list of nodes
+
+    Returns:
+        List of nodes
+    """
+    def get_nodes(self) -> List[Node]:
+        return self.nodes
+
+    """
+    Returns all faces
+
+    Returns:
+        List of faces
+    """
+    def get_faces(self) -> list:
+        raise RuntimeError("This element does't implement get faces")
+
+    """
+    Returns all edges
+
+    Returns:
+        List of edges
+    """
+    def get_edges(self) -> list:
+        raise RuntimeError("This element does't implement get edges")
+
     """
     Returns the node ids as of each element as a numpy array of shape (num_ele, num_nod_per_ele)
 
@@ -62,6 +78,75 @@ class Element:
             arr[i] = node.id
         
         return arr
+
+    """
+    Returns a list of dpoints that is shared by all nodes of the element
+
+    Returns:
+        List of dpoint
+    """
+    def get_dpoints(self):
+        dpoint = None
+
+        for p in self.nodes:
+            if dpoint is None:
+                dpoint = set(p.dpoint)
+            else:
+                dpoint = set(p.dpoint).intersection(dpoint)
+        
+        return list(dpoint)
+
+    """
+    Returns a list of dlines that is shared by all nodes of the element
+
+    Returns:
+        List of dlines
+    """
+    def get_dlines(self):
+        dlines = None
+
+        for p in self.nodes:
+            if dlines is None:
+                dlines = set(p.dline)
+            else:
+                dlines = set(p.dline).intersection(dlines)
+        
+        return list(dlines)
+
+    """
+    Returns a list of dsurf that is shared by all nodes of the element
+
+    Returns:
+        List of dsurfs
+    """
+    def get_dsurfs(self):
+        dsurf = None
+
+        for p in self.nodes:
+            if dsurf is None:
+                dsurf = set(p.dsurf)
+            else:
+                dsurf = set(p.dsurf).intersection(dsurf)
+        
+        return list(dsurf)
+
+    """
+    Returns a list of dvol that is shared by all nodes of the element
+
+    Returns:
+        List of dvols
+    """
+    def get_dvols(self):
+        dvol = None
+
+        for p in self.nodes:
+            if dvol is None:
+                dvol = set(p.dvol)
+            else:
+                dvol = set(p.dline).intersection(dvol)
+        
+        return list(dvol)
+
 
     
     """
@@ -85,22 +170,7 @@ class Element:
 
         dest.write('\n')
 
-    """
-    Returns a list of the Faces of the element (The faces are a list of nodes)
 
-    Returns:
-        List[List[Node]] List of faces in baci order
-    """
-    def get_faces(self):
-        flist = []
-
-        if self.shape not in self.ElementFaces:
-            raise('This element is not implemented')
-
-        for f in self.ElementFaces[self.shape]:
-            flist.append([self.nodes[i] for i in f])
-
-        return flist
 
     """
     Returns the number of nodes from the shapes
@@ -123,7 +193,9 @@ class Element:
             "WEDGE6"  : 6,
             "QUAD4"   : 4,
             "TRI3"    : 3,
+            "TRI6"    : 6,
             "LINE2"   : 2,
+            "LINE3"   : 3,
             "QUAD9"   : 9,
         }
         

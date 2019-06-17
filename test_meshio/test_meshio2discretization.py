@@ -26,8 +26,9 @@ class TestMeshio2Discretization(unittest.TestCase):
     def test_vice_versa(self):
         dis: lnmmeshio.Discretization = lnmmeshio.read(os.path.join(script_dir, 'data', 'dummy2.dat'))
 
+        mesh = lnmmeshio.meshio_to_discretization.discretization2mesh(dis)
         dis2: lnmmeshio.Discretization = lnmmeshio.meshio_to_discretization.mesh2Discretization(
-            lnmmeshio.meshio_to_discretization.discretization2mesh(dis)
+            mesh
         )
 
         dis.compute_ids(zero_based=True)
@@ -49,7 +50,7 @@ class TestMeshio2Discretization(unittest.TestCase):
                 sorted(node1.dline), sorted(node2.dline)
             )
             self.assertListEqual(
-                sorted(node1.dsurf), sorted(node2.dsurf)
+                sorted(node1.dsurf), sorted(node2.dsurf), 'id: {0}'.format(node1.id)
             )
         
         self.assertEqual(dis.elements.get_num_structure(), dis2.elements.get_num_structure())

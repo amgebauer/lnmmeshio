@@ -5,6 +5,7 @@ from ..fiber import Fiber
 from ..node import Node
 from typing import List, Dict
 import re
+from .parse_element import parse as parse_ele
 
 """
 Class holding all elements in different categories. Current implemented categories are
@@ -170,54 +171,22 @@ class ElementContainer:
         List of elements
     """
     @staticmethod
-    def __read_elements(nodes: List['Node'], lines: List[str]):
+    def __read_elements(nodes: List[Node], lines: List[str]):
         eles = []
 
-        re_ele = re.compile(r'^[ ]*([0-9]+)[ ]+(\S+)[ ]+(\S+)[ ]+')
+
         for line in lines:
-            line = line.split('//', 1)[0]
-            # parse ele id, type and shape
-            ele_match = re_ele.search(line)
-            if not ele_match:
+
+            ele = parse_ele(line, nodes)
+            
+            if ele is None:
                 continue
 
-            ele_id = int(ele_match.group(1))
-            ele_type = ele_match.group(2)
-            ele_shape = ele_match.group(3)
-            
-            node_ids_str, span = read_option_item(line, ele_shape, Element.get_num_nodes(ele_shape))
-            node_ids = [int(i) for i in node_ids_str]
-
-            ele = Element(ele_type, ele_shape,
-                [ nodes[i-1] for i in node_ids]
-            )
             eles.append(ele)
 
             # safety check for integrity of the dat file
-            if int(ele_id) != len(eles):
-                raise RuntimeError('Element ids in dat file have a gap at {0}!={1}!'.format(ele_id, len(eles)))
-            
-            # read fibers
-            ele.fibers = Fiber.parse_fibers(line)
-
-            # read remaining options
-            # assume only one value per option, which must not be the case in general
-            line = line[span[1]:]
-            while True:
-                line, key = read_next_key(line)
-                if line is None:
-                    break
-
-                num = 1
-                if Fiber.get_fiber_type(key) is not None:
-                    num = 3
-
-                line, value = read_next_value(line, num=num)
-
-                if line is None:
-                    break
-                
-                ele.options[key] = value
+            if int(ele.id) != len(eles):
+                raise RuntimeError('Element ids in dat file have a gap at {0}!={1}!'.format(ele.id, len(eles)))
             
         
         return eles
