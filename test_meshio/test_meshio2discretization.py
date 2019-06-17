@@ -52,24 +52,67 @@ class TestMeshio2Discretization(unittest.TestCase):
                 sorted(node1.dsurf), sorted(node2.dsurf)
             )
         
-        eletype_list1: List[str] = []
-        eletype_list2: List[str] = []
+        self.assertEqual(dis.elements.get_num_structure(), dis2.elements.get_num_structure())
+        self.assertEqual(dis.elements.get_num_fluid(), dis2.elements.get_num_fluid())
+        self.assertEqual(dis.elements.get_num_ale(), dis2.elements.get_num_ale())
+        self.assertEqual(dis.elements.get_num_transport(), dis2.elements.get_num_transport())
+        self.assertEqual(dis.elements.get_num_thermo(), dis2.elements.get_num_thermo())
 
-        for flieldtype, eles in dis.elements.items():
-            if len(eles) > 0:
-                eletype_list1.append(flieldtype)
+        if dis.elements.get_num_structure() > 0:
 
-        for flieldtype, eles in dis2.elements.items():
-            if len(eles) > 0:
-                eletype_list2.append(flieldtype)
-        
-        self.assertListEqual(sorted(eletype_list1), sorted(eletype_list2))
+            for ele1, ele2 in zip(dis.elements.structure, dis2.elements.structure):
+                
+                # check, whether nodes are the same within the element
+                self.assertEqual(ele1.shape, ele2.shape)
+                self.assertEqual(len(ele1.nodes), len(ele2.nodes))
+
+                for n1, n2 in zip(ele1.nodes, ele2.nodes):
+
+                    self.assertEqual(n1.id, n2.id)
     
-        for eletype in eletype_list1:
 
-            self.assertEqual(len(dis.elements[eletype]), len(dis2.elements[eletype]))
+        if dis.elements.get_num_ale() > 0:
 
-            for ele1, ele2 in zip(dis.elements[eletype], dis2.elements[eletype]):
+            for ele1, ele2 in zip(dis.elements.ale, dis2.elements.ale):
+                
+                # check, whether nodes are the same within the element
+                self.assertEqual(ele1.shape, ele2.shape)
+                self.assertEqual(len(ele1.nodes), len(ele2.nodes))
+
+                for n1, n2 in zip(ele1.nodes, ele2.nodes):
+
+                    self.assertEqual(n1.id, n2.id)
+        
+
+        if dis.elements.get_num_fluid() > 0:
+
+            for ele1, ele2 in zip(dis.elements.fluid, dis2.elements.fluid):
+                
+                # check, whether nodes are the same within the element
+                self.assertEqual(ele1.shape, ele2.shape)
+                self.assertEqual(len(ele1.nodes), len(ele2.nodes))
+
+                for n1, n2 in zip(ele1.nodes, ele2.nodes):
+
+                    self.assertEqual(n1.id, n2.id)
+
+
+        if dis.elements.get_num_transport() > 0:
+
+            for ele1, ele2 in zip(dis.elements.transport, dis2.elements.transport):
+                
+                # check, whether nodes are the same within the element
+                self.assertEqual(ele1.shape, ele2.shape)
+                self.assertEqual(len(ele1.nodes), len(ele2.nodes))
+
+                for n1, n2 in zip(ele1.nodes, ele2.nodes):
+
+                    self.assertEqual(n1.id, n2.id)
+        
+
+        if dis.elements.get_num_thermo() > 0:
+
+            for ele1, ele2 in zip(dis.elements.thermo, dis2.elements.thermo):
                 
                 # check, whether nodes are the same within the element
                 self.assertEqual(ele1.shape, ele2.shape)

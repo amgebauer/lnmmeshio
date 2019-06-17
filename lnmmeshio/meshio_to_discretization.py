@@ -114,7 +114,7 @@ def mesh2Discretization(mesh: meshio.Mesh) -> Discretization:
     maxdim = max([cell_to_dim[celltype] for celltype in mesh.cells.keys()])
     
     # create Elements from cells
-    disc.elements[Element.FieldTypeStructure] = []
+    disc.elements.structure = []
     for celltype, cells in mesh.cells.items():
 
         if celltype not in cell_nodes:
@@ -142,7 +142,7 @@ def mesh2Discretization(mesh: meshio.Mesh) -> Discretization:
                     # also need to reorder nodes in a few element types
                     [nodes[i] for i in ele_node_order_vtk2baci[cell_disc_shape[celltype]]]
                 )
-                disc.elements[Element.FieldTypeStructure].append(ele)
+                disc.elements.structure.append(ele)
 
                 # extract material info from cell data
                 matid: int = _get_id_from_cell_data(mesh.cell_data[celltype])[cellindex]
