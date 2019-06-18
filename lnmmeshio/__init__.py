@@ -6,10 +6,10 @@ import sys,os
 
 from meshio import Mesh, read as _meshioread, write as _meshiowrite
 from . import meshio_to_discretization
-from .discretization import Discretization
 from .node import Node
 from .fiber import Fiber
-from .element.element import Element
+from . import element
+from .element.element_container import ElementContainer
 from .element.hex8 import Hex8
 from .element.tet10 import Tet10
 from .element.tet4 import Tet4
@@ -18,6 +18,8 @@ from .element.tri6 import Tri6
 from .element.tri3 import Tri3
 from .element.line2 import Line2
 from .element.line3 import Line3
+from .element.element import Element
+from .discretization import Discretization
 from . import ioutils
 from . import ensightio
 
