@@ -143,7 +143,7 @@ class Element:
             if dvol is None:
                 dvol = set(p.dvol)
             else:
-                dvol = set(p.dline).intersection(dvol)
+                dvol = set(p.dvol).intersection(dvol)
         
         return list(dvol)
 
