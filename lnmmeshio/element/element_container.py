@@ -17,6 +17,11 @@ ElementContainer.transport
 ElementContainer.thermo
 """
 class ElementContainer:
+    TypeStructure: str = 'structure'
+    TypeFluid: str = 'fluid'
+    TypeALE: str = 'ale'
+    TypeTransport: str = 'transport'
+    TypeThermo: str = 'thermo'
 
     """
     Initialize element contained
@@ -130,29 +135,73 @@ class ElementContainer:
         List[Tuple[str, List[Element]]]
     """
     def items(self):
-        keys = []
-        values = []
+        return zip(self.keys(), self.values())
+    
+    """
+    Returns a list of keys of the elemet types
+
+    Returns:
+        List[str]
+    """
+    def keys(self):
+        ele_keys = []
+
         if self.structure is not None:
-            keys.append('structure')
-            values.append(self.structure)
-
+            ele_keys.append(self.TypeStructure)
         if self.fluid is not None:
-            keys.append('fluid')
-            values.append(self.fluid)
-
+            ele_keys.append(self.TypeFluid)
         if self.ale is not None:
-            keys.append('ale')
-            values.append(self.ale)
-
-        if self.thermo is not None:
-            keys.append('thermo')
-            values.append(self.thermo)
-
+            ele_keys.append(self.TypeALE)
         if self.transport is not None:
-            keys.append('transport')
-            values.append(self.transport)
+            ele_keys.append(self.TypeTransport)
+        if self.thermo is not None:
+            ele_keys.append(self.TypeThermo)
         
-        return zip(keys, values)
+        return ele_keys
+
+    """
+    Returns the list of elements belonging to a type of discretization
+
+    Args:
+        key: str Type of field
+
+    Returns:
+        List[Element]
+    """
+    def __getitem__(self, key):
+        if key == self.TypeStructure:
+            return self.structure
+        elif key == self.TypeFluid:
+            return self.fluid
+        elif key == self.TypeALE:
+            return self.ale
+        elif key == self.TypeTransport:
+            return self.transport
+        elif key == self.TypeThermo:
+            return self.thermo
+        
+        return None
+    
+        """
+    Returns the list of elements belonging to a type of discretization
+
+    Args:
+        key: str Type of field
+        value: List[Element] List of elements
+    """
+    def __setitem__(self, key, value):
+        if key == self.TypeStructure:
+            self.structure = value
+        elif key == self.TypeFluid:
+            self.fluid = value
+        elif key == self.TypeALE:
+            self.ale = value
+        elif key == self.TypeTransport:
+            self.transport = value
+        elif key == self.TypeThermo:
+            self.thermo = value
+        else:
+            raise KeyError('Key not found: {0}'.format(key))
 
     """
     Writes the element section with section title and elements. If elements is None,
