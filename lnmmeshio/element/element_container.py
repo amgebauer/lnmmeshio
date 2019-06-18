@@ -182,7 +182,30 @@ class ElementContainer:
         
         raise KeyError('Key not found: {0}'.format(key))
     
-        """
+    """
+    Returns the a boolean, whether the field type is available
+
+    Args:
+        key: str Type of field
+
+    Returns:
+        bool
+    """
+    def __contains__(self, key):
+        if key == self.TypeStructure and self.structure is not None:
+            return True
+        elif key == self.TypeFluid and self.fluid is not None:
+            return True
+        elif key == self.TypeALE and self.ale is not None:
+            return True
+        elif key == self.TypeTransport and self.transport is not None:
+            return True
+        elif key == self.TypeThermo and self.thermo is not None:
+            return True
+        
+        return False
+
+    """
     Returns the list of elements belonging to a type of discretization
 
     Args:

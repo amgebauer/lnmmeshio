@@ -27,11 +27,17 @@ class TestEleContainer(unittest.TestCase):
     def test_elecontainer(self):
         c = ElementContainer()
 
+        self.assertFalse(ElementContainer.TypeStructure in c)
+        self.assertFalse(ElementContainer.TypeFluid in c)
+        self.assertFalse(ElementContainer.TypeALE in c)
+        self.assertFalse(ElementContainer.TypeTransport in c)
+        self.assertFalse(ElementContainer.TypeThermo in c)
+
         self.assertRaises(KeyError, lambda: c[ElementContainer.TypeStructure])
         self.assertRaises(KeyError, lambda: c[ElementContainer.TypeFluid])
         self.assertRaises(KeyError, lambda: c[ElementContainer.TypeALE])
         self.assertRaises(KeyError, lambda: c[ElementContainer.TypeTransport])
-        self.assertRaises(KeyError, lambda: c[ElementContainer.TypeTransport])
+        self.assertRaises(KeyError, lambda: c[ElementContainer.TypeThermo])
         self.assertRaises(KeyError, lambda: c['doesnotexist'])
         with self.assertRaises(KeyError) as _:
             c['doesnotexist'] = 1
@@ -55,3 +61,10 @@ class TestEleContainer(unittest.TestCase):
         c[ElementContainer.TypeThermo] = [5]
         self.assertListEqual(c[ElementContainer.TypeThermo], [5])
         self.assertListEqual(c.thermo, [5])
+
+
+        self.assertTrue(ElementContainer.TypeStructure in c)
+        self.assertTrue(ElementContainer.TypeFluid in c)
+        self.assertTrue(ElementContainer.TypeALE in c)
+        self.assertTrue(ElementContainer.TypeTransport in c)
+        self.assertTrue(ElementContainer.TypeThermo in c)
