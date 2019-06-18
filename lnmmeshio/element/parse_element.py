@@ -78,26 +78,7 @@ def parse(line: str, nodes: List[Node], throw_if_unknown=False):
     node_ids_str, span = read_option_item(line, ele_shape, Element.get_num_nodes(ele_shape))
     ele_nodes = [ nodes[int(i)-1] for i in node_ids_str]
 
-    if ele_shape == Line2.ShapeName:
-        ele = Line2(ele_type, ele_nodes)
-    elif ele_shape == Line3.ShapeName:
-        ele = Line3(ele_type, ele_nodes)
-    elif ele_shape == Tri3.ShapeName:
-        ele = Tri3(ele_type, ele_nodes)
-    elif ele_shape == Tri6.ShapeName:
-        ele = Tri6(ele_type, ele_nodes)
-    elif ele_shape == Quad4.ShapeName:
-        ele = Quad4(ele_type, ele_nodes)
-    elif ele_shape == Tet4.ShapeName:
-        ele = Tet4(ele_type, ele_nodes)
-    elif ele_shape == Tet10.ShapeName:
-        ele = Tet10(ele_type, ele_nodes)
-    elif ele_shape == Hex8.ShapeName:
-        ele = Hex8(ele_type, ele_nodes)
-    else:
-        if throw_if_unknown:
-            raise RuntimeError('The element type {0} is unknown'.format(ele_shape))
-        ele = Element(ele_type, ele_shape, ele_nodes)
+    ele = create_element(ele_type, ele_shape, ele_nodes, throw_if_unknown=throw_if_unknown)
 
     ele.id = ele_id
     
