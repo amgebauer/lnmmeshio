@@ -122,6 +122,37 @@ class ElementContainer:
             ele_list.append(self.thermo)
 
         return ele_list
+    
+    """
+    Returns a list of tuples with key and values for each element type
+
+    Returns:
+        List[Tuple[str, List[Element]]]
+    """
+    def items(self):
+        keys = []
+        values = []
+        if self.structure is not None:
+            keys.append('structure')
+            values.append(self.structure)
+
+        if self.fluid is not None:
+            keys.append('fluid')
+            values.append(self.fluid)
+
+        if self.ale is not None:
+            keys.append('ale')
+            values.append(self.ale)
+
+        if self.thermo is not None:
+            keys.append('thermo')
+            values.append(self.thermo)
+
+        if self.transport is not None:
+            keys.append('transport')
+            values.append(self.transport)
+        
+        return zip(keys, values)
 
     """
     Writes the element section with section title and elements. If elements is None,
