@@ -2,8 +2,8 @@ from setuptools import setup
 
 setup(
     name='lnmmeshio',
-    version='2.2.12',
-    packages=['lnmmeshio',],
+    version='2.2.17',
+    packages=['lnmmeshio', 'lnmmeshio.element'],
     license='unlicensed. All rights reserved.',
     long_description=open('README.md').read(),
     install_requires=[
