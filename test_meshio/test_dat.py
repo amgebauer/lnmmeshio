@@ -317,6 +317,8 @@ class TestDat(unittest.TestCase):
             ['4.1', '4.2']
         )
 
+        self.assertEqual(lnmmeshio.ioutils.read_option_item(line, 'KEY5'), (None, None))
+
     def test_io_utils_read_next_option(self):
         # build file
         dummy_file = io.StringIO()
@@ -345,6 +347,14 @@ class TestDat(unittest.TestCase):
         self.assertEqual(key, 'KEY4')
         self.assertListEqual(value, ['4.1', '4.2'])
 
+    def test_dummy_read(self):
+        dummy_file = io.StringIO()
+        lnmmeshio.ioutils.write_title(dummy_file, 'TITLE', newline=True)
+        lnmmeshio.ioutils.write_title(dummy_file, 'TITLE', newline=True)
+        dummy_file.seek(0)
+        
+        with self.assertRaises(ValueError) as _:
+            lnmmeshio.ioutils.read_dat_sections(dummy_file)
 
 if __name__ == '__main__':
     unittest.main()
