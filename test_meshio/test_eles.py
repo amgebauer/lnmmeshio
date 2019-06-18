@@ -33,6 +33,30 @@ class TestEles(unittest.TestCase):
 
         return nodes
 
+    def test_common(self):
+        ele = Element(None, 'X', self.__get_nodes(3))
+
+        ele.nodes[0].dvol = [0, 1, 2, 3]
+        ele.nodes[1].dvol = [0, 1, 2]
+        ele.nodes[2].dvol = [0, 1]
+
+        ele.nodes[0].dsurf = [10, 11, 12, 13]
+        ele.nodes[1].dsurf = [10, 11, 12]
+        ele.nodes[2].dsurf = [10, 11]
+
+        ele.nodes[0].dline = [20, 21, 22, 23]
+        ele.nodes[1].dline = [20, 21, 22]
+        ele.nodes[2].dline = [20, 21]
+
+        ele.nodes[0].dpoint = [30, 31, 32, 33]
+        ele.nodes[1].dpoint = [30, 31, 32]
+        ele.nodes[2].dpoint = [30, 31]
+
+        self.assertListEqual(ele.get_dvols(), [0, 1])
+        self.assertListEqual(ele.get_dsurfs(), [10, 11])
+        self.assertListEqual(ele.get_dlines(), [20, 21])
+        self.assertListEqual(ele.get_dpoints(), [30, 31])
+
     def test_hex8(self):
         FACES = [[0, 1, 2, 3], [0, 1, 5, 4], [1, 2, 6, 5], [2, 3, 7, 6], [3, 0, 4, 7], [4, 5, 6, 7]]
         EDGES = [[0, 1], [1, 2], [2, 3], [3, 0], [0, 4], [1, 5], [2, 6], [3, 7], [4, 5], [5, 6], [6, 7], [7, 4]]
