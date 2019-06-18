@@ -7,6 +7,7 @@
 import numpy as np
 import meshio
 from .discretization import Element, Discretization, Node
+from .element.parse_element import create_element
 from progress.bar import Bar
 from .element.line2 import Line2
 from .element.line3 import Line3
@@ -141,7 +142,7 @@ def mesh2Discretization(mesh: meshio.Mesh) -> Discretization:
             eledim = cell_to_dim[celltype]
             if maxdim == eledim:
                 # this is a normal element
-                ele = Element(
+                ele = create_element(
                     cell_disc_eles[celltype],
                     cell_disc_shape[celltype],
                     # also need to reorder nodes in a few element types

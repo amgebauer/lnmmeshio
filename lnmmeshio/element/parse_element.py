@@ -18,6 +18,43 @@ from ..node import Node
 RegExEle = re.compile(r'^[ ]*([0-9]+)[ ]+(\S+)[ ]+(\S+)[ ]+')
 
 """
+Creates an element from a given element shape
+
+Args:
+    elename: name of the element (e.g. SOLIDH8)
+    shape: str shape of the element (e.g. HEX8)
+    nodes: nodes of the element
+    throw_if_unknown: bool Throw an exception, if element type is not known
+
+Return:
+    Element of the specific type
+"""
+def create_element(ele_type: str, ele_shape: str, ele_nodes: List[Node], throw_if_unknown=False):
+
+    if ele_shape == Line2.ShapeName:
+        ele = Line2(ele_type, ele_nodes)
+    elif ele_shape == Line3.ShapeName:
+        ele = Line3(ele_type, ele_nodes)
+    elif ele_shape == Tri3.ShapeName:
+        ele = Tri3(ele_type, ele_nodes)
+    elif ele_shape == Tri6.ShapeName:
+        ele = Tri6(ele_type, ele_nodes)
+    elif ele_shape == Quad4.ShapeName:
+        ele = Quad4(ele_type, ele_nodes)
+    elif ele_shape == Tet4.ShapeName:
+        ele = Tet4(ele_type, ele_nodes)
+    elif ele_shape == Tet10.ShapeName:
+        ele = Tet10(ele_type, ele_nodes)
+    elif ele_shape == Hex8.ShapeName:
+        ele = Hex8(ele_type, ele_nodes)
+    else:
+        if throw_if_unknown:
+            raise RuntimeError('The element type {0} is unknown'.format(ele_shape))
+        ele = Element(ele_type, ele_shape, ele_nodes)
+    
+    return ele
+
+"""
 Parses the element and returns an instance of an appropriate element type
 
 Args:
@@ -27,7 +64,7 @@ Args:
 Returns:
     An instance of the properly instantianted element
 """
-def parse(line: str, nodes: List[Node]):
+def parse(line: str, nodes: List[Node], throw_if_unknown=False):
     line = line.split('//', 1)[0]
     # parse ele id, type and shape
     ele_match = RegExEle.search(line)
@@ -58,6 +95,8 @@ def parse(line: str, nodes: List[Node]):
     elif ele_shape == Hex8.ShapeName:
         ele = Hex8(ele_type, ele_nodes)
     else:
+        if throw_if_unknown:
+            raise RuntimeError('The element type {0} is unknown'.format(ele_shape))
         ele = Element(ele_type, ele_shape, ele_nodes)
 
     ele.id = ele_id
