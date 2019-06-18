@@ -169,18 +169,18 @@ class ElementContainer:
         List[Element]
     """
     def __getitem__(self, key):
-        if key == self.TypeStructure:
+        if key == self.TypeStructure and self.structure is not None:
             return self.structure
-        elif key == self.TypeFluid:
+        elif key == self.TypeFluid and self.fluid is not None:
             return self.fluid
-        elif key == self.TypeALE:
+        elif key == self.TypeALE and self.ale is not None:
             return self.ale
-        elif key == self.TypeTransport:
+        elif key == self.TypeTransport and self.transport is not None:
             return self.transport
-        elif key == self.TypeThermo:
+        elif key == self.TypeThermo and self.thermo is not None:
             return self.thermo
         
-        return None
+        raise KeyError('Key not found: {0}'.format(key))
     
         """
     Returns the list of elements belonging to a type of discretization
