@@ -7,9 +7,13 @@ from .line3 import Line3
 from .tri3 import Tri3
 from .tri6 import Tri6
 from .quad4 import Quad4
+from .quad8 import Quad8
+from .quad9 import Quad9
 from .tet4 import Tet4
 from .tet10 import Tet10
 from .hex8 import Hex8
+from .hex20 import Hex20
+from .hex27 import Hex27
 import re
 from ..fiber import Fiber
 from ..node import Node
@@ -41,12 +45,20 @@ def create_element(ele_type: str, ele_shape: str, ele_nodes: List[Node], throw_i
         ele = Tri6(ele_type, ele_nodes)
     elif ele_shape == Quad4.ShapeName:
         ele = Quad4(ele_type, ele_nodes)
+    elif ele_shape == Quad8.ShapeName:
+        ele = Quad8(ele_type, ele_nodes)
+    elif ele_shape == Quad9.ShapeName:
+        ele = Quad9(ele_type, ele_nodes)
     elif ele_shape == Tet4.ShapeName:
         ele = Tet4(ele_type, ele_nodes)
     elif ele_shape == Tet10.ShapeName:
         ele = Tet10(ele_type, ele_nodes)
     elif ele_shape == Hex8.ShapeName:
         ele = Hex8(ele_type, ele_nodes)
+    elif ele_shape == Hex20.ShapeName:
+        ele = Hex20(ele_type, ele_nodes)
+    elif ele_shape == Hex27.ShapeName:
+        ele = Hex27(ele_type, ele_nodes)
     else:
         if throw_if_unknown:
             raise RuntimeError('The element type {0} is unknown'.format(ele_shape))
@@ -75,7 +87,7 @@ def parse(line: str, nodes: List[Node], throw_if_unknown=False):
     ele_type = ele_match.group(2)
     ele_shape = ele_match.group(3)
     
-    node_ids_str, span = read_option_item(line, ele_shape, Element.get_num_nodes(ele_shape))
+    node_ids_str, span = read_option_item(line, ele_shape, Element.num_nodes_by_shape(ele_shape))
     ele_nodes = [ nodes[int(i)-1] for i in node_ids_str]
 
     ele = create_element(ele_type, ele_shape, ele_nodes, throw_if_unknown=throw_if_unknown)

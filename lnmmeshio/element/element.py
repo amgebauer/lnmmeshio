@@ -182,7 +182,7 @@ class Element:
         int: number of nodes
     """
     @staticmethod
-    def get_num_nodes(shape: str):
+    def num_nodes_by_shape(shape: str):
         shape_dict = {
             "TET4"    : 4,
             "TET10"   : 10,
@@ -196,6 +196,7 @@ class Element:
             "TRI6"    : 6,
             "LINE2"   : 2,
             "LINE3"   : 3,
+            "QUAD8"   : 8,
             "QUAD9"   : 9,
         }
         

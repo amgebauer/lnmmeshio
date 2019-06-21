@@ -11,9 +11,13 @@ from .fiber import Fiber
 from . import element
 from .element.element_container import ElementContainer
 from .element.hex8 import Hex8
+from .element.hex20 import Hex20
+from .element.hex27 import Hex27
 from .element.tet10 import Tet10
 from .element.tet4 import Tet4
 from .element.quad4 import Quad4
+from .element.quad8 import Quad8
+from .element.quad9 import Quad9
 from .element.tri6 import Tri6
 from .element.tri3 import Tri3
 from .element.line2 import Line2
