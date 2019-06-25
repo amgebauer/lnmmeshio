@@ -26,11 +26,13 @@ from .element.element import Element
 from .discretization import Discretization
 from . import ioutils
 from . import ensightio
+from . import mimics_stlio
 
 import numpy as np
 
 __TYPE_BACI = 1
 __TYPE_CASE = 2
+__TYPE_MIMICS_STL = 3
 __TYPE_OTHER = 0
 
 def _get_type(filename, file_format=None) -> bool:
@@ -42,10 +44,14 @@ def _get_type(filename, file_format=None) -> bool:
             return __TYPE_BACI
         elif extension == '.case':
             return __TYPE_CASE
+        elif extension == '.mstl':
+            return __TYPE_MIMICS_STL
     elif file_format == 'dat' or file_format == 'dis':
         return __TYPE_BACI
     elif file_format == 'case' or file_format == 'ensight':
         return __TYPE_CASE
+    elif file_format == 'mimicsstl':
+        return __TYPE_MIMICS_STL
     
     return __TYPE_OTHER
 
@@ -71,6 +77,10 @@ def read(filename, file_format=None):
     elif ftype == __TYPE_CASE:
         # this is ensight gold file format
         raise NotImplementedError('Case file reading is not implemented yet')
+    elif ftype == __TYPE_MIMICS_STL:
+        return meshio_to_discretization.mesh2Discretization(
+            mimics_stlio.read(filename)
+        )
     else:
         # this maybe is a file format supported by meshio
         return meshio_to_discretization.mesh2Discretization(
@@ -104,6 +114,8 @@ def write(filename: str, discretization: Discretization, file_format=None):
     elif ftype == __TYPE_CASE:
         # this is ensight gold file format
         ensightio.write_case(filename, discretization)
+    elif ftype == __TYPE_MIMICS_STL:
+        raise NotImplementedError('Writing in Mimics stl is currently not supported')
     else:
         write_mesh(filename, meshio_to_discretization.discretization2mesh(discretization), file_format=file_format)
 
@@ -128,6 +140,8 @@ def read_mesh(filename, file_format=None):
     elif ftype == __TYPE_CASE:
         # this is ensight gold file format
         raise NotImplementedError('Case file reading into mesh is not implemented yet')
+    elif ftype == __TYPE_MIMICS_STL:
+        return mimics_stlio.read(filename)
     else:
         # this maybe is a file format supported by meshio
         return _meshioread(filename, file_format=file_format)
@@ -150,6 +164,8 @@ def write_mesh(filename, mesh, file_format=None, **kwargs):
     elif ftype == __TYPE_CASE:
         # this is ensight gold file format
         raise NotImplementedError('Case file writing into mesh is not implemented yet')
+    elif ftype == __TYPE_MIMICS_STL:
+        return mimics_stlio.write(filename, mesh)
     else:
         _meshiowrite(filename, mesh, file_format, **kwargs)
 
