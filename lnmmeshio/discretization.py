@@ -8,8 +8,7 @@ from .element.element import Element
 from .element.element_container import ElementContainer
 from .node import Node
 from .fiber import Fiber
-from progress.bar import Bar
-from lnmpyutils import progress
+from .progress import progress
 
 """
 This class holds the discretization, consisting out of nodes and elements. The nodes and

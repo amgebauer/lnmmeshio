@@ -6,7 +6,7 @@ from ..node import Node
 from typing import List, Dict
 import re
 from .parse_element import parse as parse_ele
-from lnmpyutils import progress
+from .progress import progress
 
 """
 Class holding all elements in different categories. Current implemented categories are
