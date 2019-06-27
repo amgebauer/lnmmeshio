@@ -10,6 +10,7 @@ setup(
         'progress>=1.5',
         'numpy>=1.16.3',
         'python-utils>=2.3.0',
-        'meshio>=2.3.8'
+        'meshio>=2.3.8',
+        'lnmpyutils>=1.0.4'
     ]
 )
