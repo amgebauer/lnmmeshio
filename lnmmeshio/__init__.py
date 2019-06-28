@@ -55,7 +55,7 @@ def _get_type(filename, file_format=None) -> bool:
     
     return __TYPE_OTHER
 
-def read(filename, file_format=None):
+def read(filename, file_format=None, out=False):
     """
     Reads an unstructured mesh with added data
 
@@ -73,7 +73,7 @@ def read(filename, file_format=None):
     if ftype == __TYPE_BACI:
         # this is a BACI file format
         with open(filename, 'r') as f:
-            return read_baci(f)
+            return read_baci(f, out=out)
     elif ftype == __TYPE_CASE:
         # this is ensight gold file format
         raise NotImplementedError('Case file reading is not implemented yet')
@@ -87,10 +87,10 @@ def read(filename, file_format=None):
             _meshioread(filename, file_format=file_format)
         )
 
-def read_baci(input_stream):
+def read_baci(input_stream, out=False):
     sections = ioutils.read_dat_sections(input_stream)
                 
-    return Discretization.read(sections)
+    return Discretization.read(sections, out=out)
 
 def write(filename: str, discretization: Discretization, file_format=None):
     """

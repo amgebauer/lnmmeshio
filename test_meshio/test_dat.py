@@ -31,7 +31,7 @@ class TestDat(unittest.TestCase):
 
     def test_write(self):
         # read dat file
-        mesh = lnmmeshio.read(os.path.join(script_dir, 'data', 'dummy.dat'))
+        mesh = lnmmeshio.read(os.path.join(script_dir, 'data', 'dummy.dat'), out=True)
 
         if not os.path.isdir(os.path.join(script_dir, 'tmp')):
             os.makedirs(os.path.join(script_dir, 'tmp'))
@@ -45,7 +45,7 @@ class TestDat(unittest.TestCase):
 
     def test_read_new(self):
         # read discretization
-        disc = lnmmeshio.read(os.path.join(script_dir, 'data', 'dummy.dat'))
+        disc = lnmmeshio.read(os.path.join(script_dir, 'data', 'dummy.dat'), out=True)
 
         self.assertEqual(len(disc.nodes), 224)
         self.assertEqual(len(disc.elements.structure), 89)
@@ -58,7 +58,7 @@ class TestDat(unittest.TestCase):
     def test_write_new(self):
         
         # build dummy discretization
-        d: lnmmeshio.Discretization = lnmmeshio.read(os.path.join(script_dir, 'data', 'dummy.dat'))
+        d: lnmmeshio.Discretization = lnmmeshio.read(os.path.join(script_dir, 'data', 'dummy.dat'), out=True)
         d.nodes = [
             lnmmeshio.Node(np.array([0.0, 0.0, 0.0])),
             lnmmeshio.Node(np.array([1.0, 0.0, 0.0])),

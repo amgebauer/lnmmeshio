@@ -6,6 +6,7 @@ from ..node import Node
 from typing import List, Dict
 import re
 from .parse_element import parse as parse_ele
+from ..progress import progress
 
 """
 Class holding all elements in different categories. Current implemented categories are
@@ -243,23 +244,23 @@ class ElementContainer:
                 ele.write(dest)
 
     @staticmethod
-    def read_element_sections(sections: Dict[str, List[str]], nodes: List[Node]):
+    def read_element_sections(sections: Dict[str, List[str]], nodes: List[Node], out=False):
         elec = ElementContainer()
         # read elements
         if 'STRUCTURE ELEMENTS' in sections:
-            elec.structure = ElementContainer.__read_elements(nodes, sections['STRUCTURE ELEMENTS'])
+            elec.structure = ElementContainer.__read_elements(nodes, sections['STRUCTURE ELEMENTS'], out=out, fieldtype='Structural elements')
         
         if 'FLUID ELEMENTS' in sections:
-            elec.fluid = ElementContainer.__read_elements(nodes, sections['FLUID ELEMENTS'])
+            elec.fluid = ElementContainer.__read_elements(nodes, sections['FLUID ELEMENTS'], out=out, fieldtype='Fluid elements')
         
         if 'ALE ELEMENTS' in sections:
-            elec.ale = ElementContainer.__read_elements(nodes, sections['ALE ELEMENTS'])
+            elec.ale = ElementContainer.__read_elements(nodes, sections['ALE ELEMENTS'], out=out, fieldtype='ALE elements')
         
         if 'TRANSPORT ELEMENTS' in sections:
-            elec.transport = ElementContainer.__read_elements(nodes, sections['TRANSPORT ELEMENTS'])
+            elec.transport = ElementContainer.__read_elements(nodes, sections['TRANSPORT ELEMENTS'], out=out, fieldtype='Transport elements')
         
         if 'THERMO ELEMENTS' in sections:
-            elec.thermo = ElementContainer.__read_elements(nodes, sections['THERMO ELEMENTS'])
+            elec.thermo = ElementContainer.__read_elements(nodes, sections['THERMO ELEMENTS'], out=out, fieldtype='Thermo elements')
         
         return elec
 
@@ -274,11 +275,13 @@ class ElementContainer:
         List of elements
     """
     @staticmethod
-    def __read_elements(nodes: List[Node], lines: List[str]):
+    def __read_elements(nodes: List[Node], lines: List[str], out=False, fieldtype=None):
         eles = []
 
+        if fieldtype is None:
+            fieldtype = 'Elements'
 
-        for line in lines:
+        for line in progress(lines, out=out, label=fieldtype):
 
             ele = parse_ele(line, nodes)
             

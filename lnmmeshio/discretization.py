@@ -8,6 +8,7 @@ from .element.element import Element
 from .element.element_container import ElementContainer
 from .node import Node
 from .fiber import Fiber
+from .progress import progress
 
 """
 This class holds the discretization, consisting out of nodes and elements. The nodes and
@@ -261,11 +262,11 @@ class Discretization:
         Discretization object
     """
     @staticmethod
-    def read(sections: Dict[str, List[str]]) -> 'Discretization':
+    def read(sections: Dict[str, List[str]], out: bool = False) -> 'Discretization':
         disc = Discretization()
 
         # read nodes
-        for line in sections['NODE COORDS']:
+        for line in progress(sections['NODE COORDS'], out=out, label='Nodes'):
             if 'FNODE' in line:
                 # this is a fiber node
                 nodeid, _ = read_option_item(line, 'FNODE')
@@ -293,7 +294,7 @@ class Discretization:
 
         # read DPOINT topology
         if 'DNODE-NODE TOPOLOGY' in sections:
-            for line in sections['DNODE-NODE TOPOLOGY']:
+            for line in progress(sections['DNODE-NODE TOPOLOGY'], out=out, label='dnode topology'):
                 nodeid_str, _ = read_option_item(line, 'NODE')
                 
                 if nodeid_str is None or nodeid_str == '':
@@ -311,7 +312,7 @@ class Discretization:
 
         # read DLINE topology
         if 'DLINE-NODE TOPOLOGY' in sections:
-            for line in sections['DLINE-NODE TOPOLOGY']:
+            for line in progress(sections['DLINE-NODE TOPOLOGY'], out=out, label='dline topology'):
                 nodeid_str, _ = read_option_item(line, 'NODE')
                 
                 if nodeid_str is None or nodeid_str == '':
@@ -329,7 +330,7 @@ class Discretization:
 
         # read DSURF topology
         if 'DSURF-NODE TOPOLOGY' in sections:
-            for line in sections['DSURF-NODE TOPOLOGY']:
+            for line in progress(sections['DSURF-NODE TOPOLOGY'], out=out, label='dsurf topology'):
                 nodeid_str, _ = read_option_item(line, 'NODE')
                 
                 if nodeid_str is None or nodeid_str == '':
@@ -347,7 +348,7 @@ class Discretization:
 
         # read DVOL topology
         if 'DVOL-NODE TOPOLOGY' in sections:
-            for line in sections['DVOL-NODE TOPOLOGY']:
+            for line in progress(sections['DVOL-NODE TOPOLOGY'], out=out, label='dvol topology'):
                 nodeid_str, _ = read_option_item(line, 'NODE')
                 
                 if nodeid_str is None or nodeid_str == '':
@@ -363,7 +364,7 @@ class Discretization:
                 disc.nodes[nodeid-1].dvol.append(int(dvol))
 
         # read elements
-        disc.elements = ElementContainer.read_element_sections(sections, disc.nodes)
+        disc.elements = ElementContainer.read_element_sections(sections, disc.nodes, out=out)
 
         return disc
     
