@@ -92,18 +92,22 @@ def read_baci(input_stream, out=False):
                 
     return Discretization.read(sections, out=out)
 
-def write(filename: str, discretization: Discretization, file_format=None):
+def write(filename: str, discretization: Discretization, file_format=None, override=True):
     """
     Writes an unstructured mesh with added data
 
     Args:
         filename: The file to read from
         file_format: The file format of the file
+        override: Flag, whether existing files should be overriden (dangerous)
     
     Returns:
         Discretization: Returns the discretization in BACI format
     """
     assert isinstance(filename, str)
+
+    if not override and os.path.exists(filename):
+        raise FileExistsError("The file already exists")
 
     ftype: int = _get_type(filename, file_format=file_format)
 
@@ -146,7 +150,7 @@ def read_mesh(filename, file_format=None):
         # this maybe is a file format supported by meshio
         return _meshioread(filename, file_format=file_format)
 
-def write_mesh(filename, mesh, file_format=None, **kwargs):
+def write_mesh(filename, mesh, file_format=None, override=True, **kwargs):
     """
     Writes an unstructured mesh with added data from meshio raw data
 
@@ -154,10 +158,14 @@ def write_mesh(filename, mesh, file_format=None, **kwargs):
         filename: The file to read from
         mesh: meshio raw mesh data
         file_format: The file format of the file
+        override: Flag, whether existing files should be overriden (dangerous)
     """
     assert isinstance(filename, str)
 
     ftype: int = _get_type(filename, file_format=file_format)
+
+    if not override and os.path.isfile(filename):
+        raise FileExistsError("The file already exists")
 
     if ftype == __TYPE_BACI:
         write(filename, meshio_to_discretization.mesh2Discretization(mesh), file_format=file_format)

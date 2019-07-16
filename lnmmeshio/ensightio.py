@@ -23,14 +23,18 @@ def get_unique_filename(filename):
     
     return fname
 
-def write_case(filename, dis: Discretization, binary=True):
+def write_case(filename, dis: Discretization, binary=True, override=False):
     dis.compute_ids(False)
     filedir = os.path.dirname(filename)
 
     basename = os.path.splitext(os.path.basename(filedir))[0]
 
     # write geometry file
-    geofile =  get_unique_filename(os.path.join(filedir, '{0}_geometry.geo'.format(basename)))
+    if override:
+        geofile = os.path.join(filedir, '{0}_geometry.geo'.format(basename))
+    else:
+        geofile = get_unique_filename(os.path.join(filedir, '{0}_geometry.geo'.format(basename)))
+            
     with open(geofile, 'w{0}'.format('b' if binary else '')) as f:
         write_geometry(f, dis, binary=binary)
 
@@ -79,7 +83,10 @@ def write_case(filename, dis: Discretization, binary=True):
     # write them finally
     ele_vars_props = {}
     for varname, data in ele_vars.items():
-        varfile = get_unique_filename(os.path.join(filedir, '{0}_variable.{1}'.format(basename, varname)))
+        if override:
+            varfile = os.path.join(filedir, '{0}_variable.{1}'.format(basename, varname))
+        else:
+            varfile = get_unique_filename(os.path.join(filedir, '{0}_variable.{1}'.format(basename, varname)))
         ele_vars_props[varname] = {}
         ele_vars_props[varname]['filename'] = os.path.basename(varfile)
         with open(varfile, 'w{0}'.format('b' if binary else '')) as f:
@@ -103,7 +110,10 @@ def write_case(filename, dis: Discretization, binary=True):
     
     nodal_vars_props = {}
     for varname, data in nodal_vars.items():
-        varfile = get_unique_filename(os.path.join(filedir, '{0}_variable.{1}'.format(basename, varname)))
+        if override:
+            varfile = os.path.join(filedir, '{0}_variable.{1}'.format(basename, varname))
+        else:
+            varfile = get_unique_filename(os.path.join(filedir, '{0}_variable.{1}'.format(basename, varname)))
         nodal_vars_props[varname] = {}
         nodal_vars_props[varname]['filename'] = os.path.basename(varfile)
         with open(varfile, 'w{0}'.format('b' if binary else '')) as f:
@@ -111,10 +121,12 @@ def write_case(filename, dis: Discretization, binary=True):
                 write_node_variable(f, dis, varname, data, binary=binary)
 
     # write case file
-    casefile = get_unique_filename(filename)
+    if override:
+        casefile = filename
+    else:
+        casefile = get_unique_filename(filename)
     with open(casefile, 'w') as f:
         _write_case(f, os.path.basename(geofile), ele_vars_props, nodal_vars_props)
-    #raise NotImplementedError("Not implemented yet")
 
 def _write_case(fstream, geofile, ele_vars_props, nodal_vars_props):
 
