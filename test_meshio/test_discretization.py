@@ -18,37 +18,37 @@ class TestMeshio2Discretization(unittest.TestCase):
 
         # test scalar
         self.assertListEqual(
-            [n.id for n in dis.get_nodes_by_dnode(1)],
+            [n.id for n in dis.pointnodesets[0]],
             [1]
         )
         self.assertListEqual(
-            [n.id for n in dis.get_nodes_by_dline(1)],
+            [n.id for n in dis.linenodesets[0]],
             [1, 2]
         )
         self.assertListEqual(
-            [n.id for n in dis.get_nodes_by_dsurf(1)],
+            [n.id for n in dis.surfacenodesets[0]],
             [1, 2, 3]
         )
         self.assertListEqual(
-            [n.id for n in dis.get_nodes_by_dvol(1)],
+            [n.id for n in dis.volumenodesets[0]],
             [1, 2, 3, 4]
         )
 
         # test list
         self.assertListEqual(
-            [n.id for n in dis.get_nodes_by_dnode([1])],
+            [n.id for n in dis.pointnodesets[0]],
             [1]
         )
         self.assertListEqual(
-            [n.id for n in dis.get_nodes_by_dline([1])],
+            [n.id for n in dis.linenodesets[0]],
             [1, 2]
         )
         self.assertListEqual(
-            [n.id for n in dis.get_nodes_by_dsurf([1])],
+            [n.id for n in dis.surfacenodesets[0]],
             [1, 2, 3]
         )
         self.assertListEqual(
-            [n.id for n in dis.get_nodes_by_dvol([1])],
+            [n.id for n in dis.volumenodesets[0]],
             [1, 2, 3, 4]
         )
         

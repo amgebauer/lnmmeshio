@@ -19,6 +19,7 @@ from lnmmeshio import Tri6
 from lnmmeshio import Line2
 from lnmmeshio import Line3
 from lnmmeshio import Element
+from lnmmeshio.nodeset import VolumeNodeset, SurfaceNodeset, LineNodeset, PointNodeset
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 
@@ -40,26 +41,44 @@ class TestEles(unittest.TestCase):
     def test_common(self):
         ele = Element(None, 'X', self.__get_nodes(3))
 
-        ele.nodes[0].dvol = [0, 1, 2, 3]
-        ele.nodes[1].dvol = [0, 1, 2]
-        ele.nodes[2].dvol = [0, 1]
+        vnds = [VolumeNodeset(0), VolumeNodeset(1), VolumeNodeset(2), VolumeNodeset(3)]
+        snds = [SurfaceNodeset(10), SurfaceNodeset(11), SurfaceNodeset(12), SurfaceNodeset(13)]
+        lnds = [LineNodeset(20), LineNodeset(21), LineNodeset(22), LineNodeset(23)]
+        pnds = [PointNodeset(30), PointNodeset(31), PointNodeset(32), PointNodeset(33)]
 
-        ele.nodes[0].dsurf = [10, 11, 12, 13]
-        ele.nodes[1].dsurf = [10, 11, 12]
-        ele.nodes[2].dsurf = [10, 11]
+        for i in [0, 1, 2, 3]: vnds[i].add_node(ele.nodes[0])
+        for i in [0, 1, 2]: vnds[i].add_node(ele.nodes[1])
+        for i in [0, 1]: vnds[i].add_node(ele.nodes[2])
 
-        ele.nodes[0].dline = [20, 21, 22, 23]
-        ele.nodes[1].dline = [20, 21, 22]
-        ele.nodes[2].dline = [20, 21]
+        for i in [0, 1, 2, 3]: snds[i].add_node(ele.nodes[0])
+        for i in [0, 1, 2]: snds[i].add_node(ele.nodes[1])
+        for i in [0, 1]: snds[i].add_node(ele.nodes[2])
 
-        ele.nodes[0].dpoint = [30, 31, 32, 33]
-        ele.nodes[1].dpoint = [30, 31, 32]
-        ele.nodes[2].dpoint = [30, 31]
+        for i in [0, 1, 2, 3]: lnds[i].add_node(ele.nodes[0])
+        for i in [0, 1, 2]: lnds[i].add_node(ele.nodes[1])
+        for i in [0, 1]: lnds[i].add_node(ele.nodes[2])
 
-        self.assertListEqual(ele.get_dvols(), [0, 1])
-        self.assertListEqual(ele.get_dsurfs(), [10, 11])
-        self.assertListEqual(ele.get_dlines(), [20, 21])
-        self.assertListEqual(ele.get_dpoints(), [30, 31])
+        for i in [0, 1, 2, 3]: pnds[i].add_node(ele.nodes[0])
+        for i in [0, 1, 2]: pnds[i].add_node(ele.nodes[1])
+        for i in [0, 1]: pnds[i].add_node(ele.nodes[2])
+
+        for ns in vnds:
+            for n in ns:
+                n.volumenodesets.append(ns)
+        for ns in snds:
+            for n in ns:
+                n.surfacenodesets.append(ns)
+        for ns in lnds:
+            for n in ns:
+                n.linenodesets.append(ns)
+        for ns in pnds:
+            for n in ns:
+                n.pointnodesets.append(ns)
+            
+        self.assertListEqual(sorted([ns.id for ns in ele.get_dvols()]), [0, 1])
+        self.assertListEqual(sorted([ns.id for ns in ele.get_dsurfs()]), [10, 11])
+        self.assertListEqual(sorted([ns.id for ns in ele.get_dlines()]), [20, 21])
+        self.assertListEqual(sorted([ns.id for ns in ele.get_dpoints()]), [30, 31])
 
     def __test_ele(self, shape, cls, nnodes, faces, facetype, edges, edgetype):
 

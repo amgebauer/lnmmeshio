@@ -42,15 +42,28 @@ class TestMeshio2Discretization(unittest.TestCase):
             self.assertAlmostEqual(
                 np.linalg.norm(node1.coords - node2.coords), 0
             )
+        
+        # compare nodesets
+        self.assertEqual(len(dis.pointnodesets), len(dis2.pointnodesets))
+        self.assertEqual(len(dis.linenodesets), len(dis2.linenodesets))
+        self.assertEqual(len(dis.surfacenodesets), len(dis2.surfacenodesets))
 
+        for pns1, pns2 in zip(dis.pointnodesets, dis2.pointnodesets):
             self.assertListEqual(
-                sorted(node1.dpoint), sorted(node2.dpoint)
+                [n.id for n in pns1],
+                [n.id for n in pns2]
             )
+
+        for lns1, pns2 in zip(dis.linenodesets, dis2.linenodesets):
             self.assertListEqual(
-                sorted(node1.dline), sorted(node2.dline)
+                [n.id for n in lns1],
+                [n.id for n in lns1]
             )
+
+        for sns1, pns2 in zip(dis.surfacenodesets, dis2.surfacenodesets):
             self.assertListEqual(
-                sorted(node1.dsurf), sorted(node2.dsurf), 'id: {0}'.format(node1.id)
+                [n.id for n in sns1],
+                [n.id for n in sns1]
             )
         
         self.assertEqual(dis.elements.get_num_structure(), dis2.elements.get_num_structure())

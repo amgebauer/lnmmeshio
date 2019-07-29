@@ -4,6 +4,8 @@ import os
 import filecmp
 import io
 import numpy as np
+from lnmmeshio.nodeset import PointNodeset, LineNodeset, SurfaceNodeset, VolumeNodeset
+
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
  
@@ -47,18 +49,21 @@ class TestDat(unittest.TestCase):
         # read discretization
         disc = lnmmeshio.read(os.path.join(script_dir, 'data', 'dummy.dat'), out=True)
 
+        disc.compute_ids(zero_based=False)
+
         self.assertEqual(len(disc.nodes), 224)
         self.assertEqual(len(disc.elements.structure), 89)
         self.assertEqual(len(disc.elements.transport), 0)
 
-        self.assertListEqual(disc.nodes[0].dsurf, [1, 13])
-        self.assertListEqual(disc.nodes[47].dsurf, [9])
-        self.assertListEqual(disc.nodes[147].dsurf, [6])
+        self.assertListEqual([ns.id for ns in disc.nodes[0].surfacenodesets], [1, 13])
+        self.assertListEqual([ns.id for ns in disc.nodes[47].surfacenodesets], [9])
+        self.assertListEqual([ns.id for ns in disc.nodes[147].surfacenodesets], [6])
+
 
     def test_write_new(self):
         
         # build dummy discretization
-        d: lnmmeshio.Discretization = lnmmeshio.read(os.path.join(script_dir, 'data', 'dummy.dat'), out=True)
+        d: lnmmeshio.Discretization = lnmmeshio.Discretization()
         d.nodes = [
             lnmmeshio.Node(np.array([0.0, 0.0, 0.0])),
             lnmmeshio.Node(np.array([1.0, 0.0, 0.0])),
@@ -69,19 +74,24 @@ class TestDat(unittest.TestCase):
             d.nodes[i].fibers[lnmmeshio.Fiber.TypeFiber1] = lnmmeshio.Fiber(np.array([1.0, 0.0, 0.0]))
             d.nodes[i].fibers[lnmmeshio.Fiber.TypeFiber2] = lnmmeshio.Fiber(np.array([0.0, 1.0, 0.0]))
         
-        d.nodes[0].dpoint = [1]
+        d.pointnodesets.append(PointNodeset(1))
+        d.linenodesets.append(LineNodeset(1))
+        d.surfacenodesets.append(SurfaceNodeset(1))
+        d.volumenodesets.append(VolumeNodeset(1))
+
+        d.pointnodesets[0].add_node(d.nodes[0])
 
         # dline
         for i in range(0, 2):
-            d.nodes[i].dline = [1]
+            d.linenodesets[0].add_node(d.nodes[i])
 
         # dsurf
         for i in range(0, 3):
-            d.nodes[i].dsurf = [1]
+            d.surfacenodesets[0].add_node(d.nodes[i])
 
         # dvol
         for i in range(0, 4):
-            d.nodes[i].dvol = [1]
+            d.volumenodesets[0].add_node(d.nodes[i])
 
         d.elements.structure = [
             lnmmeshio.Element('SOLIDT4SCATRA', 'TET4', d.nodes)
@@ -96,6 +106,7 @@ class TestDat(unittest.TestCase):
 
         # read dummy file
         d_new = lnmmeshio.read_baci(dummy_file)
+        d_new.compute_ids(zero_based=True)
 
         self.assertEqual(len(d_new.nodes), 4)
         self.assertEqual(len(d_new.elements.structure), 1)
@@ -109,25 +120,27 @@ class TestDat(unittest.TestCase):
             self.assertAlmostEqual(np.linalg.norm(d_new.nodes[i].fibers[lnmmeshio.Fiber.TypeFiber1].fiber-np.array([1, 0, 0])), 0.0)
             self.assertAlmostEqual(np.linalg.norm(d_new.nodes[i].fibers[lnmmeshio.Fiber.TypeFiber2].fiber-np.array([0, 1, 0])), 0.0)
         
-        self.assertListEqual(d_new.nodes[0].dpoint, [1])
-        self.assertListEqual(d_new.nodes[1].dpoint, [])
-        self.assertListEqual(d_new.nodes[2].dpoint, [])
-        self.assertListEqual(d_new.nodes[3].dpoint, [])
+        self.assertEqual(len(d_new.pointnodesets), 1)
+        self.assertEqual(len(d_new.pointnodesets[0]), 1)
+        self.assertEqual(d_new.pointnodesets[0][0].id, 0)
 
-        self.assertListEqual(d_new.nodes[0].dline, [1])
-        self.assertListEqual(d_new.nodes[1].dline, [1])
-        self.assertListEqual(d_new.nodes[2].dline, [])
-        self.assertListEqual(d_new.nodes[3].dline, [])
+        self.assertEqual(len(d_new.linenodesets), 1)
+        self.assertEqual(len(d_new.linenodesets[0]), 2)
+        self.assertEqual(d_new.linenodesets[0][0].id, 0)
+        self.assertEqual(d_new.linenodesets[0][1].id, 1)
 
-        self.assertListEqual(d_new.nodes[0].dsurf, [1])
-        self.assertListEqual(d_new.nodes[1].dsurf, [1])
-        self.assertListEqual(d_new.nodes[2].dsurf, [1])
-        self.assertListEqual(d_new.nodes[3].dsurf, [])
+        self.assertEqual(len(d_new.surfacenodesets), 1)
+        self.assertEqual(len(d_new.surfacenodesets[0]), 3)
+        self.assertEqual(d_new.surfacenodesets[0][0].id, 0)
+        self.assertEqual(d_new.surfacenodesets[0][1].id, 1)
+        self.assertEqual(d_new.surfacenodesets[0][2].id, 2)
 
-        self.assertListEqual(d_new.nodes[0].dvol, [1])
-        self.assertListEqual(d_new.nodes[1].dvol, [1])
-        self.assertListEqual(d_new.nodes[2].dvol, [1])
-        self.assertListEqual(d_new.nodes[3].dvol, [1])
+        self.assertEqual(len(d_new.volumenodesets), 1)
+        self.assertEqual(len(d_new.volumenodesets[0]), 4)
+        self.assertEqual(d_new.volumenodesets[0][0].id, 0)
+        self.assertEqual(d_new.volumenodesets[0][1].id, 1)
+        self.assertEqual(d_new.volumenodesets[0][2].id, 2)
+        self.assertEqual(d_new.volumenodesets[0][3].id, 3)
 
         
         self.assertEqual(

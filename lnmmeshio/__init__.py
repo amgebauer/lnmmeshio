@@ -27,6 +27,9 @@ from .discretization import Discretization
 from . import ioutils
 from . import ensightio
 from . import mimics_stlio
+from .conditions import condition
+from .conditions import surf_dirich_condition
+from .conditions import conditionreader
 
 import numpy as np
 
@@ -121,7 +124,8 @@ def write(filename: str, discretization: Discretization, file_format=None, overr
     elif ftype == __TYPE_MIMICS_STL:
         raise NotImplementedError('Writing in Mimics stl is currently not supported')
     else:
-        write_mesh(filename, meshio_to_discretization.discretization2mesh(discretization), file_format=file_format)
+        m = meshio_to_discretization.discretization2mesh(discretization)
+        write_mesh(filename, m, file_format=file_format)
 
 def read_mesh(filename, file_format=None):
     """

@@ -17,10 +17,11 @@ class Node:
         self.id = None
         self.coords: np.array = coords
         self.fibers: Dict[str, Fiber] = {}
-        self.dpoint = []
-        self.dline = []
-        self.dsurf = []
-        self.dvol = []
+
+        self.pointnodesets = []
+        self.linenodesets = []
+        self.surfacenodesets = []
+        self.volumenodesets = []
         self.data = {}
     
     """
