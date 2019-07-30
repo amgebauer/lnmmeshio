@@ -12,5 +12,5 @@ class VolumeDirichletConditions(CommonConditions):
         return "DESIGN VOL DIRICH CONDITIONS"
 
     @staticmethod
-    def read(lines, dis) -> 'VolumeDirichletConditions':
-        return CommonConditions.read(lines, dis, c.ConditionsType.ActOnType.VOLUME)
+    def read(lines, dat) -> 'VolumeDirichletConditions':
+        return CommonConditions.read(lines, dat, c.ConditionsType.ActOnType.VOLUME)

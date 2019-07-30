@@ -12,5 +12,5 @@ class SurfaceNeumannConditions(CommonConditions):
         return "DESIGN SURF NEUMANN CONDITIONS"
 
     @staticmethod
-    def read(lines, dis) -> 'SurfaceNeumannConditions':
-        return CommonConditions.read(lines, dis, c.ConditionsType.ActOnType.SURFACE)
+    def read(lines, dat) -> 'SurfaceNeumannConditions':
+        return CommonConditions.read(lines, dat, c.ConditionsType.ActOnType.SURFACE)

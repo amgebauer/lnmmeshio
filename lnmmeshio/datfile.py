@@ -10,7 +10,7 @@ from .node import Node
 from .fiber import Fiber
 from .progress import progress
 from .discretization import Discretization
-from .function import Function
+from .functions.function import Function
 from .conditions.condition import ConditionsType
 from .conditions.conditionreader import read_conditions
 
@@ -52,8 +52,9 @@ class Datfile:
 
         for f in self.functions:
             f.reset()
-    
-        """
+
+
+    """
     Static method that creates the discretizations file from the input lines of a .dat file
 
     Args:
@@ -73,4 +74,4 @@ class Datfile:
         dat.functions = Function.read_functions(sections)
 
         # read boundary conditions
-        dat.conditions = read_conditions(sections, dat.discretization)
+        dat.conditions = read_conditions(sections, dat)

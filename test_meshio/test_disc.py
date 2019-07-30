@@ -9,7 +9,7 @@ from lnmmeshio.nodeset import PointNodeset, LineNodeset, SurfaceNodeset, VolumeN
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
  
-class TestDat(unittest.TestCase):
+class TestDiscretizationIO(unittest.TestCase):
  
     def setUp(self):
         pass

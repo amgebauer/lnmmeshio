@@ -10,7 +10,6 @@ from .node import Node
 from .fiber import Fiber
 from .progress import progress
 from .nodeset import PointNodeset, LineNodeset, SurfaceNodeset, VolumeNodeset
-from .function import Function
 
 """
 This class holds the discretization, consisting out of nodes and elements. The nodes and

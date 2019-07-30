@@ -12,5 +12,5 @@ class PointDirichletConditions(CommonConditions):
         return "DESIGN POINT DIRICH CONDITIONS"
 
     @staticmethod
-    def read(lines, dis) -> 'PointDirichletConditions':
-        return CommonConditions.read(lines, dis, c.ConditionsType.ActOnType.POINT)
+    def read(lines, dat) -> 'PointDirichletConditions':
+        return CommonConditions.read(lines, dat, c.ConditionsType.ActOnType.POINT)

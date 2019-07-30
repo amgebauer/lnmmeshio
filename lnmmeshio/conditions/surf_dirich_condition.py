@@ -12,5 +12,5 @@ class SurfaceDirichletConditions(CommonConditions):
         return "DESIGN SURF DIRICH CONDITIONS"
 
     @staticmethod
-    def read(lines, dis) -> 'SurfaceDirichletConditions':
-        return CommonConditions.read(lines, dis, c.ConditionsType.ActOnType.SURFACE)
+    def read(lines, dat) -> 'SurfaceDirichletConditions':
+        return CommonConditions.read(lines, dat, c.ConditionsType.ActOnType.SURFACE)

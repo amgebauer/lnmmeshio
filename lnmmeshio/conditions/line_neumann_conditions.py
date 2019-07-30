@@ -12,5 +12,5 @@ class LineNeumannConditions(CommonConditions):
         return "DESIGN LINE NEUMANN CONDITIONS"
 
     @staticmethod
-    def read(lines, dis) -> 'LineNeumannConditions':
-        return CommonConditions.read(lines, dis, c.ConditionsType.ActOnType.LINE)
+    def read(lines, dat) -> 'LineNeumannConditions':
+        return CommonConditions.read(lines, dat, c.ConditionsType.ActOnType.LINE)

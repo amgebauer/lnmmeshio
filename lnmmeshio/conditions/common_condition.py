@@ -31,7 +31,7 @@ class CommonCondition(c.Condition):
         ))
 
     @staticmethod
-    def read(line, dis, acton):
+    def read(line, dat, acton):
         nodeset_id_str = read_option_item(line, 'E')[0]
         if nodeset_id_str is None:
             return None
@@ -41,19 +41,22 @@ class CommonCondition(c.Condition):
         fcn = read_option_item(line, 'FUNCT', numdof)[0]
 
         if acton == c.ConditionsType.ActOnType.POINT:
-            nodeset = dis.pointnodesets[int(nodeset_id_str)-1]
+            nodeset = dat.pointnodesets[int(nodeset_id_str)-1]
         elif acton == c.ConditionsType.ActOnType.LINE:
-            nodeset = dis.linenodesets[int(nodeset_id_str)-1]
+            nodeset = dat.linenodesets[int(nodeset_id_str)-1]
         elif acton == c.ConditionsType.ActOnType.SURFACE:
-            nodeset = dis.surfacenodesets[int(nodeset_id_str)-1]
+            nodeset = dat.surfacenodesets[int(nodeset_id_str)-1]
         elif acton == c.ConditionsType.ActOnType.VOLUME:
-            nodeset = dis.volumenodesets[int(nodeset_id_str)-1]
+            nodeset = dat.volumenodesets[int(nodeset_id_str)-1]
         onoff = np.array([int(i) for i in onoff_str], dtype=bool)
         value = np.array(value, dtype=float)
         fcn = np.array(fcn, dtype=int)
 
         if np.any(fcn):
-            raise NotImplementedError("Currently functions are not supported in this kind of bc")
+            fcns = [None]*numdof
+            for i, f in enumerate(fcn):
+                if f > 0:
+                    fcns[i] = dat.functions[f-1]
 
         return CommonCondition(nodeset, onoff, value, acton)
 

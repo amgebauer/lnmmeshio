@@ -51,6 +51,41 @@ def read_option_item(line: str, option: str, num: int = 1):
     else:
         return [match.group(i) for i in range(2, num+2)], match.span(0)
 
+def read_ints(line: str, option: str, num: int) -> np.array:
+    str_items = read_option_item(line, option, num)[0]
+
+    if str_items is None:
+        raise RuntimeError("Could not find int array {1} in {0}".format(line, option))
+    
+
+    int_items = None
+    try:
+        int_items = [int(i) for i in str_items]
+    except TypeError:
+        int_items = [int(str_items)]
+    return np.array(int_items)
+
+def read_int(line: str, option: str) -> int:
+    return read_ints(line, option, 1)[0]
+
+
+def read_floats(line: str, option: str, num: int) -> np.array:
+    str_items = read_option_item(line, option, num)[0]
+
+    if str_items is None:
+        raise RuntimeError("Could not find float array {1} in {0}".format(line, option))
+    
+
+    float_items = None
+    try:
+        float_items = [float(i) for i in str_items]
+    except TypeError:
+        float_items = [float(str_items)]
+    return np.array(float_items)
+
+def read_float(line: str, option: str) -> int:
+    return read_floats(line, option, 1)[0]
+
 def read_next_key(line):
     regex = re.compile(r'^[ ]*(\S+)\s*')
 

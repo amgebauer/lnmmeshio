@@ -12,5 +12,5 @@ class VolumeNeumannConditions(CommonConditions):
         return "DESIGN VOL NEUMANN CONDITIONS"
 
     @staticmethod
-    def read(lines, dis) -> 'VolumeNeumannConditions':
-        return CommonConditions.read(lines, dis, c.ConditionsType.ActOnType.VOLUME)
+    def read(lines, dat) -> 'VolumeNeumannConditions':
+        return CommonConditions.read(lines, dat, c.ConditionsType.ActOnType.VOLUME)

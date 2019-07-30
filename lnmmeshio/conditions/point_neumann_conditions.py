@@ -12,5 +12,5 @@ class PointNeumannConditions(CommonConditions):
         return "DESIGN POINT NEUMANN CONDITIONS"
 
     @staticmethod
-    def read(lines, dis) -> 'PointNeumannConditions':
-        return CommonConditions.read(lines, dis, c.ConditionsType.ActOnType.POINT)
+    def read(lines, dat) -> 'PointNeumannConditions':
+        return CommonConditions.read(lines, dat, c.ConditionsType.ActOnType.POINT)

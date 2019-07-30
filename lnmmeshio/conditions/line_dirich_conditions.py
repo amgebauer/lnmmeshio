@@ -12,5 +12,5 @@ class LineDirichletConditions(CommonConditions):
         return "DESIGN LINE DIRICH CONDITIONS"
 
     @staticmethod
-    def read(lines, dis) -> 'LineDirichletConditions':
-        return CommonConditions.read(lines, dis, c.ConditionsType.ActOnType.LINE)
+    def read(lines, dat) -> 'LineDirichletConditions':
+        return CommonConditions.read(lines, dat, c.ConditionsType.ActOnType.LINE)
