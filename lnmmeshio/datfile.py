@@ -28,6 +28,9 @@ class Datfile:
 
         # initialize conditions
         self.conditions = List[ConditionsType]
+
+        # initialize head
+        self.head: Dict[str, List[str]] = {}
     
         """
     Computes the ids of the elements and nodes. 
@@ -44,7 +47,7 @@ class Datfile:
             f.id = id
             id += 1
         
-        """
+    """
     Resets the computed ids
     """
     def reset(self):
@@ -75,3 +78,5 @@ class Datfile:
 
         # read boundary conditions
         dat.conditions = read_conditions(sections, dat)
+
+        # read head

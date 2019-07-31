@@ -35,7 +35,7 @@ def read_dat_sections(origin):
     return content
 
 def read_option_item(line: str, option: str, num: int = 1):
-    regex = re.compile('(^| ){0}{1}($|\s)'.format(re.escape(option), num*'[ ]+([\\S]+)'))
+    regex = re.compile(r'(^| ){0}{1}($|\s)'.format(re.escape(option), num*'[ ]+([\\S]+)'))
 
     # split comment
     line = line.split('//', 1)[0]
