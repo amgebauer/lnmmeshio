@@ -14,6 +14,7 @@ from .functions.function import Function
 from .conditions.condition import ConditionsType
 from .conditions.conditionreader import read_conditions
 from .head import Head
+from .result_description import ResultDescription
 
 """
 This class holds all information in the datfiles, consisting out of the discretization, conditions
@@ -28,12 +29,15 @@ class Datfile:
         self.functions: List[Function] = []
 
         # initialize conditions
-        self.conditions = List[ConditionsType]
+        self.conditions: List[ConditionsType] = []
+
+        # initialize result description
+        self.result_description: List[ResultDescription] = []
 
         # initialize head
         self.head: Head = Head()
     
-        """
+    """
     Computes the ids of the elements and nodes. 
 
     Args:
@@ -64,19 +68,101 @@ class Datfile:
         dest: Stream to write the datfile to
     """
     def write(self, dest):
+        sections = OrderedDict()
+
         # write head
-        self.head.write(dest)
+        sections.update(self.head.get_sections())
 
         # write functions
         for f in self.functions:
-            f.write(dest)
+            sections.update(f.get_sections())
         
         # write conditions
         for c in self.conditions:
+            sections.update(c.get_sections())
             c.write(dest)
         
+        # write result description
+        sections['RESULT DESCRIPTION'] = []
+        for d in self.result_description:
+            sections['RESULT DESCRIPTION'].append(d.get_line())
+
         # write discretization
-        self.discretization.write(dest)
+        sections.update(self.discretization.get_sections())
+
+        # reorder sections
+        sections = Datfile.reorder_sections(sections)
+
+        # write sections
+        for title, lines in sections.items():
+            write_title(dest, title, True)
+            for l in lines:
+                dest.write('{0}\n'.format(l))
+    
+    """
+    Reorderes the sections of the datfile into a specific order
+
+    Args:
+        sections: Dictionary of sections as keys and section lines as values
+    
+    Return:
+        ordered dictionary of sections as keys and section lines as values
+    """
+    @staticmethod
+    def reorder_sections(sections):
+        ORDER_RULES = [
+            '',
+            'TITLE',
+            'PROBLEM SIZE',
+            'PROBLEM TYP',
+            None, # this will be filled by the rest
+            'MATERIALS', # materials
+            re.compile(r'^FUNCT\d+$'), # functions
+            'RESULT DESCRIPTION',
+            re.compile(r'.*\sCONDITIONS$'), # conditions
+            'DESIGN DESCRIPTION',
+            'DNODE-NODE TOPOLOGY',
+            'DLINE-NODE TOPOLOGY',
+            'DSURF-NODE TOPOLOGY',
+            'DVOL-NODE TOPOLOGY',
+            'NODE COORDS',
+            re.compile(r'[A-Z]+\s+ELEMENTS$'),
+            'END'
+        ]
+        to_process = list(sections.keys())
+        myorder = []
+
+        # order keys
+        rest_pos = None
+        for order_rule in ORDER_RULES:
+            if isinstance(order_rule, re.Pattern):
+                # look for all keys that fit and are not added yet
+                matches = []
+                for i in to_process:
+                    if order_rule.match(i):
+                        matches.append(i)
+
+
+                myorder.extend(sorted(matches))
+                to_process = [i for i in to_process if i not in matches]
+
+            elif order_rule is None:
+                if rest_pos is None:
+                    rest_pos = len(myorder)
+            else:
+                # this is a single string
+                if order_rule in to_process:
+                    myorder.append(order_rule)
+                    to_process.remove(order_rule)
+        
+        if rest_pos is None:
+            rest_pos = len(myorder)
+        
+        for i in sorted(to_process):
+            myorder.insert(rest_pos, i)
+            rest_pos += 1
+
+        return OrderedDict((k, sections[k]) for k in myorder)
 
     """
     Static method that creates the discretizations file from the input lines of a .dat file
@@ -99,6 +185,9 @@ class Datfile:
 
         # read boundary conditions
         dat.conditions = read_conditions(sections, dat)
+
+        # read result description
+        dat.result_description = ResultDescription.parseall(sections, dat)
 
         # read head
         dat.head = Head.read(sections)

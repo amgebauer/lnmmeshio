@@ -1,5 +1,7 @@
-import re
-from .ioutils import read_next_key, read_next_option, read_next_value, write_comment, write_option, write_option_list, write_title
+import re, io
+from .ioutils import read_next_key, read_next_option, read_next_value, write_comment, write_option, \
+    write_option_list, write_title, line_comment, line_option, line_option_list
+from collections import OrderedDict
 
 EXCLUDE_SECTIONS = [
     re.compile(r'^FUNCT\d+$'),
@@ -45,6 +47,9 @@ class BaseLine:
         if len(l) == 1:
                 return l[0], None
         return l[0], l[1]
+    
+    def get_line(self):
+        raise NotImplementedError("This method is not implemented, but should be by the derived class")
 
 class SingleOptionLine(BaseLine):
 
@@ -67,6 +72,22 @@ class SingleOptionLine(BaseLine):
             write_comment(dest, self.comment, True)
         else:
             dest.write('\n')
+
+    def get_line(self):
+        l = io.StringIO()
+        comments_written = False
+        if self.comment is not None and len(self.comment) > 50:
+            # write comment in extra line
+            l.write(line_comment(self.comment))
+            comments_written = True
+        
+        l.write(line_option(self.key, self.value, None))
+
+        if not comments_written and self.comment is not None:
+            l.write(' ')
+            l.write(line_comment(self.comment))
+        
+        return l.getvalue()
 
     @staticmethod
     def parse(line):
@@ -103,6 +124,22 @@ class MultipleOptionsLine(BaseLine):
             write_comment(dest, self.comment, True)
         else:
             dest.write('\n')
+
+    def get_line(self):
+        l = io.StringIO()
+        comments_written = False
+        if self.comment is not None and len(self.comment) > 50:
+            # write comment in extra line
+            l.write(line_comment(self.comment))
+            comments_written = True
+        
+        l.write(line_option_list(self.options))
+
+        if not comments_written and self.comment is not None:
+            l.write(' ')
+            l.write(line_comment(self.comment))
+        
+        return l.getvalue()
 
     @staticmethod
     def parse(line):
@@ -151,6 +188,15 @@ class Section:
         write_title(dest, self.name, True)
         if self.comment is not None:
             write_comment(dest, self.comment, True)
+    
+    def get_sections(self):
+        d = OrderedDict()
+        d[self.name] = []
+
+        if self.comment != None:
+            d[self.name] = '// {0}'.format(self.comment)
+        
+        return d
 
 class TextSection(Section):
 
@@ -165,6 +211,12 @@ class TextSection(Section):
     
     def __getitem__(self, i):
         return self.lines[i]
+
+    def get_sections(self):
+        d = super(TextSection, self).get_sections()
+        for l in self.lines:
+            d[self.name].append(l)
+        return d
 
     def write(self, dest):
         super(TextSection, self).write(dest)
@@ -185,6 +237,12 @@ class SingleOptionSection(Section):
         super(SingleOptionSection, self).write(dest)
         for l in self.lines:
             l.write(dest)
+
+    def get_sections(self):
+        d = super(SingleOptionSection, self).get_sections()
+        for l in self.lines:
+            d[self.name].append(l.get_line())
+        return d
 
     def __len__(self):
         return len(self.lines)
@@ -232,6 +290,12 @@ class MultipleOptionsSection(Section):
     
     def append(self, line):
         self.lines.append(line)
+
+    def get_sections(self):
+        d = super(MultipleOptionsSection, self).get_sections()
+        for l in self.lines:
+            d[self.name].append(l.get_line())
+        return d
     
     def write(self, dest):
         super(MultipleOptionsSection, self).write(dest)
@@ -271,6 +335,14 @@ class Head:
             return None
         return self.sections[key]
     
+    def get_sections(self):
+        d = OrderedDict()
+
+        for section in self.sections.values():
+            d.update(section.get_sections())
+
+        return d
+
     def write(self, dest):
         for section in self.sections.values():
             section.write(dest)
