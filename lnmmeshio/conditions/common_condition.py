@@ -11,7 +11,7 @@ class CommonCondition(c.Condition):
         self.funct = funct
         self.acton = acton
 
-    def write(self, dest):
+    def get_line(self):
         if self.funct is None:
             fcns = [0]
         else:
@@ -23,12 +23,12 @@ class CommonCondition(c.Condition):
         if len(fcns) != len(self.onoff) or len(self.onoff) != len(self.value):
             raise RuntimeError("Dimensions do not fit!")
 
-        dest.write("E {0} - NUMDOF {1} ONOFF {2} VAL {3} FUNCT {4}\n".format(
+        return "E {0} - NUMDOF {1} ONOFF {2} VAL {3} FUNCT {4}".format(
             self.nodeset.id, len(self.onoff),
             ' '.join(['1' if i==True else '0' for i in self.onoff]),
             ' '.join([str(i) for i in self.value]),
             ' '.join([str(i) for i in fcns])
-        ))
+        )
 
     @staticmethod
     def read(line, dat, acton):

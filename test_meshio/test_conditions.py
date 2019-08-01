@@ -72,10 +72,9 @@ class TestConditions(unittest.TestCase):
 
             bc = CommonCondition(dis.surfacenodesets[0], np.array([True]*3+[False]*2), np.array([0.1, 0.2, 0.3, 0.4, 0.5]), acton)
 
-            dummy_file = io.StringIO()
-            bc.write(dummy_file)
+            dummy_file = bc.get_line()
 
-            self.assertEqual('E 0 - NUMDOF 5 ONOFF 1 1 1 0 0 VAL 0.1 0.2 0.3 0.4 0.5 FUNCT 0 0 0 0 0\n', dummy_file.getvalue())  
+            self.assertEqual('E 0 - NUMDOF 5 ONOFF 1 1 1 0 0 VAL 0.1 0.2 0.3 0.4 0.5 FUNCT 0 0 0 0 0', dummy_file)  
 
     def common_conditions(self, clsref, containerref, head, type):
         dis = TestConditions.get_discretization()
@@ -87,14 +86,18 @@ class TestConditions(unittest.TestCase):
         bcs.add(bc1)
         bcs.add(bc2)
 
-        dummy_file = io.StringIO()
-        bcs.write(dummy_file)
-        content = dummy_file.getvalue()
-        while content[0] == '-':
-            content = content[1:]
+        sections = bcs.get_sections()
 
-        self.assertEqual('DESIGN {0} {1} CONDITIONS\nD{0} 2\nE 0 - NUMDOF 5 ONOFF 1 1 1 0 0 VAL 0.1 0.2 0.3 0.4 0.5 FUNCT 0 0 0 0 0\nE 1 - NUMDOF 5 ONOFF 1 1 0 0 0 VAL 0.1 0.2 0.3 0.4 0.5 FUNCT 0 0 0 0 0\n'.format(head, type), content)
-    
+        self.assertDictEqual(dict(bcs.get_sections()),
+            {
+                'DESIGN {0} {1} CONDITIONS'.format(head, type): [
+                    'D{0} 2'.format(head),
+                    'E 0 - NUMDOF 5 ONOFF 1 1 1 0 0 VAL 0.1 0.2 0.3 0.4 0.5 FUNCT 0 0 0 0 0',
+                    'E 1 - NUMDOF 5 ONOFF 1 1 0 0 0 VAL 0.1 0.2 0.3 0.4 0.5 FUNCT 0 0 0 0 0'
+                ]
+            }
+        )
+
     def test_write_surfdirich_multiple(self):
         self.common_conditions(CommonCondition, SurfaceDirichletConditions, 'SURF', 'DIRICH')
     
@@ -147,6 +150,21 @@ class TestConditions(unittest.TestCase):
         self.assertListEqual(list(bcs[0][1].onoff), [True]*3)
         self.assertListEqual(list(bcs[0][0].value), [0.1, 0.2, 0.3, 0.4, 0.5, 0.6])
         self.assertListEqual(list(bcs[0][1].value), [0.1, 0.2, 0.3])
+
+    def test_unknown_condition(self):
+        dis = TestConditions.get_discretization()
+
+        sections = {}
+        sections['DESIGN NONEXISTANT CONDITIONS'] = []
+        sections['DESIGN NONEXISTANT CONDITIONS'].append(' //D1 2')
+        sections['DESIGN NONEXISTANT CONDITIONS'].append(' //E 1 - NUMDOF 6 ONOFF 1 1 1 0 0 0 VAL 0.1 0.2 0.3 0.4 0.5 0.6 FUNCT 0 0 0 0 0 0')
+        self.assertListEqual(read_conditions(sections, dis), [])
+        
+        sections['DESIGN NONEXISTANT CONDITIONS'].append('D1 2')
+        sections['DESIGN NONEXISTANT CONDITIONS'].append('E 1 - NUMDOF 6 ONOFF 1 1 1 0 0 0 VAL 0.1 0.2 0.3 0.4 0.5 0.6 FUNCT 0 0 0 0 0 0')
+
+        with self.assertRaises(NotImplementedError):
+            bcs = read_conditions(sections, dis)
 
     def test_read_surfdirich_multiple(self):
         self.read_common_multiple('SURF', 'DIRICH')

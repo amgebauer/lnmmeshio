@@ -8,6 +8,9 @@ from .surf_neumann_condition import SurfaceNeumannConditions
 from .point_neumann_conditions import PointNeumannConditions
 from .line_neumann_conditions import LineNeumannConditions
 from .volume_neumann_conditions import VolumeNeumannConditions
+import re
+
+REGEX_CONDITION = re.compile(r'.*\sCONDITIONS$')
 
 def read_conditions(sections, dat) -> List[ConditionsType]:
     conditions = []
@@ -35,7 +38,7 @@ def read_conditions(sections, dat) -> List[ConditionsType]:
             conditions.append(VolumeNeumannConditions.read(lines, dat))
         
         # unknown condition
-        elif title[:-4] == ' CONDITIONS':
+        elif REGEX_CONDITION.match(title) is not None:
             # check, whether there are non-empty lines
             for line in lines:
                 line = line.split('//', 1)[0].strip()

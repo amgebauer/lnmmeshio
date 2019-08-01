@@ -1,10 +1,11 @@
 from enum import Enum
 from .. import ioutils
+from collections import OrderedDict
 
 class Condition:
 
-    def write(self, dest):
-        raise NotImplementedError("The condition needs to implement write!")
+    def get_line(self):
+        raise NotImplementedError("The condition needs to implement get_line!")
 
 """
 This class is an abstract definition of an condition.
@@ -40,19 +41,24 @@ class ConditionsType:
             raise StopIteration
         return self[self.i-1]
 
-    def write(self, dest):
-        ioutils.write_title(dest, self.get_baci_header(), True)
+    def get_sections(self):
+        sections = OrderedDict()
+        sections[self.get_baci_header()] = []
+
         if self.acton == ConditionsType.ActOnType.POINT:
-            dest.write('DPOINT {0}\n'.format(len(self)))
+            sections[self.get_baci_header()].append('DPOINT {0}'.format(len(self)))
         elif self.acton == ConditionsType.ActOnType.LINE:
-            dest.write('DLINE {0}\n'.format(len(self)))
+            sections[self.get_baci_header()].append('DLINE {0}'.format(len(self)))
         elif self.acton == ConditionsType.ActOnType.SURFACE:
-            dest.write('DSURF {0}\n'.format(len(self)))
+            sections[self.get_baci_header()].append('DSURF {0}'.format(len(self)))
         elif self.acton == ConditionsType.ActOnType.VOLUME:
-            dest.write('DVOL {0}\n'.format(len(self)))
+            sections[self.get_baci_header()].append('DVOL {0}'.format(len(self)))
         
         for item in self:
-            item.write(dest)
+            sections[self.get_baci_header()].append(item.get_line())
+            
+        return sections
+
     
     @staticmethod
     def read(lines, dis):

@@ -40,6 +40,8 @@ class Function:
             lines.append(v.get_line())
         d['FUNCT{0}'.format(self.id)] = lines
 
+        return d
+
     def write(self, dest):
         write_title(dest, 'FUNCT{0}'.format(self.id), True)
         

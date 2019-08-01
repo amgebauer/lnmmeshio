@@ -61,13 +61,14 @@ class Datfile:
         for f in self.functions:
             f.reset()
 
-    """
-    Writes the content of the datfile into dest
 
-    Args:
-        dest: Stream to write the datfile to
     """
-    def write(self, dest):
+    Creates an dictionary of lines with section title as key
+
+    Return:
+        Dat file as dict
+    """
+    def get_sections(self):
         sections = OrderedDict()
 
         # write head
@@ -80,7 +81,6 @@ class Datfile:
         # write conditions
         for c in self.conditions:
             sections.update(c.get_sections())
-            c.write(dest)
         
         # write result description
         sections['RESULT DESCRIPTION'] = []
@@ -89,6 +89,17 @@ class Datfile:
 
         # write discretization
         sections.update(self.discretization.get_sections())
+
+        return sections
+
+    """
+    Writes the content of the datfile into dest
+
+    Args:
+        dest: Stream to write the datfile to
+    """
+    def write(self, dest):
+        sections = self.get_sections()
 
         # reorder sections
         sections = Datfile.reorder_sections(sections)

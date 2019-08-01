@@ -5,6 +5,7 @@ from lnmmeshio.discretization import Discretization
 from lnmmeshio.node import Node
 from lnmmeshio.element.element import Element
 from lnmmeshio.element.tri3 import Tri3
+from lnmmeshio.functions.function import Function
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
  
@@ -22,6 +23,8 @@ class TestResultDescription(unittest.TestCase):
         dat.discretization.elements.structure = [
             Tri3('TRI3', copy.copy(dat.discretization.nodes))
         ]
+
+        dat.functions = [Function(1)]
         return dat
     
     def test_read_description(self):
