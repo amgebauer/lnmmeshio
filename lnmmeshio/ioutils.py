@@ -76,7 +76,8 @@ def read_floats(line: str, option: str, num: int) -> np.array:
     if str_items is None:
         raise RuntimeError("Could not find float array {1} in {0}".format(line, option))
     
-
+    if isinstance(str_items, str):
+        str_items = [str_items]
     float_items = None
     try:
         float_items = [float(i) for i in str_items]

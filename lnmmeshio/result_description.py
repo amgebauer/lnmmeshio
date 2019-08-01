@@ -27,11 +27,11 @@ class ResultDescription:
     
     @staticmethod
     def parseall(sections, datfile):
-        if 'RESULT DESCRPTION' not in sections:
+        if 'RESULT DESCRIPTION' not in sections:
             return []
         
         r = []
-        for line in sections['RESULT DESCRPTION']:
+        for line in sections['RESULT DESCRIPTION']:
             d = ResultDescription.parse(line, datfile)
 
             if d is not None:
