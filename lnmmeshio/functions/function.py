@@ -2,6 +2,7 @@ from .component import Component
 from ..ioutils import read_option_item, write_option_list, write_title
 from .variable import BaseVariable
 from .variablereader import read_variable
+from collections import OrderedDict
 
 class Function:
 
@@ -27,6 +28,18 @@ class Function:
         
         self.variables[variable.name] = variable
     
+    def get_sections(self):
+        d = OrderedDict()
+
+        lines = []
+
+        for c in self.components:
+            lines.append(c.get_line())
+            
+        for v in self.variables.values():
+            lines.append(v.get_line())
+        d['FUNCT{0}'.format(self.id)] = lines
+
     def write(self, dest):
         write_title(dest, 'FUNCT{0}'.format(self.id), True)
         

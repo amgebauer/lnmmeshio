@@ -1,5 +1,5 @@
 from .variable import BaseVariable
-from ..ioutils import read_option_item, read_int, read_ints, read_floats, write_option_list
+from ..ioutils import read_option_item, read_int, read_ints, read_floats, write_option_list, line_option_list
 
 class LinearInterpolationVariable(BaseVariable):
     
@@ -8,16 +8,19 @@ class LinearInterpolationVariable(BaseVariable):
         self.times = times
         self.values = values
     
-    def write(self, dest):
-        super(LinearInterpolationVariable, self).write(dest)
+    def get_line(self):
+        line = super(LinearInterpolationVariable, self).get_line()
+
         d = {
             'TYPE': 'linearinterpolation',
             'NUMPOINTS': len(self.times),
             'TIMES': self.times,
             'VALUES': self.values
         }
-        dest.write(' ')
-        write_option_list(dest, d, newline=True)
+        return '{0} {1}'.format(line, line_option_list(d))
+
+    def write(self, dest):
+        dest.write('{0}\n'.format(self.get_line()))
     
     @staticmethod
     def read_variable(line):

@@ -1,4 +1,4 @@
-from ..ioutils import read_option_item, write_option_list, read_int
+from ..ioutils import read_option_item, write_option_list, read_int, line_option_list
 
 class Component:
 
@@ -7,11 +7,14 @@ class Component:
         self.pos = pos
     
     def write(self, dest):
+        dest.write('{0}\n'.format(self.get_line()))
+
+    def get_line(self):
         d = {
             'COMPONENT': self.pos,
             'FUNCTION': self.expression
         }
-        write_option_list(dest, d, newline=True)
+        return line_option_list(d) 
 
     @staticmethod
     def read_component(line):

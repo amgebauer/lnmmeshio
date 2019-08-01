@@ -7,6 +7,7 @@ from typing import List, Dict
 import re
 from .parse_element import parse as parse_ele
 from ..progress import progress
+from collections import OrderedDict
 
 """
 Class holding all elements in different categories. Current implemented categories are
@@ -106,6 +107,17 @@ class ElementContainer:
         ElementContainer.__write_section(dest, 'ALE ELEMENTS', self.ale)
         ElementContainer.__write_section(dest, 'TRANSPORT ELEMENTS', self.transport)
         ElementContainer.__write_section(dest, 'THERMO ELEMENTS', self.thermo)
+
+    """
+    Returns an ordereddict of sections with the corresponding lines
+    """
+    def get_sections(self):
+        d = OrderedDict()
+        for key, elements in self.items():
+            d[ElementContainer.get_section_name(key)] = ElementContainer.__get_section_lines(elements)
+        
+        return d
+
 
     """
     Returns a list of List[Elements] for the different element types
@@ -240,8 +252,23 @@ class ElementContainer:
     def __write_section(dest, section_name: str, elements: List[Element]):
         if elements is not None:
             write_title(dest, section_name)
+            for line in ElementContainer.__get_section_lines(elements):
+                dest.write('{0}\n'.format(line))
+
+    """
+    Writes the elements into an list of lines
+
+    Args:
+        elements: List of elements
+    """
+    @staticmethod
+    def __get_section_lines(elements: List[Element]):
+        lines = []
+        if elements is not None:
             for ele in elements:
-                ele.write(dest)
+                lines.append(ele.get_line())
+        
+        return lines
 
     @staticmethod
     def read_element_sections(sections: Dict[str, List[str]], nodes: List[Node], out=False):
@@ -296,3 +323,16 @@ class ElementContainer:
             
         
         return eles
+
+    @staticmethod
+    def get_section_name(fieldtype):
+        if fieldtype == ElementContainer.TypeStructure:
+            return 'STRUCTURE ELEMENTS'
+        if fieldtype == ElementContainer.TypeFluid:
+            return 'FLUID ELEMENTS'
+        if fieldtype == ElementContainer.TypeALE:
+            return 'ALE ELEMENTS'
+        if fieldtype == ElementContainer.TypeTransport:
+            return 'TRANSPORT ELEMENTS'
+        if fieldtype == ElementContainer.TypeThermo:
+            return 'THERMO ELEMENTS'

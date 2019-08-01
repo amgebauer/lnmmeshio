@@ -1,7 +1,7 @@
 import numpy as np
 from typing import List, Dict
 from .ioutils import write_title, write_option_list, write_option, read_option_item, \
-    read_next_option, read_next_key, read_next_value
+    read_next_option, read_next_key, read_next_value, line_option, line_comment, line_option_list, line_title
 from collections import OrderedDict
 import re
 from .element.element import Element
@@ -102,6 +102,50 @@ class Discretization:
         
         return arr
 
+    def get_sections(self):
+        self.compute_ids(zero_based=False)
+
+        sections = OrderedDict()
+
+        # write problem size
+        num_ele = 0
+        for elelist in self.elements.values():
+            num_ele += len(elelist)
+        problem_size = []
+        problem_size.append(line_option('ELEMENTS', num_ele))
+        problem_size.append(line_option('NODES', len(self.nodes)))
+        problem_size.append(line_option('DIM', 3))
+        problem_size.append(line_option('MATERIALS', 9999)) # Write dummy value
+        sections['PROBLEM SIZE'] = problem_size
+
+        # write design description
+        design_description = []
+        design_description.append(line_option('NDPOINT', len(self.pointnodesets) if self.pointnodesets is not None else 0))
+        design_description.append(line_option('NDLINE', len(self.linenodesets) if self.linenodesets is not None else 0))
+        design_description.append(line_option('NDSURF', len(self.surfacenodesets) if self.surfacenodesets is not None else 0))
+        design_description.append(line_option('NDVOL', len(self.volumenodesets) if self.volumenodesets is not None else 0))
+        sections['DESIGN DESCRIPTION'] = design_description
+
+        # write topology
+        for ns in [self.pointnodesets, self.linenodesets, self.surfacenodesets, self.volumenodesets]:
+            for nsi in ns:
+                section_name = nsi.get_section()
+                if section_name not in sections:
+                    sections[section_name] = []
+                
+                sections[section_name].extend(nsi.get_lines())
+        
+        # write nodes
+        nodes = []
+        for node in self.nodes:
+            nodes.append(node.get_line())
+        sections['NODE COORDS'] = nodes
+    
+        # write elements
+        sections.update(self.elements.get_sections())
+
+        return sections
+
     """
     Writes the discretization related sections into the stream variable dest
 
@@ -109,56 +153,12 @@ class Discretization:
         dest: stream variable (could for example be: with open('file.dat', 'w') as dest: ...)
     """
     def write(self, dest):
+        sections = self.get_sections()
 
-        self.compute_ids(zero_based=False)
-
-        # write problem size
-        num_ele = 0
-        for elelist in self.elements.values():
-            num_ele += len(elelist)
-        
-        write_title(dest, 'PROBLEM SIZE')
-        write_option(dest, 'ELEMENTS', num_ele)
-        write_option(dest, 'NODES', len(self.nodes))
-        write_option(dest, 'DIM', 3)
-        write_option(dest, 'MATERIALS', 9999) # Write dummy value
-
-        # write design description
-        write_title(dest, 'DESIGN DESCRIPTION')
-        write_option(dest, 'NDPOINT', len(self.pointnodesets) if self.pointnodesets is not None else 0)
-        write_option(dest, 'NDLINE', len(self.linenodesets) if self.linenodesets is not None else 0)
-        write_option(dest, 'NDSURF', len(self.surfacenodesets) if self.surfacenodesets is not None else 0)
-        write_option(dest, 'NDVOL', len(self.volumenodesets) if self.volumenodesets is not None else 0)
-
-        # write topology
-        if len(self.pointnodesets) > 0:
-            PointNodeset.write_header(dest)
-            for ns in self.pointnodesets:
-                ns.write(dest)
-
-        if len(self.linenodesets) > 0:
-            LineNodeset.write_header(dest)
-            for ns in self.linenodesets:
-                ns.write(dest)
-
-        if len(self.surfacenodesets) > 0:
-            SurfaceNodeset.write_header(dest)
-            for ns in self.surfacenodesets:
-                ns.write(dest)
-
-        if len(self.volumenodesets) > 0:
-            VolumeNodeset.write_header(dest)
-            for ns in self.volumenodesets:
-                ns.write(dest)
-
-        # write nodes
-        write_title(dest, 'NODE COORDS')
-        for node in self.nodes:
-            node.write(dest)
-
-        # write elements
-        self.elements.write(dest)
-        write_title(dest, 'END')
+        for key, lines in sections.items():
+            write_title(dest, key)
+            for l in lines:
+                dest.write('{0}\n'.format(l))
 
     """
     Finalizes the discretization by creating internal references

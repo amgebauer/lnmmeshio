@@ -276,7 +276,7 @@ class Head:
             section.write(dest)
 
     @staticmethod
-    def read_head(sections) -> 'Head':
+    def read(sections) -> 'Head':
         head = Head()
 
         for section, lines in sections.items():

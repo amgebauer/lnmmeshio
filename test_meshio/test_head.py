@@ -22,7 +22,7 @@ class TestHead(unittest.TestCase):
         with open(os.path.join(script_dir, 'data', 'full.dat'), 'r') as f:
             sections = ioutils.read_dat_sections(f)
         
-        head: Head = Head.read_head(sections)
+        head: Head = Head.read(sections)
 
         # check, whether that worked
         str_dyn = head['STRUCTURAL DYNAMIC']

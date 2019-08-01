@@ -1,7 +1,8 @@
 from typing import List
 import numpy as np
+import io
 from ..ioutils import write_title, write_option_list, write_option, read_option_item, \
-    read_next_option, read_next_key, read_next_value
+    read_next_option, read_next_key, read_next_value, line_option_list
 from collections import OrderedDict
 from ..node import Node
 
@@ -147,6 +148,24 @@ class Element:
         
         return list(volumenodesets)
 
+    def get_line(self):
+        line = io.StringIO()
+        if self.id is None:
+            raise RuntimeError('You have to compute ids before writing')
+        
+        line.write('{0} {1} '.format(self.id, self.type))
+
+        options: OrderedDict = OrderedDict()
+        options[self.shape] = [i.id for i in self.nodes]
+        options.update(self.options)
+
+        line.write(line_option_list(options))
+
+        for t, f in self.fibers.items():
+            line.write(' ')
+            line.write(f.get_line(t))
+        
+        return line.getvalue()
 
     
     """

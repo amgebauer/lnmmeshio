@@ -39,9 +39,16 @@ class Nodeset:
             raise StopIteration()
         return self.nodes[self.i-1]
     
-    def write(self, dest):
+    def get_lines(self):
+        lines = []
         for n in self:
-            dest.write('NODE {0} D{1} {2}\n'.format(n.id, self.get_typename_long().upper(), self.id))
+            lines.append('NODE {0} D{1} {2}'.format(n.id, self.get_typename_long().upper(), self.id))
+        
+        return lines
+
+    def write(self, dest):
+        for l in self.get_lines():
+            dest.write('{0}\n'.format(l))
 
     @staticmethod
     def base_read(lines, nodes, nodeset_cls, out=False):
@@ -90,8 +97,12 @@ class PointNodeset(Nodeset):
         return "NODE"
     
     @staticmethod
+    def get_section():
+        return 'DNODE-NODE TOPOLOGY'
+    
+    @staticmethod
     def write_header(dest):
-        write_title(dest, 'DNODE-NODE TOPOLOGY')
+        write_title(dest, PointNodeset.get_section())
 
     @staticmethod
     def read(lines, nodes, out=False):
@@ -111,8 +122,12 @@ class LineNodeset(Nodeset):
         return "LINE"
     
     @staticmethod
+    def get_section():
+        return 'DLINE-NODE TOPOLOGY'
+    
+    @staticmethod
     def write_header(dest):
-        write_title(dest, 'DLINE-NODE TOPOLOGY')
+        write_title(dest, LineNodeset.get_section())
 
     @staticmethod
     def read(lines, nodes, out=False):
@@ -132,8 +147,12 @@ class SurfaceNodeset(Nodeset):
         return "SURF"
     
     @staticmethod
+    def get_section():
+        return 'DSURF-NODE TOPOLOGY'
+    
+    @staticmethod
     def write_header(dest):
-        write_title(dest, 'DSURF-NODE TOPOLOGY')
+        write_title(dest, SurfaceNodeset.get_section())
 
     @staticmethod
     def read(lines, nodes, out=False):
@@ -153,8 +172,12 @@ class VolumeNodeset(Nodeset):
         return "VOL"
     
     @staticmethod
+    def get_section():
+        return 'DVOL-NODE TOPOLOGY'
+    
+    @staticmethod
     def write_header(dest):
-        write_title(dest, 'DVOL-NODE TOPOLOGY')
+        write_title(dest, VolumeNodeset.get_section())
 
     @staticmethod
     def read(lines, nodes, out=False):

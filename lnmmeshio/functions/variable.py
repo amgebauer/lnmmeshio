@@ -1,14 +1,17 @@
 
-from ..ioutils import read_option_item, write_option_list
+from ..ioutils import read_option_item, write_option_list, line_option_list
 
 class BaseVariable:
 
     def __init__(self, name):
         self.name = name
     
-    def write(self, dest):
+    def get_line(self):
         d = {
             'VARIABLE': 0,
             'NAME': self.name
         }
-        write_option_list(dest, d, newline=False)
+        return line_option_list(d)
+
+    def write(self, dest):
+        dest.write('{0}\n'.format(self.get_line()))

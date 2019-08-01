@@ -13,6 +13,7 @@ from .discretization import Discretization
 from .functions.function import Function
 from .conditions.condition import ConditionsType
 from .conditions.conditionreader import read_conditions
+from .head import Head
 
 """
 This class holds all information in the datfiles, consisting out of the discretization, conditions
@@ -30,7 +31,7 @@ class Datfile:
         self.conditions = List[ConditionsType]
 
         # initialize head
-        self.head: Dict[str, List[str]] = {}
+        self.head: Head = Head()
     
         """
     Computes the ids of the elements and nodes. 
@@ -56,6 +57,26 @@ class Datfile:
         for f in self.functions:
             f.reset()
 
+    """
+    Writes the content of the datfile into dest
+
+    Args:
+        dest: Stream to write the datfile to
+    """
+    def write(self, dest):
+        # write head
+        self.head.write(dest)
+
+        # write functions
+        for f in self.functions:
+            f.write(dest)
+        
+        # write conditions
+        for c in self.conditions:
+            c.write(dest)
+        
+        # write discretization
+        self.discretization.write(dest)
 
     """
     Static method that creates the discretizations file from the input lines of a .dat file
@@ -80,3 +101,4 @@ class Datfile:
         dat.conditions = read_conditions(sections, dat)
 
         # read head
+        dat.head = Head.read(sections)
