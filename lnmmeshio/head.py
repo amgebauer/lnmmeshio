@@ -46,9 +46,9 @@ class BaseLine:
 
         if len(l) == 1:
                 return l[0], None
-        return l[0], l[1]
+        return l[0].strip(), l[1].strip()
     
-    def get_line(self):
+    def get_lines(self):
         raise NotImplementedError("This method is not implemented, but should be by the derived class")
 
 class SingleOptionLine(BaseLine):
@@ -73,21 +73,21 @@ class SingleOptionLine(BaseLine):
         else:
             dest.write('\n')
 
-    def get_line(self):
-        l = io.StringIO()
+    def get_lines(self):
+        l = []
         comments_written = False
         if self.comment is not None and len(self.comment) > 50:
             # write comment in extra line
-            l.write(line_comment(self.comment))
+            l.append(line_comment(self.comment))
             comments_written = True
         
-        l.write(line_option(self.key, self.value, None))
+        l.append(line_option(self.key, self.value, None))
 
         if not comments_written and self.comment is not None:
-            l.write(' ')
-            l.write(line_comment(self.comment))
+            l[-1] += ' '
+            l[-1] += line_comment(self.comment)
         
-        return l.getvalue()
+        return l
 
     @staticmethod
     def parse(line):
@@ -125,21 +125,21 @@ class MultipleOptionsLine(BaseLine):
         else:
             dest.write('\n')
 
-    def get_line(self):
-        l = io.StringIO()
+    def get_lines(self):
+        l = []
         comments_written = False
         if self.comment is not None and len(self.comment) > 50:
             # write comment in extra line
-            l.write(line_comment(self.comment))
+            l.append(line_comment(self.comment))
             comments_written = True
         
-        l.write(line_option_list(self.options))
+        l.append(line_option_list(self.options))
 
         if not comments_written and self.comment is not None:
-            l.write(' ')
-            l.write(line_comment(self.comment))
+            l[-1] += ' '
+            l[-1] += line_comment(self.comment)
         
-        return l.getvalue()
+        return l
 
     @staticmethod
     def parse(line):
@@ -164,8 +164,8 @@ class CommentLine(BaseLine):
     def __init__(self, comment):
         super(CommentLine, self).__init__(comment)
         
-    def write(self, dest):
-        write_comment(dest, self.comment, True)
+    def get_lines(self):
+        return line_comment(self.comment)
 
     @staticmethod
     def parse(line):
@@ -241,7 +241,7 @@ class SingleOptionSection(Section):
     def get_sections(self):
         d = super(SingleOptionSection, self).get_sections()
         for l in self.lines:
-            d[self.name].append(l.get_line())
+            d[self.name].extend(l.get_lines())
         return d
 
     def __len__(self):
@@ -294,7 +294,7 @@ class MultipleOptionsSection(Section):
     def get_sections(self):
         d = super(MultipleOptionsSection, self).get_sections()
         for l in self.lines:
-            d[self.name].append(l.get_line())
+            d[self.name].extend(l.get_lines())
         return d
     
     def write(self, dest):

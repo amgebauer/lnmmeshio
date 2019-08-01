@@ -26,6 +26,18 @@ class TestFunctions(unittest.TestCase):
         self.assertListEqual(list(var.values), [0.1, 0.2, 0.3])
         self.assertEqual(var.name, 'a')
     
+    def test_read_unknownvariable(self):
+        inp = 'VARIABLE 0 NAME a TYPE nonexistantvariable'
+
+        with self.assertRaises(NotImplementedError):
+            read_variable(inp)
+
+    def test_read_multiplecomponentvariable(self):
+        inp = 'VARIABLE 1 NAME a TYPE nonexistantvariable'
+
+        with self.assertRaises(RuntimeError):
+            read_variable(inp)
+
     def test_write_linearinterpolationvariable(self):
         dummy_file = io.StringIO()
 

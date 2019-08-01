@@ -10,6 +10,7 @@ import meshio
 from lnmmeshio.head import Head, CommentLine, MultipleOptionsLine, SingleOptionLine, MultipleOptionsSection, SingleOptionSection, TextSection
 from lnmmeshio.datfile import Datfile
 from lnmmeshio import ioutils
+from collections import OrderedDict
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
  
@@ -68,3 +69,38 @@ class TestHead(unittest.TestCase):
         self.assertEqual(lines[7], '----------------------------------------------------------------MATERIALS')
         self.assertEqual(lines[8], 'MAT 1 DERE 2 // fancy comment')
         self.assertEqual(lines[9], 'MAT 12 DERE 23')
+
+    def test_write_multiple_options_line(self):
+        m = MultipleOptionsLine(OrderedDict({'a': 1, 'b': 2}))
+        self.assertListEqual(m.get_lines(), ['a 1 b 2'])
+
+        m = MultipleOptionsLine(OrderedDict({'a': 1, 'b': 2}), 'small comment')
+        self.assertListEqual(m.get_lines(), ['a 1 b 2 // small comment'])
+
+        m = MultipleOptionsLine(
+            OrderedDict({'a': 1, 'b': 2}),
+            'this is a very long comment that must be placed on an extra line before'
+        )
+        self.assertListEqual(m.get_lines(),
+            ['// this is a very long comment that must be placed on an extra line before','a 1 b 2']
+        )
+    
+    def test_parse_multiple_options_line(self):
+        inp = 'a 1 b 2 // comment'
+        l = MultipleOptionsLine.parse(inp)
+
+        self.assertIsNotNone(l)
+        self.assertDictEqual(l.options, {'a': ['1'], 'b': ['2']})
+        self.assertEqual(l.comment, 'comment')
+    
+    def test_parse_comment_line(self):
+        inp = '// comment'
+        l = CommentLine.parse(inp)
+
+        self.assertIsNotNone(l)
+        self.assertEqual(l.comment, 'comment')
+
+        with self.assertRaises(ValueError):
+            CommentLine.parse('a // comment')
+        
+        self.assertIsNone(CommentLine.parse('').comment)
