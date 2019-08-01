@@ -11,6 +11,7 @@ from lnmmeshio.head import Head, CommentLine, MultipleOptionsLine, SingleOptionL
 from lnmmeshio.datfile import Datfile
 from lnmmeshio import ioutils
 from collections import OrderedDict
+import re
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
  
@@ -83,6 +84,28 @@ class TestHead(unittest.TestCase):
         )
         self.assertListEqual(m.get_lines(),
             ['// this is a very long comment that must be placed on an extra line before','a 1 b 2']
+        )
+
+    def assertRegexListEqual(self, l1, regex):
+        self.assertEqual(len(l1), len(regex))
+        for l, r in zip(l1, regex):
+            self.assertRegexpMatches(l, r)
+
+    def test_single_option_line(self):
+        m = SingleOptionLine('key', 'value')
+
+        self.assertRegexListEqual(m.get_lines(), [re.compile(r'^key\s+value$')])
+
+        m = SingleOptionLine('key', 'value', 'small comment')
+        self.assertRegexListEqual(m.get_lines(), [re.compile(r'^key\s+value\s+//\s+small comment$')])
+
+        m = SingleOptionLine(
+            'key', 'value',
+            'this is a very long comment that must be placed on an extra line before'
+        )
+        self.assertRegexListEqual(m.get_lines(),
+            [re.compile(r'^\s*//\s+this is a very long comment that must be placed on an extra line before$'),
+                re.compile(r'^key\s+value$')]
         )
     
     def test_parse_multiple_options_line(self):
