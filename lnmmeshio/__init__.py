@@ -80,14 +80,10 @@ def read(filename, file_format=None, out=False):
 
     ftype: int = _get_type(filename, file_format=file_format)
 
-    if ftype == __TYPE_BACI:
+    if ftype == __TYPE_BACI or ftype == __TYPE_BACI_DISCR:
         # this is a BACI file format
         with open(filename, 'r') as f:
             return read_baci(f, out=out)
-    elif ftype == __TYPE_BACI_DISCR:
-        # this is a BACI file format
-        with open(filename, 'r') as f:
-            return read_baci_discr(f, out=out)
     elif ftype == __TYPE_CASE:
         # this is ensight gold file format
         raise NotImplementedError('Case file reading is not implemented yet')

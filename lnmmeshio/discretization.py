@@ -164,6 +164,14 @@ class Discretization:
     Finalizes the discretization by creating internal references
     """
     def finalize(self):
+
+        # remove old nodesets
+        for n in self.nodes:
+            n.pointnodesets.clear()
+            n.linenodesets.clear()
+            n.surfacenodesets.clear()
+            n.volumenodesets.clear()
+            
         # add point nodesets
         for ns in self.pointnodesets:
             for n in ns:
