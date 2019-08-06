@@ -501,7 +501,3 @@ NODE 224 COORD 1.0 1.0 14.0
 87 SOLIDH8 HEX8 190 192 197 195 215 217 222 220 MAT 6 KINEM nonlinear EAS none
 88 SOLIDH8 HEX8 192 193 198 197 217 218 223 222 MAT 6 KINEM nonlinear EAS none
 89 SOLIDH8 HEX8 193 194 199 198 218 219 224 223 MAT 6 KINEM nonlinear EAS none
------------------------------------------------------------FLUID ELEMENTS
--------------------------------------------------------------ALE ELEMENTS
--------------------------------------------------------TRANSPORT ELEMENTS
-----------------------------------------------------------THERMO ELEMENTS

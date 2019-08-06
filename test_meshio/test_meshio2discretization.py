@@ -21,10 +21,10 @@ class TestMeshio2Discretization(unittest.TestCase):
         if not os.path.isdir(os.path.join(script_dir, 'tmp')):
             os.makedirs(os.path.join(script_dir, 'tmp'))
             
-        lnmmeshio.write(os.path.join(script_dir, 'tmp', 'dummy_mesh.dat'), dis, file_format='dis')
+        lnmmeshio.write(os.path.join(script_dir, 'tmp', 'dummy_mesh.dat'), dis, file_format='dat')
     
     def test_vice_versa(self):
-        dis: lnmmeshio.Discretization = lnmmeshio.read(os.path.join(script_dir, 'data', 'dummy2.dat'))
+        dis: lnmmeshio.Discretization = lnmmeshio.read(os.path.join(script_dir, 'data', 'dummy2.dat')).discretization
 
         mesh = lnmmeshio.meshio_to_discretization.discretization2mesh(dis)
         dis2: lnmmeshio.Discretization = lnmmeshio.meshio_to_discretization.mesh2Discretization(

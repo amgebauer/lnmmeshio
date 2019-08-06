@@ -13,7 +13,7 @@ class TestMeshio2Discretization(unittest.TestCase):
         pass
 
     def test_get_nodes(self):
-        dis: lnmmeshio.Discretization = lnmmeshio.read(os.path.join(script_dir, 'data', 'dummy2.dat'))
+        dis: lnmmeshio.Discretization = lnmmeshio.read(os.path.join(script_dir, 'data', 'dummy2.dat')).discretization
         dis.compute_ids(zero_based=False)
 
         # test scalar

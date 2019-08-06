@@ -47,13 +47,12 @@ class TestDiscretizationIO(unittest.TestCase):
 
     def test_read_new(self):
         # read discretization
-        disc = lnmmeshio.read(os.path.join(script_dir, 'data', 'dummy.dat'), out=True)
+        disc = lnmmeshio.read(os.path.join(script_dir, 'data', 'dummy.dat'), out=True).discretization
 
         disc.compute_ids(zero_based=False)
 
         self.assertEqual(len(disc.nodes), 224)
         self.assertEqual(len(disc.elements.structure), 89)
-        self.assertEqual(len(disc.elements.transport), 0)
 
         self.assertListEqual([ns.id for ns in disc.nodes[0].surfacenodesets], [1, 13])
         self.assertListEqual([ns.id for ns in disc.nodes[47].surfacenodesets], [9])
@@ -105,7 +104,7 @@ class TestDiscretizationIO(unittest.TestCase):
         dummy_file.seek(0)
 
         # read dummy file
-        d_new = lnmmeshio.read_baci(dummy_file)
+        d_new = lnmmeshio.read_baci(dummy_file).discretization
         d_new.compute_ids(zero_based=True)
 
         self.assertEqual(len(d_new.nodes), 4)

@@ -106,7 +106,9 @@ class Datfile:
 
         # write sections
         for title, lines in sections.items():
-            write_title(dest, title, True)
+            if len(lines) == 0: continue
+            if title != '':
+                write_title(dest, title, True)
             for l in lines:
                 dest.write('{0}\n'.format(l))
     
@@ -202,3 +204,5 @@ class Datfile:
 
         # read head
         dat.head = Head.read(sections)
+
+        return dat
