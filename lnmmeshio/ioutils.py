@@ -2,6 +2,7 @@ from collections import OrderedDict
 import re
 import numpy as np
 import struct
+import io
 
 def read_dat_sections(origin):
     """
@@ -35,7 +36,7 @@ def read_dat_sections(origin):
     return content
 
 def read_option_item(line: str, option: str, num: int = 1):
-    regex = re.compile('(^| ){0}{1}\\s'.format(re.escape(option), num*'[ ]+([\\S]+)'))
+    regex = re.compile(r'(^| ){0}{1}($|\s)'.format(re.escape(option), num*'[ ]+([\\S]+)'))
 
     # split comment
     line = line.split('//', 1)[0]
@@ -50,6 +51,42 @@ def read_option_item(line: str, option: str, num: int = 1):
         return match.group(2), match.span(0)
     else:
         return [match.group(i) for i in range(2, num+2)], match.span(0)
+
+def read_ints(line: str, option: str, num: int) -> np.array:
+    str_items = read_option_item(line, option, num)[0]
+
+    if str_items is None:
+        raise RuntimeError("Could not find int array {1} in {0}".format(line, option))
+    
+
+    int_items = None
+    try:
+        int_items = [int(i) for i in str_items]
+    except TypeError:
+        int_items = [int(str_items)]
+    return np.array(int_items)
+
+def read_int(line: str, option: str) -> int:
+    return read_ints(line, option, 1)[0]
+
+
+def read_floats(line: str, option: str, num: int) -> np.array:
+    str_items = read_option_item(line, option, num)[0]
+
+    if str_items is None:
+        raise RuntimeError("Could not find float array {1} in {0}".format(line, option))
+    
+    if isinstance(str_items, str):
+        str_items = [str_items]
+    float_items = None
+    try:
+        float_items = [float(i) for i in str_items]
+    except TypeError:
+        float_items = [float(str_items)]
+    return np.array(float_items)
+
+def read_float(line: str, option: str) -> int:
+    return read_floats(line, option, 1)[0]
 
 def read_next_key(line):
     regex = re.compile(r'^[ ]*(\S+)\s*')
@@ -112,31 +149,34 @@ def text_fill(text: str, length: int, chr=' ', minimum=1, fill_left: bool = Fals
     else:
         return '{0}{1}'.format(text, fill_str)
 
+def line_title(title: str):
+    return text_fill(title, 73, chr='-', minimum=3, fill_left=True)
+
 def write_title(dest, title: str, newline = True):
-    dest.write('{0}{1}'.format(text_fill(title, 73, chr='-', minimum=3, fill_left=True), '\n' if newline else ''))
+    dest.write('{0}{1}'.format(line_title(title), '\n' if newline else ''))
 
-def write_option(dest, key: str, value, comment: str = None, newline = True):
-
+def line_option(key: str, value, comment: str = None):
     if comment is not None:
-        dest.write('{0}{1}// {2}{3}'.format(
+        return '{0}{1}// {2}'.format(
             text_fill(key, 32, chr=' '),
             text_fill(str(value), 32, chr=' '),
-            comment,
-            '\n' if newline else ''
-        ))
+            comment
+        )
     else:
-        dest.write('{0}{1}{2}'.format(
+        return '{0}{1}'.format(
             text_fill(key, 32, chr=' '),
-            str(value),
-            '\n' if newline else ''
-        ))
+            str(value)
+        )
 
-def write_option_list(dest, list: OrderedDict, newline=True):
+def write_option(dest, key: str, value, comment: str = None, newline = True):
+    dest.write('{0}{1}'.format(line_option(key, value, comment), '\n' if newline else ''))
 
+def line_option_list(list: OrderedDict):
+    line = io.StringIO()
     first_entry: bool = True
     for key, value in list.items():
         if not first_entry:
-            dest.write(' ')
+            line.write(' ')
         first_entry = False
 
         if hasattr(value, '__iter__') and not isinstance(value, str):
@@ -144,13 +184,18 @@ def write_option_list(dest, list: OrderedDict, newline=True):
         else:
             val_str = value
 
-        dest.write('{0} {1}'.format(key, val_str))
+        line.write('{0} {1}'.format(key, val_str))
     
-    if newline:
-        dest.write('\n')
+    return line.getvalue()
+
+def write_option_list(dest, options: OrderedDict, newline=True):
+    dest.write('{0}{1}'.format(line_option_list(options), '\n' if newline else ''))
+
+def line_comment(comment):
+    return '// {0}'.format(comment)
 
 def write_comment(dest, comment, newline = True):
-    dest.write('// {0}{1}'.format(comment, '\n' if newline else ''))
+    dest.write('{0}{1}'.format(line_comment(comment), '\n' if newline else ''))
 
 def ens_write_floats(file_handle, arr: np.array, binary=True):
     """reads array of length floats"""

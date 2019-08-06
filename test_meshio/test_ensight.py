@@ -16,7 +16,7 @@ class TestEnsight(unittest.TestCase):
             os.makedirs(os.path.join(script_dir, 'tmp'))
  
     def test_write_ensight(self):
-        dis: lnmmeshio.Discretization = lnmmeshio.read(os.path.join(script_dir, 'data', 'dummy.dat'))
+        dis: lnmmeshio.Discretization = lnmmeshio.read(os.path.join(script_dir, 'data', 'dummy.dat')).discretization
         dis.compute_ids(zero_based=False)
 
         for elelist in dis.elements.values():

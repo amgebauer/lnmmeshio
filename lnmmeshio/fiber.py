@@ -1,6 +1,6 @@
 import numpy as np
 from .ioutils import write_title, write_option_list, write_option, read_option_item, \
-    read_next_option, read_next_key, read_next_value
+    read_next_option, read_next_key, read_next_value, line_option_list
 
 """
 Class that holds all information of fibers
@@ -22,13 +22,12 @@ class Fiber:
         self.fiber = fib
 
     """
-    Writes the corresponding section in the dat file into the stream type variable dest
+    Gets the corresponding line in the dat file
 
     Args:
-        dest: stream variable where to write the fiber
         inp_type: type of fiber (defined as static variable)
     """
-    def write(self, dest, inp_type):
+    def get_line(self, inp_type):
         ftype = None
 
         if inp_type == Fiber.TypeFiber1:
@@ -42,9 +41,19 @@ class Fiber:
         else:
             raise ValueError('Unknown fiber type {0}'.format(inp_type))
 
-        write_option_list(dest, {
+        return line_option_list({
             ftype: self.fiber
-        }, newline=False)
+        })
+
+    """
+    Writes the corresponding section in the dat file into the stream type variable dest
+
+    Args:
+        dest: stream variable where to write the fiber
+        inp_type: type of fiber (defined as static variable)
+    """
+    def write(self, dest, inp_type):
+        dest.write(self.get_line(inp_type))
     
     """
     Returns the corresponding fiber type enum from the definition in the dat file

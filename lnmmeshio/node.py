@@ -1,6 +1,7 @@
 import numpy as np
 from typing import Dict, List
 from .fiber import Fiber
+import io
 
 """
 Class that holds all information of nodes like coords, fibers, nodesets (and additional data)
@@ -17,10 +18,11 @@ class Node:
         self.id = None
         self.coords: np.array = coords
         self.fibers: Dict[str, Fiber] = {}
-        self.dpoint = []
-        self.dline = []
-        self.dsurf = []
-        self.dvol = []
+
+        self.pointnodesets = []
+        self.linenodesets = []
+        self.surfacenodesets = []
+        self.volumenodesets = []
         self.data = {}
     
     """
@@ -29,6 +31,27 @@ class Node:
     def reset(self):
         self.id = None
     
+    """
+    Returns the line definition in the dat file
+    """
+    def get_line(self):
+        dest = io.StringIO()
+        if len(self.fibers) > 0:
+            dest.write('FNODE')
+        else:
+            dest.write('NODE')
+        
+        if self.id is None:
+            raise RuntimeError('You have to compute ids before writing')
+        
+        dest.write(' {0} COORD {1}'.format(self.id, ' '.join([repr(i) for i in self.coords])))
+        
+        for k, f in self.fibers.items():
+            dest.write(' ')
+            f.write(dest, k)
+
+        return dest.getvalue()
+
     """
     Writes the corresponding line in to the stream variable
 
