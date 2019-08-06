@@ -31,7 +31,7 @@ from .conditions import condition
 from .conditions import surf_dirich_condition
 from .conditions import conditionreader
 from .datfile import Datfile
-from nodeset import PointNodeset, LineNodeset, SurfaceNodeset, VolumeNodeset
+from .nodeset import PointNodeset, LineNodeset, SurfaceNodeset, VolumeNodeset
 
 import numpy as np
 
