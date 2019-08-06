@@ -18,7 +18,8 @@ class Nodeset:
         self.id = None
     
     def add_node(self, node):
-        self.nodes.append(node)
+        if node not in self.nodes:
+            self.nodes.append(node)
     
     def add_nodes(self, nodes):
         self.nodes.extend(nodes)
