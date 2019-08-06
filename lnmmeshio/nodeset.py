@@ -198,7 +198,8 @@ class NodesetBuilder:
         self.nodesets[self.id2pos[id]].add_node(node)
     
     def finalize(self):
-        return self.nodesets
+        # return nodeset sorted by its id to preserve the id
+        return [self.nodesets[self.id2pos[i]] for i in sorted(list(self.id2pos))]
 
 class PointNodesetBuilder(NodesetBuilder):
     def __init__(self):
