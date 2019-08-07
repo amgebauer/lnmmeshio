@@ -88,14 +88,18 @@ def read(filename, file_format=None, out=False):
         # this is ensight gold file format
         raise NotImplementedError('Case file reading is not implemented yet')
     elif ftype == __TYPE_MIMICS_STL:
-        return meshio_to_discretization.mesh2Discretization(
+        dat: Datfile = Datfile()
+        dat.discretization = meshio_to_discretization.mesh2Discretization(
             mimics_stlio.read(filename)
         )
+        return dat
     else:
         # this maybe is a file format supported by meshio
-        return meshio_to_discretization.mesh2Discretization(
+        dat: Datfile = Datfile()
+        dat.discretization = meshio_to_discretization.mesh2Discretization(
             _meshioread(filename, file_format=file_format)
         )
+        return dat
 
 def read_baci(input_stream, out=False):
     sections = ioutils.read_dat_sections(input_stream)

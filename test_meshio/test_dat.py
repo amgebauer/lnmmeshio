@@ -102,5 +102,3 @@ class TestDat(unittest.TestCase):
         dat = TestDat.get_generic()
 
         sections = dat.get_sections()
-
-        print(sections)
