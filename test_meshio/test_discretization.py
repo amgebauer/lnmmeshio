@@ -22,15 +22,15 @@ class TestMeshio2Discretization(unittest.TestCase):
             [1]
         )
         self.assertListEqual(
-            [n.id for n in dis.linenodesets[0]],
+            sorted([n.id for n in dis.linenodesets[0]]),
             [1, 2]
         )
         self.assertListEqual(
-            [n.id for n in dis.surfacenodesets[0]],
+            sorted([n.id for n in dis.surfacenodesets[0]]),
             [1, 2, 3]
         )
         self.assertListEqual(
-            [n.id for n in dis.volumenodesets[0]],
+            sorted([n.id for n in dis.volumenodesets[0]]),
             [1, 2, 3, 4]
         )
 
@@ -40,15 +40,15 @@ class TestMeshio2Discretization(unittest.TestCase):
             [1]
         )
         self.assertListEqual(
-            [n.id for n in dis.linenodesets[0]],
+            sorted([n.id for n in dis.linenodesets[0]]),
             [1, 2]
         )
         self.assertListEqual(
-            [n.id for n in dis.surfacenodesets[0]],
+            sorted([n.id for n in dis.surfacenodesets[0]]),
             [1, 2, 3]
         )
         self.assertListEqual(
-            [n.id for n in dis.volumenodesets[0]],
+            sorted([n.id for n in dis.volumenodesets[0]]),
             [1, 2, 3, 4]
         )
         

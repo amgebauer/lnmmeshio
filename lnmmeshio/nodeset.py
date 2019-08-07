@@ -4,7 +4,7 @@ from .progress import progress
 class Nodeset:
     def __init__(self, id):
         self.id = id
-        self.nodes = []
+        self.nodes = set()
     
     @staticmethod
     def get_typename_long():
@@ -18,26 +18,18 @@ class Nodeset:
         self.id = None
     
     def add_node(self, node):
-        self.nodes.append(node)
+        if node not in self.nodes:
+            self.nodes.add(node)
     
     def add_nodes(self, nodes):
-        self.nodes.extend(nodes)
-    
-    def __getitem__(self, key):
-        return self.nodes[key]
+        for n in nodes:
+            self.nodes.add(n)
 
     def __len__(self):
         return len(self.nodes)
     
     def __iter__(self):
-        self.i = 0
-        return self
-    
-    def __next__(self):
-        self.i += 1
-        if self.i > len(self):
-            raise StopIteration()
-        return self.nodes[self.i-1]
+        return iter(self.nodes)
     
     def get_lines(self):
         lines = []

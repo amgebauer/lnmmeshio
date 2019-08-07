@@ -3,6 +3,7 @@ import lnmmeshio
 import os
 import filecmp
 import io
+from lnmmeshio import ioutils
 import numpy as np
 from lnmmeshio.nodeset import PointNodeset, LineNodeset, SurfaceNodeset, VolumeNodeset
 
@@ -42,8 +43,19 @@ class TestDiscretizationIO(unittest.TestCase):
         lnmmeshio.write(os.path.join(script_dir, 'tmp', 'gen.dat'), mesh)
 
         # check, whether both files are identical
-        self.assertTrue(filecmp.cmp(os.path.join(script_dir, 'data', 'dummy.dat'),
-            os.path.join((script_dir), 'tmp', 'gen.dat')))
+        #self.assertTrue(filecmp.cmp(os.path.join(script_dir, 'data', 'dummy.dat'),
+        #    os.path.join((script_dir), 'tmp', 'gen.dat')))
+
+        # check, whether both sections do coincide
+        with open(os.path.join(script_dir, 'data', 'dummy.dat'), 'r') as f:
+            sections1 = ioutils.read_dat_sections(f)
+        with open(os.path.join(script_dir, 'tmp', 'gen.dat'), 'r') as f:
+            sections2 = ioutils.read_dat_sections(f)
+        
+        self.assertListEqual(sorted(list(sections1.keys())), sorted(list(sections2.keys())))
+
+        for key in sections1.keys():
+            self.assertListEqual(sorted(sections1[key]), sorted(sections2[key]))
 
     def test_read_new(self):
         # read discretization
@@ -119,27 +131,10 @@ class TestDiscretizationIO(unittest.TestCase):
             self.assertAlmostEqual(np.linalg.norm(d_new.nodes[i].fibers[lnmmeshio.Fiber.TypeFiber1].fiber-np.array([1, 0, 0])), 0.0)
             self.assertAlmostEqual(np.linalg.norm(d_new.nodes[i].fibers[lnmmeshio.Fiber.TypeFiber2].fiber-np.array([0, 1, 0])), 0.0)
         
-        self.assertEqual(len(d_new.pointnodesets), 1)
-        self.assertEqual(len(d_new.pointnodesets[0]), 1)
-        self.assertEqual(d_new.pointnodesets[0][0].id, 0)
-
-        self.assertEqual(len(d_new.linenodesets), 1)
-        self.assertEqual(len(d_new.linenodesets[0]), 2)
-        self.assertEqual(d_new.linenodesets[0][0].id, 0)
-        self.assertEqual(d_new.linenodesets[0][1].id, 1)
-
-        self.assertEqual(len(d_new.surfacenodesets), 1)
-        self.assertEqual(len(d_new.surfacenodesets[0]), 3)
-        self.assertEqual(d_new.surfacenodesets[0][0].id, 0)
-        self.assertEqual(d_new.surfacenodesets[0][1].id, 1)
-        self.assertEqual(d_new.surfacenodesets[0][2].id, 2)
-
-        self.assertEqual(len(d_new.volumenodesets), 1)
-        self.assertEqual(len(d_new.volumenodesets[0]), 4)
-        self.assertEqual(d_new.volumenodesets[0][0].id, 0)
-        self.assertEqual(d_new.volumenodesets[0][1].id, 1)
-        self.assertEqual(d_new.volumenodesets[0][2].id, 2)
-        self.assertEqual(d_new.volumenodesets[0][3].id, 3)
+        self.assertListEqual([n.id for n in d_new.pointnodesets], [0])
+        self.assertListEqual([sorted([n.id for n in nds]) for nds in d_new.linenodesets], [[0, 1]])
+        self.assertListEqual([sorted([n.id for n in nds]) for nds in d_new.surfacenodesets], [[0, 1, 2]])
+        self.assertListEqual([sorted([n.id for n in nds]) for nds in d_new.volumenodesets], [[0, 1, 2, 3]])
 
         
         self.assertEqual(

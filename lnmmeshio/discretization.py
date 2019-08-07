@@ -29,7 +29,7 @@ class Discretization:
         self.linenodesets: List[LineNodeset] = []
         self.surfacenodesets: List[SurfaceNodeset] = []
         self.volumenodesets: List[VolumeNodeset] = []
-    
+
     """
     Computes the ids of the elements and nodes. 
 
@@ -171,7 +171,7 @@ class Discretization:
             n.linenodesets.clear()
             n.surfacenodesets.clear()
             n.volumenodesets.clear()
-            
+
         # add point nodesets
         for ns in self.pointnodesets:
             for n in ns:
