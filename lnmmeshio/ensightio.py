@@ -43,7 +43,7 @@ def write_case(filename, dat: Datfile, binary=True, override=False):
     # write element variables
     ele_count = {}
     # get number of elements for each type
-    for eles in dis.elements.values():
+    for eles in dat.discretization.elements.values():
         for ele in eles:
             if ele.shape not in shape_to_eletype:
                 raise NotImplementedError('This kind of element is not known: {0}'.format(ele.shape))
