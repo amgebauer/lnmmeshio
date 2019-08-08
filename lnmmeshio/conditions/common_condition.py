@@ -82,6 +82,11 @@ class CommonConditions(c.ConditionsType):
         conditions = CommonConditions(acton)
         number = None
         for line in lines:
+
+            line = line.split('//', 1)[0].strip()
+            if line == '':
+                continue
+
             if number is None:
                 if conditions.acton == c.ConditionsType.ActOnType.POINT:
                     number = int(read_option_item(line, 'DPOINT')[0])
