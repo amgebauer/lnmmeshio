@@ -182,7 +182,7 @@ def write_discr(filename: str, dis: Discretization, file_format=None, override=T
     dat: Datfile = Datfile()
     dat.discretization = dis
 
-    write(filena, dat, file_format=file_format, override=override)
+    write(filename, dat, file_format=file_format, override=override)
 
 def read_mesh(filename, file_format=None):
     """
