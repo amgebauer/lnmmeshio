@@ -1,4 +1,5 @@
 from .discretization import Discretization, Element, Node
+from .datfile import Datfile
 from . import ioutils as io
 import numpy as np
 import os
@@ -23,8 +24,8 @@ def get_unique_filename(filename):
     
     return fname
 
-def write_case(filename, dis: Discretization, binary=True, override=False):
-    dis.compute_ids(False)
+def write_case(filename, dat: Datfile, binary=True, override=False):
+    dat.compute_ids(False)
     filedir = os.path.dirname(filename)
 
     basename = os.path.splitext(os.path.basename(filedir))[0]
@@ -36,7 +37,7 @@ def write_case(filename, dis: Discretization, binary=True, override=False):
         geofile = get_unique_filename(os.path.join(filedir, '{0}_geometry.geo'.format(basename)))
             
     with open(geofile, 'w{0}'.format('b' if binary else '')) as f:
-        write_geometry(f, dis, binary=binary)
+        write_geometry(f, dat.discretization, binary=binary)
 
     # A variable is supposed to be transient if len(shape) == 3 (time component is first index)
     # write element variables
@@ -56,7 +57,7 @@ def write_case(filename, dis: Discretization, binary=True, override=False):
     # build element variables
     ele_vars = {}
     ele_cur_count = {}
-    for eles in dis.elements.values():
+    for eles in dat.discretization.elements.values():
         for ele in eles:
             if ele.shape not in shape_to_eletype:
                 raise NotImplementedError('This kind of element is not known: {0}'.format(ele.shape))
@@ -91,20 +92,20 @@ def write_case(filename, dis: Discretization, binary=True, override=False):
         ele_vars_props[varname]['filename'] = os.path.basename(varfile)
         with open(varfile, 'w{0}'.format('b' if binary else '')) as f:
             ele_vars_props[varname]['timesteps'], ele_vars_props[varname]['dim'] = \
-                write_element_variable(f, dis, varname, data, binary=binary)
+                write_element_variable(f, dat.discretization, varname, data, binary=binary)
 
 
 
     # write nodal variables
     nodal_vars = {}
-    for i, node in enumerate(dis.nodes):
+    for i, node in enumerate(dat.discretization.nodes):
         for varname, data in node.data.items():
             # ensure that data is a np array
             data = np.array(data)
             if len(data.shape) == 0:
                 data = data.reshape((1))
             if varname not in nodal_vars:
-                nodal_vars[varname] = np.zeros(tuple([len(dis.nodes)]+list(data.shape)), dtype=data.dtype)
+                nodal_vars[varname] = np.zeros(tuple([len(dat.discretization.nodes)]+list(data.shape)), dtype=data.dtype)
             
             nodal_vars[varname][i] = data
     
@@ -118,7 +119,7 @@ def write_case(filename, dis: Discretization, binary=True, override=False):
         nodal_vars_props[varname]['filename'] = os.path.basename(varfile)
         with open(varfile, 'w{0}'.format('b' if binary else '')) as f:
             nodal_vars_props[varname]['timesteps'], nodal_vars_props[varname]['dim'] = \
-                write_node_variable(f, dis, varname, data, binary=binary)
+                write_node_variable(f, dat.discretization, varname, data, binary=binary)
 
     # write case file
     if override:
