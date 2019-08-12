@@ -4,6 +4,7 @@ from . import ioutils as io
 import numpy as np
 import os
 from typing import List, Dict, Tuple
+from .progress import progress
 
 shape_to_eletype: Dict[str, str] = {
     'TET4': 'tetra4',
@@ -24,7 +25,7 @@ def get_unique_filename(filename):
     
     return fname
 
-def write_case(filename, dat: Datfile, binary=True, override=False):
+def write_case(filename, dat: Datfile, binary=True, override=False, out=True):
     dat.compute_ids(False)
     filedir = os.path.dirname(filename)
 
@@ -37,7 +38,7 @@ def write_case(filename, dat: Datfile, binary=True, override=False):
         geofile = get_unique_filename(os.path.join(filedir, '{0}_geometry.geo'.format(basename)))
             
     with open(geofile, 'w{0}'.format('b' if binary else '')) as f:
-        write_geometry(f, dat.discretization, binary=binary)
+        write_geometry(f, dat.discretization, binary=binary, out=out)
 
     # A variable is supposed to be transient if len(shape) == 3 (time component is first index)
     # write element variables
@@ -57,7 +58,7 @@ def write_case(filename, dat: Datfile, binary=True, override=False):
     # build element variables
     ele_vars = {}
     ele_cur_count = {}
-    for eles in dat.discretization.elements.values():
+    for eles in progress(dat.discretization.elements.values(), out=out, label='Prepare element data'):
         for ele in eles:
             if ele.shape not in shape_to_eletype:
                 raise NotImplementedError('This kind of element is not known: {0}'.format(ele.shape))
@@ -83,7 +84,7 @@ def write_case(filename, dat: Datfile, binary=True, override=False):
 
     # write them finally
     ele_vars_props = {}
-    for varname, data in ele_vars.items():
+    for varname, data in progress(ele_vars.items(), out=out, label='Write element data'):
         if override:
             varfile = os.path.join(filedir, '{0}_variable.{1}'.format(basename, varname))
         else:
@@ -98,7 +99,7 @@ def write_case(filename, dat: Datfile, binary=True, override=False):
 
     # write nodal variables
     nodal_vars = {}
-    for i, node in enumerate(dat.discretization.nodes):
+    for i, node in progress(enumerate(dat.discretization.nodes), out=out, label='Prepare nodal data'):
         for varname, data in node.data.items():
             # ensure that data is a np array
             data = np.array(data)
@@ -110,7 +111,7 @@ def write_case(filename, dat: Datfile, binary=True, override=False):
             nodal_vars[varname][i] = data
     
     nodal_vars_props = {}
-    for varname, data in nodal_vars.items():
+    for varname, data in progress(nodal_vars.items(), out=out, label='Write nodal data'):
         if override:
             varfile = os.path.join(filedir, '{0}_variable.{1}'.format(basename, varname))
         else:
@@ -194,7 +195,7 @@ def get_timeset_entry(id, count):
 
     return entry
 
-def write_geometry(fstream, dis: Discretization, binary=True):
+def write_geometry(fstream, dis: Discretization, binary=True, out=True):
     if binary:
         io.ens_write_string(fstream, 'C Binary', binary=True)
     
@@ -213,7 +214,7 @@ def write_geometry(fstream, dis: Discretization, binary=True):
 
     # build eletype array
     elegroups = {}
-    for eles in dis.elements.values():
+    for eles in progress(dis.elements.values(), out=out, label='Prepare element geometry'):
         for ele in eles:
             if ele.shape not in shape_to_eletype:
                 raise NotImplementedError('This kind of element is not known: {0}'.format(ele.shape))
