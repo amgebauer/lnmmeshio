@@ -68,7 +68,7 @@ class Datfile:
     Return:
         Dat file as dict
     """
-    def get_sections(self):
+    def get_sections(self, out=True):
         sections = OrderedDict()
 
         # write head
@@ -88,7 +88,7 @@ class Datfile:
             sections['RESULT DESCRIPTION'].append(d.get_line())
 
         # write discretization
-        sections.update(self.discretization.get_sections())
+        sections.update(self.discretization.get_sections(out=True))
 
         return sections
 
@@ -98,14 +98,14 @@ class Datfile:
     Args:
         dest: Stream to write the datfile to
     """
-    def write(self, dest):
-        sections = self.get_sections()
+    def write(self, dest, out=True):
+        sections = self.get_sections(out=out)
 
         # reorder sections
         sections = Datfile.reorder_sections(sections)
 
         # write sections
-        for title, lines in sections.items():
+        for title, lines in progress(sections.items(), out=out, label='Write sections'):
             if len(lines) == 0: continue
             if title != '':
                 write_title(dest, title, True)

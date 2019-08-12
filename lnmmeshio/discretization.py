@@ -102,7 +102,7 @@ class Discretization:
         
         return arr
 
-    def get_sections(self):
+    def get_sections(self, out=True):
         self.compute_ids(zero_based=False)
 
         sections = OrderedDict()
@@ -128,7 +128,7 @@ class Discretization:
 
         # write topology
         for ns in [self.pointnodesets, self.linenodesets, self.surfacenodesets, self.volumenodesets]:
-            for nsi in ns:
+            for nsi in progress(ns, out=out, label='Write Nodeset {0}'.format(type(ns))):
                 section_name = nsi.get_section()
                 if section_name not in sections:
                     sections[section_name] = []
@@ -137,12 +137,12 @@ class Discretization:
         
         # write nodes
         nodes = []
-        for node in self.nodes:
+        for node in progress(self.nodes, out=out, label='Write Nodes'):
             nodes.append(node.get_line())
         sections['NODE COORDS'] = nodes
     
         # write elements
-        sections.update(self.elements.get_sections())
+        sections.update(self.elements.get_sections(out=out))
 
         return sections
 
@@ -152,10 +152,10 @@ class Discretization:
     Args:
         dest: stream variable (could for example be: with open('file.dat', 'w') as dest: ...)
     """
-    def write(self, dest):
-        sections = self.get_sections()
+    def write(self, dest, out=True):
+        sections = self.get_sections(out=out)
 
-        for key, lines in sections.items():
+        for key, lines in progress(sections.items(), out=out, label='Write sections'):
             write_title(dest, key)
             for l in lines:
                 dest.write('{0}\n'.format(l))
