@@ -14,8 +14,8 @@ class TestEnsight(unittest.TestCase):
     def setUp(self):
         if not os.path.isdir(os.path.join(script_dir, 'tmp')):
             os.makedirs(os.path.join(script_dir, 'tmp'))
- 
-    def test_write_ensight(self):
+
+    def test_write_ensight_ascii(self):
         dat: lnmmeshio.Datfile = lnmmeshio.Datfile()
         dat.discretization: lnmmeshio.Discretization = lnmmeshio.read(os.path.join(script_dir, 'data', 'dummy.dat')).discretization
         dat.discretization.compute_ids(zero_based=False)
@@ -28,7 +28,24 @@ class TestEnsight(unittest.TestCase):
             n.data['id'] = np.array([n.id])
 
         # write ensight
-        lnmmeshio.write(os.path.join(script_dir, 'tmp', 'ensight.case'), dat)
+        lnmmeshio.ensightio.write_case(os.path.join(script_dir, 'tmp', 'ensight_ascii.case'), dat, binary=False, override=True)
+
+        # how to check?
+ 
+    def test_write_ensight_binary(self):
+        dat: lnmmeshio.Datfile = lnmmeshio.Datfile()
+        dat.discretization: lnmmeshio.Discretization = lnmmeshio.read(os.path.join(script_dir, 'data', 'dummy.dat')).discretization
+        dat.discretization.compute_ids(zero_based=False)
+
+        for elelist in dat.discretization.elements.values():
+            for ele in elelist:
+                ele.data['material'] = np.array(float(' '.join(ele.options['MAT'])))
+        
+        for n in dat.discretization.nodes:
+            n.data['id'] = np.array([n.id])
+
+        # write ensight
+        lnmmeshio.ensightio.write_case(os.path.join(script_dir, 'tmp', 'ensight_binary.case'), dat, binary=True, override=True)
 
         # how to check?
     
@@ -86,5 +103,6 @@ class TestEnsight(unittest.TestCase):
 
     
     def tearDown(self):
+        pass
         # delete tmp folder
-        shutil.rmtree(os.path.join(script_dir, 'tmp'))
+        #shutil.rmtree(os.path.join(script_dir, 'tmp'))
