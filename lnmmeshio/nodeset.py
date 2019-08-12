@@ -2,9 +2,10 @@ from .ioutils import write_title, read_option_item
 from .progress import progress
 
 class Nodeset:
-    def __init__(self, id):
+    def __init__(self, id, name = None):
         self.id = id
         self.nodes = set()
+        self.name = name
     
     @staticmethod
     def get_typename_long():
