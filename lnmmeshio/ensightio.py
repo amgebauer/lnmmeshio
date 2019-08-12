@@ -221,15 +221,15 @@ def write_geometry(fstream, dis: Discretization, binary=True, out=True):
             eletype = shape_to_eletype[ele.shape]
 
             if eletype not in elegroups:
-                elegroups[eletype] = np.zeros((0,len(ele.nodes)), dtype=int)
+                elegroups[eletype] = [] #np.zeros((0,len(ele.nodes)), dtype=int)
             
-            elegroups[eletype] = np.append(elegroups[eletype], np.array([n.id for n in ele.nodes]) \
-                .reshape((1, -1)), axis=0)
+                elegroups[eletype].append(np.array([n.id for n in ele.nodes]))
+
 
     for eletype, eles in elegroups.items():
         io.ens_write_string(fstream, eletype, binary=binary)
-        io.ens_write_int(fstream, eles.shape[0], binary=binary)
-        io.ens_write_ints(fstream, eles, binary=binary)
+        io.ens_write_int(fstream, len(eles), binary=binary)
+        io.ens_write_ints(fstream, np.array(eles), binary=binary)
     
     io.ens_write_string(fstream, 'END TIME STEP', binary=binary)
 
