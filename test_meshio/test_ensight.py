@@ -16,18 +16,19 @@ class TestEnsight(unittest.TestCase):
             os.makedirs(os.path.join(script_dir, 'tmp'))
  
     def test_write_ensight(self):
-        dis: lnmmeshio.Discretization = lnmmeshio.read(os.path.join(script_dir, 'data', 'dummy.dat')).discretization
-        dis.compute_ids(zero_based=False)
+        dat: lnmmeshio.Datfile = lnmmeshio.Datfile()
+        dat.discretization: lnmmeshio.Discretization = lnmmeshio.read(os.path.join(script_dir, 'data', 'dummy.dat')).discretization
+        dat.discretization.compute_ids(zero_based=False)
 
-        for elelist in dis.elements.values():
+        for elelist in dat.discretization.elements.values():
             for ele in elelist:
                 ele.data['material'] = np.array(float(' '.join(ele.options['MAT'])))
         
-        for n in dis.nodes:
+        for n in dat.discretization.nodes:
             n.data['id'] = np.array([n.id])
 
         # write ensight
-        lnmmeshio.write(os.path.join(script_dir, 'tmp', 'ensight.case'), dis)
+        lnmmeshio.write(os.path.join(script_dir, 'tmp', 'ensight.case'), dat)
 
         # how to check?
     
