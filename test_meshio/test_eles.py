@@ -82,7 +82,9 @@ class TestEles(unittest.TestCase):
 
     def __test_ele(self, shape, cls, nnodes, faces, facetype, edges, edgetype):
 
-        ele = parse_ele('1 ELENAME {0} {1} MAT 1 KINEM nonlinear TYPE Std'.format(shape, ' '.join([str(i) for i in range(1, nnodes+1)])), self.__get_nodes(nnodes))
+        ele = parse_ele('1 ELENAME {0} {1} MAT 11 KINEM nonlinear TYPE Std'.format(shape, ' '.join([str(i) for i in range(1, nnodes+1)])), self.__get_nodes(nnodes))
+
+        self.assertEqual(int(ele.options['MAT'][0]), 11)
 
         self.assertIsInstance(ele, cls)
 
