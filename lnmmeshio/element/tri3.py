@@ -1,12 +1,13 @@
-from .element import Element
+from .element import Element2D
 from ..node import Node
 from typing import List, Dict
 from .line2 import Line2
+import numpy as np
 
 """
 Implementation of a tri3 element
 """
-class Tri3 (Element):
+class Tri3 (Element2D):
     ShapeName: str = 'TRI3'
 
     """
@@ -48,3 +49,13 @@ class Tri3 (Element):
             Line2(None, [self.nodes[1], self.nodes[2]]),
             Line2(None, [self.nodes[2], self.nodes[0]])
         ]
+    
+    """
+    Returns the value of the shape functions at the local coordinate xi
+    """
+    @staticmethod
+    def shape_fcns(xi):
+        return np.array(
+            [
+                1-xi[0]-xi[1], xi[0], xi[1]
+            ])

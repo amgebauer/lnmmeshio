@@ -1,12 +1,13 @@
-from .element import Element
+from .element import Element2D
 from ..node import Node
 from typing import List, Dict
 from .line3 import Line3
+import numpy as np
 
 """
 Implementation of a quad9 element
 """
-class Quad9 (Element):
+class Quad9 (Element2D):
     ShapeName: str = 'QUAD9'
 
     """
@@ -49,3 +50,20 @@ class Quad9 (Element):
             Line3(None, [self.nodes[2], self.nodes[3], self.nodes[6]]),
             Line3(None, [self.nodes[3], self.nodes[0], self.nodes[7]])
         ]
+    
+    """
+    Returns the value of the shape functions at the local coordinate xi
+    """
+    @staticmethod
+    def shape_fcns(xi):
+
+        return np.array(
+            [Line3.shape_fcns(xi[0])[0]*Line3.shape_fcns(xi[1])[0],
+            Line3.shape_fcns(xi[0])[1]*Line3.shape_fcns(xi[1])[0],
+            Line3.shape_fcns(xi[0])[1]*Line3.shape_fcns(xi[1])[1],
+            Line3.shape_fcns(xi[0])[0]*Line3.shape_fcns(xi[1])[1],
+            Line3.shape_fcns(xi[0])[2]*Line3.shape_fcns(xi[1])[0],
+            Line3.shape_fcns(xi[0])[1]*Line3.shape_fcns(xi[1])[2],
+            Line3.shape_fcns(xi[0])[2]*Line3.shape_fcns(xi[1])[1],
+            Line3.shape_fcns(xi[0])[0]*Line3.shape_fcns(xi[1])[2],
+            Line3.shape_fcns(xi[0])[2]*Line3.shape_fcns(xi[1])[2]])

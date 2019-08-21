@@ -6,7 +6,6 @@ from ..ioutils import write_title, write_option_list, write_option, read_option_
 from collections import OrderedDict
 from ..node import Node
 
-
 """
 Class holding the data of one element
 """
@@ -29,13 +28,21 @@ class Element:
         self.options = options if options is not None else OrderedDict()
         self.fibers = {}
         self.data = {}
-    
+
+    """
+    Get number of nodes of the element
+
+    Returns:
+        Number of nodes of the element
+    """
+    def get_num_nodes(self) -> int:
+        raise NotImplementedError("This method is not implemented in your element")
+
     """
     Sets the element id to None
     """
     def reset(self):
         self.id = None
-    
 
     """
     Returns a list of nodes
@@ -77,7 +84,7 @@ class Element:
             if node.id is None:
                 raise RuntimeError('You need to compute ids first')
             arr[i] = node.id
-        
+
         return arr
 
     """
@@ -94,7 +101,7 @@ class Element:
                 pointnodesets = set(p.pointnodesets)
             else:
                 pointnodesets = set(p.pointnodesets).intersection(pointnodesets)
-        
+
         return list(pointnodesets)
 
     """
@@ -111,7 +118,7 @@ class Element:
                 linenodesets = set(p.linenodesets)
             else:
                 linenodesets = set(p.linenodesets).intersection(linenodesets)
-        
+
         return list(linenodesets)
 
     """
@@ -128,7 +135,7 @@ class Element:
                 surfacenodesets = set(p.surfacenodesets)
             else:
                 surfacenodesets = set(p.surfacenodesets).intersection(surfacenodesets)
-        
+
         return list(surfacenodesets)
 
     """
@@ -145,14 +152,14 @@ class Element:
                 volumenodesets = set(p.volumenodesets)
             else:
                 volumenodesets = set(p.volumenodesets).intersection(volumenodesets)
-        
+
         return list(volumenodesets)
 
     def get_line(self):
         line = io.StringIO()
         if self.id is None:
             raise RuntimeError('You have to compute ids before writing')
-        
+
         line.write('{0} {1} '.format(self.id, self.type))
 
         options: OrderedDict = OrderedDict()
@@ -164,17 +171,17 @@ class Element:
         for t, f in self.fibers.items():
             line.write(' ')
             line.write(f.get_line(t))
-        
+
         return line.getvalue()
 
-    
+
     """
     Write the corresponding element line in the dat file
     """
     def write(self, dest):
         if self.id is None:
             raise RuntimeError('You have to compute ids before writing')
-        
+
         dest.write('{0} {1} '.format(self.id, self.type))
 
         options: OrderedDict = OrderedDict()
@@ -189,14 +196,80 @@ class Element:
 
         dest.write('\n')
 
+    """
+    Returns the number of space dimensions
 
+    Returns:
+        Number of space dimensions
+    """
+    def get_space_dim(self):
+        raise NotImplementedError("This element is not correctly implemented. It needs to be derived from Element{1,2,3}D")
+
+    """
+    Returns the local variables from given global variables
+
+    Args:
+        x: Global variable
+
+    Returns:
+        Local variables (xi)
+    """
+    def get_xi(self, x):
+        raise NotImplementedError("This is currently not implemented for all elements")
+
+
+    """
+    Checkes whether a point in reference coordinates is within the element
+
+    Args:
+        xi: Point in reference coordinates
+    
+    Returns:
+        True if the point is within the element (or on the bounrary), otherwise False
+    """
+    @staticmethod
+    def is_in_ref(xi, include_boundary=True):
+        raise NotImplementedError("This is currently not implemented for all elements")
+
+    """
+    Check whether a point is within the element
+
+    Args:
+        x: Point in space
+        include_boundary: bool, Whether or not to include the boundary
+    
+    Returns:
+        True if the point is within the element (or on the boundary), otherwise False
+    """
+    def is_in(self, x, include_boundary=True):
+        return self.is_in_ref(self.get_xi(x))
+
+    """
+    Projects the quantity from the nodal quantities q to the position x
+
+    Args:
+        x: Point in space
+        q: Nodal values of the quantities
+    
+    Returns:
+        q_x: Quantity at x projected with the shape functions
+    """
+    def project_quantity(self, x: np.ndarray, q: np.ndarray):
+        shapefcns = self.shape_fcns(self.get_xi(x))
+
+        if q.shape[0] != self.get_num_nodes():
+            raise ValueError('Expecting nodal values of the quantities, expected {0} got {1}'.format(
+                self.get_num_nodes(), q.shape[0]
+            ))
+        
+        return np.dot(shapefcns, q)
 
     """
     Returns the number of nodes from the shapes
 
     Args:
         shape: shape as used in baci .dat file format
-    
+
     Returngs:
         int: number of nodes
     """
@@ -218,8 +291,86 @@ class Element:
             "QUAD8"   : 8,
             "QUAD9"   : 9,
         }
-        
+
         if shape not in shape_dict:
             raise ValueError('Element of shape {0} is unknown'.format(shape))
-        
+
         return shape_dict[shape]
+
+        """
+    Returns the value of the shape functions at the local coordinate xi
+    """
+    @staticmethod
+    def shape_fcns(xi):
+        raise NotImplementedError("This element has not implemented shape functions")
+
+class Element1D(Element):
+
+    """
+    Returns the number of space dimensions
+
+    Returns:
+        Number of space dimensions
+    """
+    def get_space_dim(self):
+        return 1
+
+class Element2D(Element):
+    """
+    Returns the number of space dimensions
+
+    Returns:
+        Number of space dimensions
+    """
+    def get_space_dim(self):
+        return 2
+
+class Element3D(Element):
+    """
+    Returns the number of space dimensions
+
+    Returns:
+        Number of space dimensions
+    """
+    def get_space_dim(self):
+        return 3
+
+class ElementTet(Element3D):
+
+    @staticmethod
+    def is_in_ref(xi, include_boundary=True):
+        if include_boundary:
+            lop = lambda x, y: x >= y
+        else:
+            lop = lambda x, y: x > y
+        
+        if not all([lop(xi[i], 0) for i in range(3)]):
+            return False
+        
+        if not lop[1, xi[0]]:
+            return False
+        
+        if not lop[1-xi[0], xi[1]]:
+            return False
+        
+        if not lop[1-xi[0]-xi[1], xi[2]]:
+            return False
+
+        return True
+
+class ElementHex(Element3D):
+
+    @staticmethod
+    def is_in_ref(xi, include_boundary=True):
+        if include_boundary:
+            lop = lambda x, y: x >= y
+        else:
+            lop = lambda x, y: x > y
+        
+        if not all([lop(xi[i], -1.0) for i in range(3)]):
+            return False
+
+        if not all([lop(1.0, xi[i]) for i in range(3)]):
+            return False
+
+        return True

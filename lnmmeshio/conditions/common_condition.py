@@ -41,13 +41,13 @@ class CommonCondition(c.Condition):
         fcn = read_option_item(line, 'FUNCT', numdof)[0]
 
         if acton == c.ConditionsType.ActOnType.POINT:
-            nodeset = dat.pointnodesets[int(nodeset_id_str)-1]
+            nodeset = dat.discretization.pointnodesets[int(nodeset_id_str)-1]
         elif acton == c.ConditionsType.ActOnType.LINE:
-            nodeset = dat.linenodesets[int(nodeset_id_str)-1]
+            nodeset = dat.discretization.linenodesets[int(nodeset_id_str)-1]
         elif acton == c.ConditionsType.ActOnType.SURFACE:
-            nodeset = dat.surfacenodesets[int(nodeset_id_str)-1]
+            nodeset = dat.discretization.surfacenodesets[int(nodeset_id_str)-1]
         elif acton == c.ConditionsType.ActOnType.VOLUME:
-            nodeset = dat.volumenodesets[int(nodeset_id_str)-1]
+            nodeset = dat.discretization.volumenodesets[int(nodeset_id_str)-1]
         onoff = np.array([int(i) for i in onoff_str], dtype=bool)
         value = np.array(value, dtype=float)
         fcn = np.array(fcn, dtype=int)
@@ -82,6 +82,11 @@ class CommonConditions(c.ConditionsType):
         conditions = CommonConditions(acton)
         number = None
         for line in lines:
+
+            line = line.split('//', 1)[0].strip()
+            if line == '':
+                continue
+
             if number is None:
                 if conditions.acton == c.ConditionsType.ActOnType.POINT:
                     number = int(read_option_item(line, 'DPOINT')[0])

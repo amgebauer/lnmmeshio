@@ -1,13 +1,14 @@
-from .element import Element
+from .element import ElementHex
 from ..node import Node
 from typing import List, Dict
 from .quad4 import Quad4
 from .line2 import Line2
+import numpy as np
 
 """
 Implementation of a HEX8 element
 """
-class Hex8 (Element):
+class Hex8 (ElementHex):
     ShapeName: str = 'HEX8'
 
     """
@@ -52,3 +53,19 @@ class Hex8 (Element):
         return [
             Line2(None, [self.nodes[i] for i in nodes]) for nodes in edge_node_ids
         ]
+    
+    """
+    Returns the value of the shape functions at the local coordinate xi
+    """
+    @staticmethod
+    def shape_fcns(xi):
+
+        return np.array(
+            [Line2.shape_fcns(xi[0])[0]*Line2.shape_fcns(xi[1])[0]*Line2.shape_fcns(xi[2])[0],
+            Line2.shape_fcns(xi[0])[1]*Line2.shape_fcns(xi[1])[0]*Line2.shape_fcns(xi[2])[0],
+            Line2.shape_fcns(xi[0])[1]*Line2.shape_fcns(xi[1])[1]*Line2.shape_fcns(xi[2])[0],
+            Line2.shape_fcns(xi[0])[0]*Line2.shape_fcns(xi[1])[1]*Line2.shape_fcns(xi[2])[0],
+            Line2.shape_fcns(xi[0])[0]*Line2.shape_fcns(xi[1])[0]*Line2.shape_fcns(xi[2])[1],
+            Line2.shape_fcns(xi[0])[1]*Line2.shape_fcns(xi[1])[0]*Line2.shape_fcns(xi[2])[1],
+            Line2.shape_fcns(xi[0])[1]*Line2.shape_fcns(xi[1])[1]*Line2.shape_fcns(xi[2])[1],
+            Line2.shape_fcns(xi[0])[0]*Line2.shape_fcns(xi[1])[1]*Line2.shape_fcns(xi[2])[1]])

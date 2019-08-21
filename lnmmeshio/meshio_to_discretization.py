@@ -8,7 +8,7 @@ import numpy as np
 import meshio
 from .discretization import Element, Discretization, Node
 from .element.parse_element import create_element
-from progress.bar import Bar
+from .progress import progress
 from .element.line2 import Line2
 from .element.line3 import Line3
 from .element.tri3 import Tri3
@@ -107,7 +107,7 @@ def mesh2Discretization(mesh: meshio.Mesh) -> Discretization:
     # node_sets -> are stored in disc.nodes
 
     # create Nodes from points
-    for i, coord in Bar('Create nodes', max=mesh.points.shape[0]).iter(enumerate(mesh.points)):
+    for i, coord in progress(enumerate(mesh.points), label='Create nodes'):
         n = Node(coord)
 
         for key, v in mesh.point_data.items():
@@ -131,7 +131,7 @@ def mesh2Discretization(mesh: meshio.Mesh) -> Discretization:
             raise Exception('The cell type {0} is currently not implemented'.format(celltype))
         
         cellindex: int = 0
-        for cell in Bar('Create {0} elements'.format(celltype), max=cells.shape[0]).iter(cells):
+        for cell in progress(cells, label='Create {0} elements'.format(celltype)):
             # read nodes that belong to the cells
             nodes = []
 

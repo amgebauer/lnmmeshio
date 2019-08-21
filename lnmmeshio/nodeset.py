@@ -2,9 +2,10 @@ from .ioutils import write_title, read_option_item
 from .progress import progress
 
 class Nodeset:
-    def __init__(self, id):
+    def __init__(self, id, name = None):
         self.id = id
         self.nodes = set()
+        self.name = name
     
     @staticmethod
     def get_typename_long():
@@ -77,8 +78,8 @@ class Nodeset:
                 
 class PointNodeset(Nodeset):
 
-    def __init__(self, id):
-        super(PointNodeset, self).__init__(id)
+    def __init__(self, id, name = None):
+        super(PointNodeset, self).__init__(id, name=name)
 
     @staticmethod
     def get_typename_long():
@@ -102,8 +103,8 @@ class PointNodeset(Nodeset):
 
 class LineNodeset(Nodeset):
 
-    def __init__(self, id):
-        super(LineNodeset, self).__init__(id)
+    def __init__(self, id, name = None):
+        super(LineNodeset, self).__init__(id, name=name)
 
     @staticmethod
     def get_typename_long():
@@ -127,8 +128,8 @@ class LineNodeset(Nodeset):
 
 class SurfaceNodeset(Nodeset):
 
-    def __init__(self, id):
-        super(SurfaceNodeset, self).__init__(id)
+    def __init__(self, id, name = None):
+        super(SurfaceNodeset, self).__init__(id, name=name)
 
     @staticmethod
     def get_typename_long():
@@ -152,8 +153,8 @@ class SurfaceNodeset(Nodeset):
 
 class VolumeNodeset(Nodeset):
 
-    def __init__(self, id):
-        super(VolumeNodeset, self).__init__(id)
+    def __init__(self, id, name = None):
+        super(VolumeNodeset, self).__init__(id, name=name)
 
     @staticmethod
     def get_typename_long():

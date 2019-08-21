@@ -22,9 +22,11 @@ class TestConditions(unittest.TestCase):
         pass
     
     @staticmethod
-    def get_discretization():
-                # build dummy discretization
+    def get_dat():
+        # build dummy discretization
+        dat: mio.Datfile = mio.Datfile()
         d: mio.Discretization = mio.Discretization()
+        dat.discretization = d
         d.nodes = [
             mio.Node(np.array([0.0, 0.0, 0.0])),
             mio.Node(np.array([1.0, 0.0, 0.0])),
@@ -63,26 +65,26 @@ class TestConditions(unittest.TestCase):
         }
 
         d.finalize()
-        return d
+        return dat
     
     def test_write_common(self):
         for acton in [ConditionsType.ActOnType.POINT, ConditionsType.ActOnType.LINE, ConditionsType.ActOnType.SURFACE, ConditionsType.ActOnType.VOLUME]:
-            dis = TestConditions.get_discretization()
-            dis.compute_ids(True)
+            dat = TestConditions.get_dat()
+            dat.compute_ids(True)
 
-            bc = CommonCondition(dis.surfacenodesets[0], np.array([True]*3+[False]*2), np.array([0.1, 0.2, 0.3, 0.4, 0.5]), acton)
+            bc = CommonCondition(dat.discretization.surfacenodesets[0], np.array([True]*3+[False]*2), np.array([0.1, 0.2, 0.3, 0.4, 0.5]), acton)
 
             dummy_file = bc.get_line()
 
             self.assertEqual('E 0 - NUMDOF 5 ONOFF 1 1 1 0 0 VAL 0.1 0.2 0.3 0.4 0.5 FUNCT 0 0 0 0 0', dummy_file)  
 
     def common_conditions(self, clsref, containerref, head, type):
-        dis = TestConditions.get_discretization()
-        dis.compute_ids(True)
+        dat = TestConditions.get_dat()
+        dat.compute_ids(True)
 
         bcs = containerref()
-        bc1 = clsref(dis.surfacenodesets[0], np.array([True]*3+[False]*2), np.array([0.1, 0.2, 0.3, 0.4, 0.5]), bcs.acton)
-        bc2 = clsref(dis.surfacenodesets[1], np.array([True]*2+[False]*3), np.array([0.1, 0.2, 0.3, 0.4, 0.5]), bcs.acton)
+        bc1 = clsref(dat.discretization.surfacenodesets[0], np.array([True]*3+[False]*2), np.array([0.1, 0.2, 0.3, 0.4, 0.5]), bcs.acton)
+        bc2 = clsref(dat.discretization.surfacenodesets[1], np.array([True]*2+[False]*3), np.array([0.1, 0.2, 0.3, 0.4, 0.5]), bcs.acton)
         bcs.add(bc1)
         bcs.add(bc2)
 
@@ -123,18 +125,18 @@ class TestConditions(unittest.TestCase):
         self.common_conditions(CommonCondition, PointNeumannConditions, 'POINT', 'NEUMANN')
 
     def test_read_common(self):
-        dis = TestConditions.get_discretization()
+        dat = TestConditions.get_dat()
 
         bc = CommonCondition.read(
-            'E 1 - NUMDOF 6 ONOFF 1 1 1 0 0 0 VAL 0.1 0.2 0.3 0.4 0.5 0.6 FUNCT 0 0 0 0 0 0', dis, mio.conditions.condition.ConditionsType.ActOnType.SURFACE
+            'E 1 - NUMDOF 6 ONOFF 1 1 1 0 0 0 VAL 0.1 0.2 0.3 0.4 0.5 0.6 FUNCT 0 0 0 0 0 0', dat, mio.conditions.condition.ConditionsType.ActOnType.SURFACE
         )
 
-        self.assertEqual(bc.nodeset, dis.surfacenodesets[0])
+        self.assertEqual(bc.nodeset, dat.discretization.surfacenodesets[0])
         self.assertListEqual(list(bc.onoff), [True]*3+[False]*3)
         self.assertListEqual(list(bc.value), [0.1, 0.2, 0.3, 0.4, 0.5, 0.6])
     
     def read_common_multiple(self, shortname, type):
-        dis = TestConditions.get_discretization()
+        dat = TestConditions.get_dat()
 
         sections = {}
         sections['DESIGN {0} {1} CONDITIONS'.format(shortname, type)] = []
@@ -142,7 +144,7 @@ class TestConditions(unittest.TestCase):
         sections['DESIGN {0} {1} CONDITIONS'.format(shortname, type)].append('E 1 - NUMDOF 6 ONOFF 1 1 1 0 0 0 VAL 0.1 0.2 0.3 0.4 0.5 0.6 FUNCT 0 0 0 0 0 0')
         sections['DESIGN {0} {1} CONDITIONS'.format(shortname, type)].append('E 2 - NUMDOF 3 ONOFF 1 1 1 VAL 0.1 0.2 0.3 FUNCT 0 0 0')
 
-        bcs = read_conditions(sections, dis)
+        bcs = read_conditions(sections, dat)
 
         self.assertEqual(len(bcs), 1)
         self.assertEqual(len(bcs[0]), 2)
@@ -152,19 +154,19 @@ class TestConditions(unittest.TestCase):
         self.assertListEqual(list(bcs[0][1].value), [0.1, 0.2, 0.3])
 
     def test_unknown_condition(self):
-        dis = TestConditions.get_discretization()
+        dat = TestConditions.get_dat()
 
         sections = {}
         sections['DESIGN NONEXISTANT CONDITIONS'] = []
         sections['DESIGN NONEXISTANT CONDITIONS'].append(' //D1 2')
         sections['DESIGN NONEXISTANT CONDITIONS'].append(' //E 1 - NUMDOF 6 ONOFF 1 1 1 0 0 0 VAL 0.1 0.2 0.3 0.4 0.5 0.6 FUNCT 0 0 0 0 0 0')
-        self.assertListEqual(read_conditions(sections, dis), [])
+        self.assertListEqual(read_conditions(sections, dat), [])
         
         sections['DESIGN NONEXISTANT CONDITIONS'].append('D1 2')
         sections['DESIGN NONEXISTANT CONDITIONS'].append('E 1 - NUMDOF 6 ONOFF 1 1 1 0 0 0 VAL 0.1 0.2 0.3 0.4 0.5 0.6 FUNCT 0 0 0 0 0 0')
 
         with self.assertRaises(NotImplementedError):
-            bcs = read_conditions(sections, dis)
+            bcs = read_conditions(sections, dat)
 
     def test_read_surfdirich_multiple(self):
         self.read_common_multiple('SURF', 'DIRICH')

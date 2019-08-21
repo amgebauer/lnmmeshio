@@ -1,13 +1,14 @@
-from .element import Element
+from .element import ElementTet
 from ..node import Node
 from typing import List, Dict
 from .tri6 import Tri6
 from .line3 import Line3
+import numpy as np
 
 """
 Implementation of a tet4 element
 """
-class Tet10 (Element):
+class Tet10 (ElementTet):
     ShapeName: str = 'TET10'
 
     """
@@ -52,3 +53,27 @@ class Tet10 (Element):
         return [
             Line3(None, [self.nodes[i] for i in nodes]) for nodes in edge_node_ids
         ]
+    
+    """
+    Returns the value of the shape functions at the local coordinate xi
+    """
+    @staticmethod
+    def shape_fcns(xi):
+        r = xi[0]
+        s = xi[1]
+        t = xi[2]
+        u = 1.0-r-s-t
+        return np.array(
+            [
+                u*(2.0*u-1.0),
+                r * (2.0 * r - 1.0),
+                s * (2.0 * s - 1.0),
+                t * (2.0 * t - 1.0),
+                4.0 * r * u,
+                4.0 * r * s,
+                4.0 * s * u,
+                4.0 * t * u,
+                4.0 * r * t,
+                4.0 * s * t
+            ]
+        )

@@ -1,12 +1,13 @@
-from .element import Element
+from .element import Element2D
 from ..node import Node
 from typing import List, Dict
 from .line2 import Line2
+import numpy as np
 
 """
 Implementation of a quad4 element
 """
-class Quad4 (Element):
+class Quad4 (Element2D):
     ShapeName: str = 'QUAD4'
 
     """
@@ -49,3 +50,15 @@ class Quad4 (Element):
             Line2(None, [self.nodes[2], self.nodes[3]]),
             Line2(None, [self.nodes[3], self.nodes[0]])
         ]
+    
+    """
+    Returns the value of the shape functions at the local coordinate xi
+    """
+    @staticmethod
+    def shape_fcns(xi):
+
+        return np.array(
+            [Line2.shape_fcns(xi[0])[0]*Line2.shape_fcns(xi[1])[0],
+            Line2.shape_fcns(xi[0])[1]*Line2.shape_fcns(xi[1])[0],
+            Line2.shape_fcns(xi[0])[1]*Line2.shape_fcns(xi[1])[1],
+            Line2.shape_fcns(xi[0])[0]*Line2.shape_fcns(xi[1])[1]])

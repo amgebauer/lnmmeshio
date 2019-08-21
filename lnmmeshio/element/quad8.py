@@ -1,12 +1,13 @@
-from .element import Element
+from .element import Element2D
 from ..node import Node
 from typing import List, Dict
 from .line3 import Line3
+import numpy as np
 
 """
 Implementation of a quad8 element
 """
-class Quad8 (Element):
+class Quad8 (Element2D):
     ShapeName: str = 'QUAD8'
 
     """
@@ -49,3 +50,30 @@ class Quad8 (Element):
             Line3(None, [self.nodes[2], self.nodes[3], self.nodes[6]]),
             Line3(None, [self.nodes[3], self.nodes[0], self.nodes[7]])
         ]
+    
+    """
+    Returns the value of the shape functions at the local coordinate xi
+    """
+    @staticmethod
+    def shape_fcns(xi):
+
+        r = xi[0]
+        s = xi[1]
+
+        rp = 1.0 + r
+        rm = 1.0 - r
+        sp = 1.0 + s
+        sm = 1.0 - s
+        r2 = 1.0 - r * r
+        s2 = 1.0 - s * s
+
+        return np.array([
+            0.25 * (rm * sm - (r2 * sm + s2 * rm)),
+            0.25 * (rp * sm - (r2 * sm + s2 * rp)),
+            0.25 * (rp * sp - (s2 * rp + r2 * sp)),
+            0.25 * (rm * sp - (r2 * sp + s2 * rm)),
+            0.5 * r2 * sm,
+            0.5 * s2 * rp,
+            0.5 * r2 * sp,
+            0.5 * s2 * rm
+        ])

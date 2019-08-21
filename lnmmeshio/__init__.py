@@ -65,7 +65,7 @@ def _get_type(filename, file_format=None) -> bool:
     
     return __TYPE_OTHER
 
-def read(filename, file_format=None, out=False):
+def read(filename, file_format=None, out=True):
     """
     Reads an unstructured mesh with added data
 
@@ -101,17 +101,51 @@ def read(filename, file_format=None, out=False):
         )
         return dat
 
-def read_baci(input_stream, out=False):
+def read_discr(filename, file_format=None, out=True):
+    """
+    Reads an unstructured mesh with added data
+
+    Args:
+        filename: The file to read from
+        file_format: The file format of the file
+    
+    Returns:
+        Discretization: Returns the discretization in BACI format
+    """
+    assert isinstance(filename, str)
+
+    ftype: int = _get_type(filename, file_format=file_format)
+
+    if ftype == __TYPE_BACI or ftype == __TYPE_BACI_DISCR:
+        # this is a BACI file format
+        with open(filename, 'r') as f:
+            return read_baci_discr(f, out=out)
+    elif ftype == __TYPE_CASE:
+        # this is ensight gold file format
+        raise NotImplementedError('Case file reading is not implemented yet')
+    elif ftype == __TYPE_MIMICS_STL:
+        dis = meshio_to_discretization.mesh2Discretization(
+            mimics_stlio.read(filename)
+        )
+        return dis
+    else:
+        # this maybe is a file format supported by meshio
+        dis = meshio_to_discretization.mesh2Discretization(
+            _meshioread(filename, file_format=file_format)
+        )
+        return dis
+
+def read_baci(input_stream, out=True):
     sections = ioutils.read_dat_sections(input_stream)
                 
     return Datfile.read(sections, out=out)
 
-def read_baci_discr(input_stream, out=False):
+def read_baci_discr(input_stream, out=True):
     sections = ioutils.read_dat_sections(input_stream)
                 
     return Discretization.read(sections, out=out)
 
-def write(filename: str, dat: Datfile, file_format=None, override=True):
+def write(filename: str, dat: Datfile, file_format=None, override=True, out=True):
     """
     Writes an dat file with head and discretization
 
@@ -130,19 +164,25 @@ def write(filename: str, dat: Datfile, file_format=None, override=True):
     if ftype == __TYPE_BACI:
         # this is a BACI file format
         with open(filename, 'w') as f:
-            dat.write(f)
+            dat.write(f, out=out)
     elif ftype == __TYPE_BACI_DISCR:
         # this is a BACI discretization file format
         with open(filename, 'w') as f:
-            dat.discretization.write(f)
+            dat.discretization.write(f, out=out)
     elif ftype == __TYPE_CASE:
         # this is ensight gold file format
-        ensightio.write_case(filename, dat)
+        ensightio.write_case(filename, dat, out=out)
     elif ftype == __TYPE_MIMICS_STL:
         raise NotImplementedError('Writing in Mimics stl is currently not supported')
     else:
         m = meshio_to_discretization.discretization2mesh(dat.discretization)
         write_mesh(filename, m, file_format=file_format)
+
+def write_discr(filename: str, dis: Discretization, file_format=None, override=True, out=True):
+    dat: Datfile = Datfile()
+    dat.discretization = dis
+
+    write(filename, dat, file_format=file_format, override=override, out=out)
 
 def read_mesh(filename, file_format=None):
     """

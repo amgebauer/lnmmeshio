@@ -111,10 +111,10 @@ class ElementContainer:
     """
     Returns an ordereddict of sections with the corresponding lines
     """
-    def get_sections(self):
+    def get_sections(self, out=True):
         d = OrderedDict()
         for key, elements in self.items():
-            d[ElementContainer.get_section_name(key)] = ElementContainer.__get_section_lines(elements)
+            d[ElementContainer.get_section_name(key)] = ElementContainer.__get_section_lines(elements, out=out)
         
         return d
 
@@ -262,10 +262,10 @@ class ElementContainer:
         elements: List of elements
     """
     @staticmethod
-    def __get_section_lines(elements: List[Element]):
+    def __get_section_lines(elements: List[Element], out=True):
         lines = []
         if elements is not None:
-            for ele in elements:
+            for ele in progress(elements, out=out, label='Write Element'):
                 lines.append(ele.get_line())
         
         return lines
