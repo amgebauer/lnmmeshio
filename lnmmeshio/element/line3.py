@@ -1,11 +1,12 @@
-from .element import Element
+from .element import Element1D
 from ..node import Node
 from typing import List, Dict
+import numpy as np
 
 """
 Implementation of a line3 element
 """
-class Line3 (Element):
+class Line3 (Element1D):
     ShapeName: str = 'LINE3'
 
     """
@@ -43,3 +44,12 @@ class Line3 (Element):
     """
     def get_edges(self) -> List['Line3']:
         return [self]
+
+    """
+    Returns the value of the shape functions at the local coordinate xi
+    """
+    @staticmethod
+    def shape_fcns(xi):
+        return np.array([
+            xi*(xi-1)/2.0, xi*(xi+1)/2.0, (1+xi)*(1-xi)
+        ])

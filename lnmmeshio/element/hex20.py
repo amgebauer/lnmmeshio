@@ -1,13 +1,14 @@
-from .element import Element
+from .element import ElementHex
 from ..node import Node
 from typing import List, Dict
 from .quad8 import Quad8
 from .line3 import Line3
+import numpy as np
 
 """
 Implementation of a HEX20 element
 """
-class Hex20 (Element):
+class Hex20 (ElementHex):
     ShapeName: str = 'HEX20'
 
     """
@@ -70,3 +71,46 @@ class Hex20 (Element):
         return [
             Line3(None, [self.nodes[i] for i in nodes]) for nodes in edge_node_ids
         ]
+    
+    """
+    Returns the value of the shape functions at the local coordinate xi
+    """
+    @staticmethod
+    def shape_fcns(xi):
+
+        r = xi[0]
+        s = xi[1]
+        t = xi[2]
+
+        rp = 1.0 + r
+        rm = 1.0 - r
+        sp = 1.0 + s
+        sm = 1.0 - s
+        tp = 1.0 + t
+        tm = 1.0 - t
+        rrm = 1.0 - r * r
+        ssm = 1.0 - s * s
+        ttm = 1.0 - t * t
+
+        return np.array([
+            0.125 * rm * sm * tm * (rm + sm + tm - 5.0),
+            0.125 * rp * sm * tm * (rp + sm + tm - 5.0),
+            0.125 * rp * sp * tm * (rp + sp + tm - 5.0),
+            0.125 * rm * sp * tm * (rm + sp + tm - 5.0),
+            0.125 * rm * sm * tp * (rm + sm + tp - 5.0),
+            0.125 * rp * sm * tp * (rp + sm + tp - 5.0),
+            0.125 * rp * sp * tp * (rp + sp + tp - 5.0),
+            0.125 * rm * sp * tp * (rm + sp + tp - 5.0),
+            0.25 * rrm * sm * tm,
+            0.25 * rp * ssm * tm,
+            0.25 * rrm * sp * tm,
+            0.25 * rm * ssm * tm,
+            0.25 * rm * sm * ttm,
+            0.25 * rp * sm * ttm,
+            0.25 * rp * sp * ttm,
+            0.25 * rm * sp * ttm,
+            0.25 * rrm * sm * tp,
+            0.25 * rp * ssm * tp,
+            0.25 * rrm * sp * tp,
+            0.25 * rm * ssm * tp
+        ])

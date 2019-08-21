@@ -1,13 +1,14 @@
-from .element import Element
+from .element import ElementHex
 from ..node import Node
 from typing import List, Dict
 from .quad9 import Quad9
 from .line3 import Line3
+import numpy as np
 
 """
 Implementation of a HEX27 element
 """
-class Hex27 (Element):
+class Hex27 (ElementHex):
     ShapeName: str = 'HEX27'
 
     """
@@ -70,3 +71,39 @@ class Hex27 (Element):
         return [
             Line3(None, [self.nodes[i] for i in nodes]) for nodes in edge_node_ids
         ]
+    
+    """
+    Returns the value of the shape functions at the local coordinate xi
+    """
+    @staticmethod
+    def shape_fcns(xi):
+
+        return np.array(
+            [Line3.shape_fcns(xi[0])[0]*Line3.shape_fcns(xi[1])[0]*Line3.shape_fcns(xi[2])[0],
+            Line3.shape_fcns(xi[0])[1]*Line3.shape_fcns(xi[1])[0]*Line3.shape_fcns(xi[2])[0],
+            Line3.shape_fcns(xi[0])[1]*Line3.shape_fcns(xi[1])[1]*Line3.shape_fcns(xi[2])[0],
+            Line3.shape_fcns(xi[0])[0]*Line3.shape_fcns(xi[1])[1]*Line3.shape_fcns(xi[2])[0],
+            Line3.shape_fcns(xi[0])[0]*Line3.shape_fcns(xi[1])[0]*Line3.shape_fcns(xi[2])[1],
+            Line3.shape_fcns(xi[0])[1]*Line3.shape_fcns(xi[1])[0]*Line3.shape_fcns(xi[2])[1],
+            Line3.shape_fcns(xi[0])[1]*Line3.shape_fcns(xi[1])[1]*Line3.shape_fcns(xi[2])[1],
+            Line3.shape_fcns(xi[0])[0]*Line3.shape_fcns(xi[1])[1]*Line3.shape_fcns(xi[2])[1],
+            Line3.shape_fcns(xi[0])[2]*Line3.shape_fcns(xi[1])[0]*Line3.shape_fcns(xi[2])[0],
+            Line3.shape_fcns(xi[0])[1]*Line3.shape_fcns(xi[1])[2]*Line3.shape_fcns(xi[2])[0],
+            Line3.shape_fcns(xi[0])[2]*Line3.shape_fcns(xi[1])[1]*Line3.shape_fcns(xi[2])[0],
+            Line3.shape_fcns(xi[0])[0]*Line3.shape_fcns(xi[1])[2]*Line3.shape_fcns(xi[2])[0],
+            Line3.shape_fcns(xi[0])[0]*Line3.shape_fcns(xi[1])[0]*Line3.shape_fcns(xi[2])[2],
+            Line3.shape_fcns(xi[0])[1]*Line3.shape_fcns(xi[1])[0]*Line3.shape_fcns(xi[2])[2],
+            Line3.shape_fcns(xi[0])[1]*Line3.shape_fcns(xi[1])[1]*Line3.shape_fcns(xi[2])[2],
+            Line3.shape_fcns(xi[0])[0]*Line3.shape_fcns(xi[1])[1]*Line3.shape_fcns(xi[2])[2],
+            Line3.shape_fcns(xi[0])[2]*Line3.shape_fcns(xi[1])[0]*Line3.shape_fcns(xi[2])[1],
+            Line3.shape_fcns(xi[0])[1]*Line3.shape_fcns(xi[1])[2]*Line3.shape_fcns(xi[2])[1],
+            Line3.shape_fcns(xi[0])[2]*Line3.shape_fcns(xi[1])[1]*Line3.shape_fcns(xi[2])[1],
+            Line3.shape_fcns(xi[0])[0]*Line3.shape_fcns(xi[1])[2]*Line3.shape_fcns(xi[2])[1],
+
+            Line3.shape_fcns(xi[0])[2]*Line3.shape_fcns(xi[1])[2]*Line3.shape_fcns(xi[2])[0],
+            Line3.shape_fcns(xi[0])[2]*Line3.shape_fcns(xi[1])[0]*Line3.shape_fcns(xi[2])[2],
+            Line3.shape_fcns(xi[0])[1]*Line3.shape_fcns(xi[1])[2]*Line3.shape_fcns(xi[2])[2],
+            Line3.shape_fcns(xi[0])[2]*Line3.shape_fcns(xi[1])[1]*Line3.shape_fcns(xi[2])[2],
+            Line3.shape_fcns(xi[0])[0]*Line3.shape_fcns(xi[1])[2]*Line3.shape_fcns(xi[2])[2],
+            Line3.shape_fcns(xi[0])[2]*Line3.shape_fcns(xi[1])[2]*Line3.shape_fcns(xi[2])[1],
+            Line3.shape_fcns(xi[0])[2]*Line3.shape_fcns(xi[1])[2]*Line3.shape_fcns(xi[2])[2]])
