@@ -27,6 +27,7 @@ def clearln():
     print('\033[F\r\x1b[K', end='')
 
 class FastBar(bar.Bar):
+    suffix = '%(percent).1f%% - %(eta_td)s'
 
     def __init__(self, label):
         super(FastBar, self).__init__(label)
