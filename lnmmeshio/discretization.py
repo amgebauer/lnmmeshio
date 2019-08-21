@@ -257,3 +257,12 @@ class Discretization:
         disc.finalize()
         return disc
     
+    def __str__(self):
+        s = ''
+        s += 'Discretization with ...\n'
+        s += '{0:>10} nodes\n'.format(len(self.nodes))
+
+        for key, eles in self.elements.items():
+            s += '{0:>10} {1} elements\n'.format(len(eles), key)
+        
+        return s
