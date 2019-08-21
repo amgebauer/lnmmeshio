@@ -17,14 +17,36 @@ def progress(iterator, out = True, label=None, btype='bar'):
             label = 'progress'
         
         if max_val < 0:
-            return ProgressIterator(spinner.Spinner(label).iter(iterator), label)
+            return ProgressIterator(FastSpinner(label).iter(iterator), label)
         else:
-            return ProgressIterator(bar.Bar(label).iter(iterator), label)
+            return ProgressIterator(FastBar(label).iter(iterator), label)
     else:
         return iterator
 
 def clearln():
     print('\033[F\r\x1b[K', end='')
+
+class FastBar(bar.Bar):
+
+    def __init__(self, label):
+        super(FastBar, self).__init__(label)
+        self.last = time.time()
+
+    def update(self):
+        if time.time()-self.last > 0.1:
+            self.last = time.time()
+            super(FastBar, self).update()
+
+class FastSpinner(spinner.Spinner):
+
+    def __init__(self, label):
+        super(FastSpinner, self).__init__(label)
+        self.last = time.time()
+
+    def update(self):
+        if time.time()-self.last > 0.1:
+            self.last = time.time()
+            super(FastSpinner, self).update()
 
 class ProgressIterator:
 
