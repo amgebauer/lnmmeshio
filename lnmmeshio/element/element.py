@@ -347,13 +347,13 @@ class ElementTet(Element3D):
         if not all([lop(xi[i], 0) for i in range(3)]):
             return False
         
-        if not lop[1, xi[0]]:
+        if not lop(1, xi[0]):
             return False
         
-        if not lop[1-xi[0], xi[1]]:
+        if not lop(1-xi[0], xi[1]):
             return False
         
-        if not lop[1-xi[0]-xi[1], xi[2]]:
+        if not lop(1-xi[0]-xi[1], xi[2]):
             return False
 
         return True
