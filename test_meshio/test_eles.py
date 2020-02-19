@@ -301,7 +301,7 @@ class TestEles(unittest.TestCase):
             Node(np.array([0.1, 2.2, 0.3])),
             Node(np.array([0.1, 0.22, 1.2]))])
         
-        noddata = np.array([0.1, 0.2, 0.3, 0.4])
+        noddata = np.array([[0.1, 0.2], [0.2, 0.3], [0.3, 0.4], [0.4, 0.5]])
 
         for i in range(4):
             n1 = ele.nodes[i]
@@ -314,7 +314,10 @@ class TestEles(unittest.TestCase):
                     pos = n1.coords+xi*(n2.coords-n1.coords)
                     qxi = q1+xi*(q2-q1)
 
-                    self.assertAlmostEqual(ele.project_quantity(pos, noddata), qxi)
+                    qxi_proj = ele.project_quantity(pos, noddata)
+
+                    for i in range(len(qxi)):
+                        self.assertAlmostEqual(qxi_proj[i], qxi[i])
 
     def test_quad4(self):
         FACES = [[0, 1, 2, 3]]

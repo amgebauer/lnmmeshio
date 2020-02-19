@@ -206,3 +206,17 @@ class Datfile:
         dat.head = Head.read(sections)
 
         return dat
+    
+
+    
+    def __str__(self):
+        s = ''
+        s += 'Dat file with ...\n'
+        s += '{0:>10} conditions\n'.format(len(self.conditions))
+        s += '{0:>10} head\n'.format('' if self.head is not None else 'no')
+        
+        if self.discretization is not None:
+            s += '\n'
+            s+= self.discretization.__str__()
+        
+        return s
