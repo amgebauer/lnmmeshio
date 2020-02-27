@@ -1,5 +1,12 @@
-from ..ioutils import write_title, write_option_list, write_option, read_option_item, \
-    read_next_option, read_next_key, read_next_value
+from ..ioutils import (
+    write_title,
+    write_option_list,
+    write_option,
+    read_option_item,
+    read_next_option,
+    read_next_key,
+    read_next_value,
+)
 from typing import List
 from .element import Element
 from .line2 import Line2
@@ -19,7 +26,7 @@ from ..fiber import Fiber
 from ..node import Node
 
 
-RegExEle = re.compile(r'^[ ]*([0-9]+)[ ]+(\S+)[ ]+(\S+)[ ]+')
+RegExEle = re.compile(r"^[ ]*([0-9]+)[ ]+(\S+)[ ]+(\S+)[ ]+")
 
 """
 Creates an element from a given element shape
@@ -33,7 +40,11 @@ Args:
 Return:
     Element of the specific type
 """
-def create_element(ele_type: str, ele_shape: str, ele_nodes: List[Node], throw_if_unknown=False):
+
+
+def create_element(
+    ele_type: str, ele_shape: str, ele_nodes: List[Node], throw_if_unknown=False
+):
 
     if ele_shape == Line2.ShapeName:
         ele = Line2(ele_type, ele_nodes)
@@ -61,10 +72,11 @@ def create_element(ele_type: str, ele_shape: str, ele_nodes: List[Node], throw_i
         ele = Hex27(ele_type, ele_nodes)
     else:
         if throw_if_unknown:
-            raise RuntimeError('The element type {0} is unknown'.format(ele_shape))
+            raise RuntimeError("The element type {0} is unknown".format(ele_shape))
         ele = Element(ele_type, ele_shape, ele_nodes)
-    
+
     return ele
+
 
 """
 Parses the element and returns an instance of an appropriate element type
@@ -76,8 +88,10 @@ Args:
 Returns:
     An instance of the properly instantianted element
 """
+
+
 def parse(line: str, nodes: List[Node], throw_if_unknown=False):
-    line = line.split('//', 1)[0]
+    line = line.split("//", 1)[0]
     # parse ele id, type and shape
     ele_match = RegExEle.search(line)
     if not ele_match:
@@ -86,20 +100,24 @@ def parse(line: str, nodes: List[Node], throw_if_unknown=False):
     ele_id = int(ele_match.group(1))
     ele_type = ele_match.group(2)
     ele_shape = ele_match.group(3)
-    
-    node_ids_str, span = read_option_item(line, ele_shape, Element.num_nodes_by_shape(ele_shape))
-    ele_nodes = [ nodes[int(i)-1] for i in node_ids_str]
 
-    ele = create_element(ele_type, ele_shape, ele_nodes, throw_if_unknown=throw_if_unknown)
+    node_ids_str, span = read_option_item(
+        line, ele_shape, Element.num_nodes_by_shape(ele_shape)
+    )
+    ele_nodes = [nodes[int(i) - 1] for i in node_ids_str]
+
+    ele = create_element(
+        ele_type, ele_shape, ele_nodes, throw_if_unknown=throw_if_unknown
+    )
 
     ele.id = ele_id
-    
+
     # read fibers
     ele.fibers = Fiber.parse_fibers(line)
 
     # read remaining options
     # assume only one value per option, which must not be the case in general
-    line = line[span[1]:]
+    line = line[span[1] :]
     while True:
         line, key = read_next_key(line)
         if line is None:
@@ -113,7 +131,7 @@ def parse(line: str, nodes: List[Node], throw_if_unknown=False):
 
         if line is None:
             break
-        
+
         ele.options[key] = value
 
     return ele

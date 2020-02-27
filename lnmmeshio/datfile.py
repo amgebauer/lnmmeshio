@@ -1,7 +1,14 @@
 import numpy as np
 from typing import List, Dict
-from .ioutils import write_title, write_option_list, write_option, read_option_item, \
-    read_next_option, read_next_key, read_next_value
+from .ioutils import (
+    write_title,
+    write_option_list,
+    write_option,
+    read_option_item,
+    read_next_option,
+    read_next_key,
+    read_next_value,
+)
 from collections import OrderedDict
 import re
 from .element.element import Element
@@ -20,8 +27,9 @@ from .result_description import ResultDescription
 This class holds all information in the datfiles, consisting out of the discretization, conditions
 and options.
 """
+
+
 class Datfile:
-    
     def __init__(self):
         self.discretization = Discretization()
 
@@ -36,31 +44,32 @@ class Datfile:
 
         # initialize head
         self.head: Head = Head()
-    
+
     """
     Computes the ids of the elements and nodes. 
 
     Args:
         zero_based: If true, the first node id is 0, otherwise 1
     """
+
     def compute_ids(self, zero_based: bool):
-        
+
         self.discretization.compute_ids(zero_based)
-        
+
         id: int = 0 if zero_based else 1
         for f in self.functions:
             f.id = id
             id += 1
-        
+
     """
     Resets the computed ids
     """
+
     def reset(self):
         self.discretization.reset()
 
         for f in self.functions:
             f.reset()
-
 
     """
     Creates an dictionary of lines with section title as key
@@ -68,6 +77,7 @@ class Datfile:
     Return:
         Dat file as dict
     """
+
     def get_sections(self, out=True):
         sections = OrderedDict()
 
@@ -77,15 +87,15 @@ class Datfile:
         # write functions
         for f in self.functions:
             sections.update(f.get_sections())
-        
+
         # write conditions
         for c in self.conditions:
             sections.update(c.get_sections())
-        
+
         # write result description
-        sections['RESULT DESCRIPTION'] = []
+        sections["RESULT DESCRIPTION"] = []
         for d in self.result_description:
-            sections['RESULT DESCRIPTION'].append(d.get_line())
+            sections["RESULT DESCRIPTION"].append(d.get_line())
 
         # write discretization
         sections.update(self.discretization.get_sections(out=True))
@@ -98,6 +108,7 @@ class Datfile:
     Args:
         dest: Stream to write the datfile to
     """
+
     def write(self, dest, out=True):
         sections = self.get_sections(out=out)
 
@@ -105,13 +116,14 @@ class Datfile:
         sections = Datfile.reorder_sections(sections)
 
         # write sections
-        for title, lines in progress(sections.items(), out=out, label='Write sections'):
-            if len(lines) == 0: continue
-            if title != '':
+        for title, lines in progress(sections.items(), out=out, label="Write sections"):
+            if len(lines) == 0:
+                continue
+            if title != "":
                 write_title(dest, title, True)
             for l in lines:
-                dest.write('{0}\n'.format(l))
-    
+                dest.write("{0}\n".format(l))
+
     """
     Reorderes the sections of the datfile into a specific order
 
@@ -121,26 +133,27 @@ class Datfile:
     Return:
         ordered dictionary of sections as keys and section lines as values
     """
+
     @staticmethod
     def reorder_sections(sections):
         ORDER_RULES = [
-            '',
-            'TITLE',
-            'PROBLEM SIZE',
-            'PROBLEM TYP',
-            None, # this will be filled by the rest
-            'MATERIALS', # materials
-            re.compile(r'^FUNCT\d+$'), # functions
-            'RESULT DESCRIPTION',
-            re.compile(r'.*\sCONDITIONS$'), # conditions
-            'DESIGN DESCRIPTION',
-            'DNODE-NODE TOPOLOGY',
-            'DLINE-NODE TOPOLOGY',
-            'DSURF-NODE TOPOLOGY',
-            'DVOL-NODE TOPOLOGY',
-            'NODE COORDS',
-            re.compile(r'[A-Z]+\s+ELEMENTS$'),
-            'END'
+            "",
+            "TITLE",
+            "PROBLEM SIZE",
+            "PROBLEM TYP",
+            None,  # this will be filled by the rest
+            "MATERIALS",  # materials
+            re.compile(r"^FUNCT\d+$"),  # functions
+            "RESULT DESCRIPTION",
+            re.compile(r".*\sCONDITIONS$"),  # conditions
+            "DESIGN DESCRIPTION",
+            "DNODE-NODE TOPOLOGY",
+            "DLINE-NODE TOPOLOGY",
+            "DSURF-NODE TOPOLOGY",
+            "DVOL-NODE TOPOLOGY",
+            "NODE COORDS",
+            re.compile(r"[A-Z]+\s+ELEMENTS$"),
+            "END",
         ]
         to_process = list(sections.keys())
         myorder = []
@@ -148,29 +161,28 @@ class Datfile:
         # order keys
         rest_pos = None
         for order_rule in ORDER_RULES:
-            if isinstance(order_rule, re.Pattern):
+            if isinstance(order_rule, str):
+                # this is a single string
+                if order_rule in to_process:
+                    myorder.append(order_rule)
+                    to_process.remove(order_rule)
+
+            elif order_rule is None:
+                if rest_pos is None:
+                    rest_pos = len(myorder)
+            else:
                 # look for all keys that fit and are not added yet
                 matches = []
                 for i in to_process:
                     if order_rule.match(i):
                         matches.append(i)
 
-
                 myorder.extend(sorted(matches))
                 to_process = [i for i in to_process if i not in matches]
 
-            elif order_rule is None:
-                if rest_pos is None:
-                    rest_pos = len(myorder)
-            else:
-                # this is a single string
-                if order_rule in to_process:
-                    myorder.append(order_rule)
-                    to_process.remove(order_rule)
-        
         if rest_pos is None:
             rest_pos = len(myorder)
-        
+
         for i in sorted(to_process):
             myorder.insert(rest_pos, i)
             rest_pos += 1
@@ -186,10 +198,11 @@ class Datfile:
     Retuns:
         Discretization object
     """
+
     @staticmethod
-    def read(sections: Dict[str, List[str]], out: bool = False) -> 'Discretization':
+    def read(sections: Dict[str, List[str]], out: bool = False) -> "Discretization":
         dat = Datfile()
-        
+
         # read discretization
         dat.discretization = Discretization.read(sections, out=out)
 
@@ -206,17 +219,15 @@ class Datfile:
         dat.head = Head.read(sections)
 
         return dat
-    
 
-    
     def __str__(self):
-        s = ''
-        s += 'Dat file with ...\n'
-        s += '{0:>10} conditions\n'.format(len(self.conditions))
-        s += '{0:>10} head\n'.format('' if self.head is not None else 'no')
-        
+        s = ""
+        s += "Dat file with ...\n"
+        s += "{0:>10} conditions\n".format(len(self.conditions))
+        s += "{0:>10} head\n".format("" if self.head is not None else "no")
+
         if self.discretization is not None:
-            s += '\n'
-            s+= self.discretization.__str__()
-        
+            s += "\n"
+            s += self.discretization.__str__()
+
         return s

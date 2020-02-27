@@ -1,21 +1,22 @@
 from progress import bar, spinner
 import time
 
-def progress(iterator, out = True, label=None, btype='bar'):
+
+def progress(iterator, out=True, label=None, btype="bar"):
 
     max_val = 0
     try:
         max_val = len(iterator)
     except TypeError:
         max_val = -1
-    
+
     if max_val == 0:
         out = False
 
     if out:
         if label is None:
-            label = 'progress'
-        
+            label = "progress"
+
         if max_val < 0:
             return ProgressIterator(FastSpinner(label).iter(iterator), label)
         else:
@@ -23,34 +24,36 @@ def progress(iterator, out = True, label=None, btype='bar'):
     else:
         return iterator
 
+
 def clearln():
-    print('\033[F\r\x1b[K', end='')
+    print("\033[F\r\x1b[K", end="")
+
 
 class FastBar(bar.Bar):
-    suffix = '%(percent).1f%% - %(eta_td)s'
+    suffix = "%(percent).1f%% - %(eta_td)s"
 
     def __init__(self, label):
         super(FastBar, self).__init__(label)
         self.last = time.time()
 
     def update(self):
-        if time.time()-self.last > 0.1:
+        if time.time() - self.last > 0.1:
             self.last = time.time()
             super(FastBar, self).update()
 
-class FastSpinner(spinner.Spinner):
 
+class FastSpinner(spinner.Spinner):
     def __init__(self, label):
         super(FastSpinner, self).__init__(label)
         self.last = time.time()
 
     def update(self):
-        if time.time()-self.last > 0.1:
+        if time.time() - self.last > 0.1:
             self.last = time.time()
             super(FastSpinner, self).update()
 
-class ProgressIterator:
 
+class ProgressIterator:
     def __init__(self, iterator, label):
         self.iterator = iterator
         self.starttime = time.time()
@@ -65,5 +68,5 @@ class ProgressIterator:
         except StopIteration:
             # print total time
             clearln()
-            print('{0} ... {1:.2f}s'.format(self.label, time.time()-self.starttime))
+            print("{0} ... {1:.2f}s".format(self.label, time.time() - self.starttime))
             raise StopIteration

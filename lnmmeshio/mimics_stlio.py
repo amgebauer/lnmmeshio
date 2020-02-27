@@ -20,11 +20,14 @@ def read(filename):
 def read_buffer(f):
     data = numpy.frombuffer(f.read(5), dtype=numpy.uint8)
     if "".join([chr(item) for item in data]) == "solid":
-        raise RuntimeError('This is the Mimics stl format, which should be binary, not ascii')
+        raise RuntimeError(
+            "This is the Mimics stl format, which should be binary, not ascii"
+        )
 
     # binary: read and discard 75 more bytes
     f.read(75)
     return _read_binary(f)
+
 
 def data_from_facets(facets):
     # Now, all facets contain the point coordinate. Try to identify individual
@@ -54,11 +57,11 @@ def _read_binary(f):
         f.read(12)
         facets.append(numpy.frombuffer(f.read(36), dtype=numpy.float32).reshape(-1, 3))
         # discard the attribute byte count
-        facet_data.append(int(struct.unpack('<h', f.read(2))[0]))
+        facet_data.append(int(struct.unpack("<h", f.read(2))[0]))
 
     points, cells = data_from_facets(numpy.array(facets))
 
-    cell_data = {"triangle": {'medit:ref': numpy.array(facet_data)}} 
+    cell_data = {"triangle": {"medit:ref": numpy.array(facet_data)}}
     return Mesh(points, cells, cell_data=cell_data)
 
 
@@ -87,13 +90,18 @@ def _compute_normals(pts):
     normals = (normals.T / nrm).T
     return normals
 
-def _write_binary(filename, points, cells, cell_data = None):
+
+def _write_binary(filename, points, cells, cell_data=None):
     pts = points[cells["triangle"]]
     normals = _compute_normals(pts)
     attrs = numpy.zeros((len(pts)), dtype=numpy.uint16)
 
-    if cell_data is not None and 'triangle' in cell_data and 'medit:ref' in cell_data['triangle']:
-        attrs = cell_data['triangle']['medit:ref'].astype(numpy.uint16)
+    if (
+        cell_data is not None
+        and "triangle" in cell_data
+        and "medit:ref" in cell_data["triangle"]
+    ):
+        attrs = cell_data["triangle"]["medit:ref"].astype(numpy.uint16)
 
     with open(filename, "wb") as fh:
         # 80 character header data

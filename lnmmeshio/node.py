@@ -6,6 +6,8 @@ import io
 """
 Class that holds all information of nodes like coords, fibers, nodesets (and additional data)
 """
+
+
 class Node:
 
     """
@@ -14,6 +16,7 @@ class Node:
     Args:
         coords: np.array((3)) Coordinates of the node
     """
+
     def __init__(self, coords: np.array = np.zeros((3))):
         self.id = None
         self.coords: np.array = coords
@@ -24,30 +27,34 @@ class Node:
         self.surfacenodesets = []
         self.volumenodesets = []
         self.data = {}
-    
+
     """
     Sets the id to None
     """
+
     def reset(self):
         self.id = None
-    
+
     """
     Returns the line definition in the dat file
     """
+
     def get_line(self):
         dest = io.StringIO()
         if len(self.fibers) > 0:
-            dest.write('FNODE')
+            dest.write("FNODE")
         else:
-            dest.write('NODE')
-        
+            dest.write("NODE")
+
         if self.id is None:
-            raise RuntimeError('You have to compute ids before writing')
-        
-        dest.write(' {0} COORD {1}'.format(self.id, ' '.join([repr(i) for i in self.coords])))
-        
+            raise RuntimeError("You have to compute ids before writing")
+
+        dest.write(
+            " {0} COORD {1}".format(self.id, " ".join([repr(i) for i in self.coords]))
+        )
+
         for k, f in self.fibers.items():
-            dest.write(' ')
+            dest.write(" ")
             f.write(dest, k)
 
         return dest.getvalue()
@@ -58,19 +65,22 @@ class Node:
     Args:
         dest: stream variable where to write the line
     """
+
     def write(self, dest):
         if len(self.fibers) > 0:
-            dest.write('FNODE')
+            dest.write("FNODE")
         else:
-            dest.write('NODE')
-        
+            dest.write("NODE")
+
         if self.id is None:
-            raise RuntimeError('You have to compute ids before writing')
-        
-        dest.write(' {0} COORD {1}'.format(self.id, ' '.join([repr(i) for i in self.coords])))
-        
+            raise RuntimeError("You have to compute ids before writing")
+
+        dest.write(
+            " {0} COORD {1}".format(self.id, " ".join([repr(i) for i in self.coords]))
+        )
+
         for k, f in self.fibers.items():
-            dest.write(' ')
+            dest.write(" ")
             f.write(dest, k)
 
-        dest.write('\n')
+        dest.write("\n")

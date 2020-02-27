@@ -6,3 +6,5 @@ lnmmeshio.egg-info
 dist
 htmlcov
 .coverage
+.tox/*
+.pytest_cache
