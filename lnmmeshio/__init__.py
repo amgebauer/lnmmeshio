@@ -2,7 +2,7 @@
 # Maintainer: Amadeus Gebauer
 #
 
-import sys,os
+import sys, os
 
 from meshio import Mesh, read as _meshioread, write as _meshiowrite
 from . import meshio_to_discretization
@@ -41,29 +41,31 @@ __TYPE_CASE = 3
 __TYPE_MIMICS_STL = 4
 __TYPE_OTHER = 0
 
+
 def _get_type(filename, file_format=None) -> bool:
     if not file_format:
         # deduct file format from extension
         _, extension = os.path.splitext(filename)
 
-        if extension == '.dat':
+        if extension == ".dat":
             return __TYPE_BACI
-        elif extension == '.dis':
+        elif extension == ".dis":
             return __TYPE_BACI_DISCR
-        elif extension == '.case':
+        elif extension == ".case":
             return __TYPE_CASE
-        elif extension == '.mstl':
+        elif extension == ".mstl":
             return __TYPE_MIMICS_STL
-    elif file_format == 'dat':
+    elif file_format == "dat":
         return __TYPE_BACI
-    elif file_format == 'dis':
+    elif file_format == "dis":
         return __TYPE_BACI_DISCR
-    elif file_format == 'case' or file_format == 'ensight':
+    elif file_format == "case" or file_format == "ensight":
         return __TYPE_CASE
-    elif file_format == 'mimicsstl':
+    elif file_format == "mimicsstl":
         return __TYPE_MIMICS_STL
-    
+
     return __TYPE_OTHER
+
 
 def read(filename, file_format=None, out=True):
     """
@@ -82,11 +84,11 @@ def read(filename, file_format=None, out=True):
 
     if ftype == __TYPE_BACI or ftype == __TYPE_BACI_DISCR:
         # this is a BACI file format
-        with open(filename, 'r') as f:
+        with open(filename, "r") as f:
             return read_baci(f, out=out)
     elif ftype == __TYPE_CASE:
         # this is ensight gold file format
-        raise NotImplementedError('Case file reading is not implemented yet')
+        raise NotImplementedError("Case file reading is not implemented yet")
     elif ftype == __TYPE_MIMICS_STL:
         dat: Datfile = Datfile()
         dat.discretization = meshio_to_discretization.mesh2Discretization(
@@ -100,6 +102,7 @@ def read(filename, file_format=None, out=True):
             _meshioread(filename, file_format=file_format)
         )
         return dat
+
 
 def read_discr(filename, file_format=None, out=True):
     """
@@ -118,15 +121,13 @@ def read_discr(filename, file_format=None, out=True):
 
     if ftype == __TYPE_BACI or ftype == __TYPE_BACI_DISCR:
         # this is a BACI file format
-        with open(filename, 'r') as f:
+        with open(filename, "r") as f:
             return read_baci_discr(f, out=out)
     elif ftype == __TYPE_CASE:
         # this is ensight gold file format
-        raise NotImplementedError('Case file reading is not implemented yet')
+        raise NotImplementedError("Case file reading is not implemented yet")
     elif ftype == __TYPE_MIMICS_STL:
-        dis = meshio_to_discretization.mesh2Discretization(
-            mimics_stlio.read(filename)
-        )
+        dis = meshio_to_discretization.mesh2Discretization(mimics_stlio.read(filename))
         return dis
     else:
         # this maybe is a file format supported by meshio
@@ -135,15 +136,18 @@ def read_discr(filename, file_format=None, out=True):
         )
         return dis
 
+
 def read_baci(input_stream, out=True):
     sections = ioutils.read_dat_sections(input_stream)
-                
+
     return Datfile.read(sections, out=out)
+
 
 def read_baci_discr(input_stream, out=True):
     sections = ioutils.read_dat_sections(input_stream)
-                
+
     return Discretization.read(sections, out=out)
+
 
 def write(filename: str, dat: Datfile, file_format=None, override=True, out=True):
     """
@@ -163,26 +167,30 @@ def write(filename: str, dat: Datfile, file_format=None, override=True, out=True
 
     if ftype == __TYPE_BACI:
         # this is a BACI file format
-        with open(filename, 'w') as f:
+        with open(filename, "w") as f:
             dat.write(f, out=out)
     elif ftype == __TYPE_BACI_DISCR:
         # this is a BACI discretization file format
-        with open(filename, 'w') as f:
+        with open(filename, "w") as f:
             dat.discretization.write(f, out=out)
     elif ftype == __TYPE_CASE:
         # this is ensight gold file format
         ensightio.write_case(filename, dat, out=out)
     elif ftype == __TYPE_MIMICS_STL:
-        raise NotImplementedError('Writing in Mimics stl is currently not supported')
+        raise NotImplementedError("Writing in Mimics stl is currently not supported")
     else:
         m = meshio_to_discretization.discretization2mesh(dat.discretization)
         write_mesh(filename, m, file_format=file_format)
 
-def write_discr(filename: str, dis: Discretization, file_format=None, override=True, out=True):
+
+def write_discr(
+    filename: str, dis: Discretization, file_format=None, override=True, out=True
+):
     dat: Datfile = Datfile()
     dat.discretization = dis
 
     write(filename, dat, file_format=file_format, override=override, out=out)
+
 
 def read_mesh(filename, file_format=None):
     """
@@ -201,15 +209,18 @@ def read_mesh(filename, file_format=None):
 
     if ftype == __TYPE_BACI:
         # this is a BACI file format
-        return meshio_to_discretization.discretization2mesh(read(filename, file_format=file_format).discretization)
+        return meshio_to_discretization.discretization2mesh(
+            read(filename, file_format=file_format).discretization
+        )
     elif ftype == __TYPE_CASE:
         # this is ensight gold file format
-        raise NotImplementedError('Case file reading into mesh is not implemented yet')
+        raise NotImplementedError("Case file reading into mesh is not implemented yet")
     elif ftype == __TYPE_MIMICS_STL:
         return mimics_stlio.read(filename)
     else:
         # this maybe is a file format supported by meshio
         return _meshioread(filename, file_format=file_format)
+
 
 def write_mesh(filename, mesh, file_format=None, override=True, **kwargs):
     """
@@ -229,14 +240,19 @@ def write_mesh(filename, mesh, file_format=None, override=True, **kwargs):
         raise FileExistsError("The file already exists")
 
     if ftype == __TYPE_BACI:
-        write(filename, meshio_to_discretization.mesh2Discretization(mesh), file_format=file_format)
+        write(
+            filename,
+            meshio_to_discretization.mesh2Discretization(mesh),
+            file_format=file_format,
+        )
     elif ftype == __TYPE_CASE:
         # this is ensight gold file format
-        raise NotImplementedError('Case file writing into mesh is not implemented yet')
+        raise NotImplementedError("Case file writing into mesh is not implemented yet")
     elif ftype == __TYPE_MIMICS_STL:
         return mimics_stlio.write(filename, mesh)
     else:
         _meshiowrite(filename, mesh, file_format, **kwargs)
+
 
 def read_sections(filename):
     """
@@ -249,7 +265,7 @@ def read_sections(filename):
     Returns:
         dict: keys are the section names and value is a list of the lines
     """
-    with open(filename, 'r') as f:
+    with open(filename, "r") as f:
         sections = ioutils.read_dat_sections(f)
 
     return sections

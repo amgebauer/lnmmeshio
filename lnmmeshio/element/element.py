@@ -1,14 +1,24 @@
 from typing import List
 import numpy as np
 import io
-from ..ioutils import write_title, write_option_list, write_option, read_option_item, \
-    read_next_option, read_next_key, read_next_value, line_option_list
+from ..ioutils import (
+    write_title,
+    write_option_list,
+    write_option,
+    read_option_item,
+    read_next_option,
+    read_next_key,
+    read_next_value,
+    line_option_list,
+)
 from collections import OrderedDict
 from ..node import Node
 
 """
 Class holding the data of one element
 """
+
+
 class Element:
 
     """
@@ -19,8 +29,10 @@ class Element:
         shape: shape of the element as used by BACI (e.g. HEX8)
         nodes: List of node objects
     """
-    def __init__(self, el_type: str, shape: str, nodes: List[Node],
-            options: OrderedDict = None):
+
+    def __init__(
+        self, el_type: str, shape: str, nodes: List[Node], options: OrderedDict = None
+    ):
         self.id = None
         self.type = el_type
         self.shape = shape
@@ -35,12 +47,14 @@ class Element:
     Returns:
         Number of nodes of the element
     """
+
     def get_num_nodes(self) -> int:
         raise NotImplementedError("This method is not implemented in your element")
 
     """
     Sets the element id to None
     """
+
     def reset(self):
         self.id = None
 
@@ -50,6 +64,7 @@ class Element:
     Returns:
         List of nodes
     """
+
     def get_nodes(self) -> List[Node]:
         return self.nodes
 
@@ -59,6 +74,7 @@ class Element:
     Returns:
         List of faces
     """
+
     def get_faces(self) -> list:
         raise RuntimeError("This element does't implement get faces")
 
@@ -68,6 +84,7 @@ class Element:
     Returns:
         List of edges
     """
+
     def get_edges(self) -> list:
         raise RuntimeError("This element does't implement get edges")
 
@@ -77,12 +94,13 @@ class Element:
     Returns:
         np.array with node ids of each element
     """
+
     def get_node_ids(self):
         arr: np.array = np.zeros((len(self.nodes)), dtype=int)
 
         for i, node in enumerate(self.nodes, start=0):
             if node.id is None:
-                raise RuntimeError('You need to compute ids first')
+                raise RuntimeError("You need to compute ids first")
             arr[i] = node.id
 
         return arr
@@ -93,6 +111,7 @@ class Element:
     Returns:
         List of dpoint
     """
+
     def get_dpoints(self):
         pointnodesets = None
 
@@ -110,6 +129,7 @@ class Element:
     Returns:
         List of dlines
     """
+
     def get_dlines(self):
         linenodesets = None
 
@@ -127,6 +147,7 @@ class Element:
     Returns:
         List of dsurfs
     """
+
     def get_dsurfs(self):
         surfacenodesets = None
 
@@ -144,6 +165,7 @@ class Element:
     Returns:
         List of dvols
     """
+
     def get_dvols(self):
         volumenodesets = None
 
@@ -158,9 +180,9 @@ class Element:
     def get_line(self):
         line = io.StringIO()
         if self.id is None:
-            raise RuntimeError('You have to compute ids before writing')
+            raise RuntimeError("You have to compute ids before writing")
 
-        line.write('{0} {1} '.format(self.id, self.type))
+        line.write("{0} {1} ".format(self.id, self.type))
 
         options: OrderedDict = OrderedDict()
         options[self.shape] = [i.id for i in self.nodes]
@@ -169,20 +191,20 @@ class Element:
         line.write(line_option_list(options))
 
         for t, f in self.fibers.items():
-            line.write(' ')
+            line.write(" ")
             line.write(f.get_line(t))
 
         return line.getvalue()
 
-
     """
     Write the corresponding element line in the dat file
     """
+
     def write(self, dest):
         if self.id is None:
-            raise RuntimeError('You have to compute ids before writing')
+            raise RuntimeError("You have to compute ids before writing")
 
-        dest.write('{0} {1} '.format(self.id, self.type))
+        dest.write("{0} {1} ".format(self.id, self.type))
 
         options: OrderedDict = OrderedDict()
         options[self.shape] = [i.id for i in self.nodes]
@@ -191,10 +213,10 @@ class Element:
         write_option_list(dest, options, newline=False)
 
         for t, f in self.fibers.items():
-            dest.write(' ')
+            dest.write(" ")
             f.write(dest, t)
 
-        dest.write('\n')
+        dest.write("\n")
 
     """
     Returns the number of space dimensions
@@ -202,8 +224,11 @@ class Element:
     Returns:
         Number of space dimensions
     """
+
     def get_space_dim(self):
-        raise NotImplementedError("This element is not correctly implemented. It needs to be derived from Element{1,2,3}D")
+        raise NotImplementedError(
+            "This element is not correctly implemented. It needs to be derived from Element{1,2,3}D"
+        )
 
     """
     Returns the local variables from given global variables
@@ -214,9 +239,9 @@ class Element:
     Returns:
         Local variables (xi)
     """
+
     def get_xi(self, x):
         raise NotImplementedError("This is currently not implemented for all elements")
-
 
     """
     Checkes whether a point in reference coordinates is within the element
@@ -227,6 +252,7 @@ class Element:
     Returns:
         True if the point is within the element (or on the bounrary), otherwise False
     """
+
     @staticmethod
     def is_in_ref(xi, include_boundary=True):
         raise NotImplementedError("This is currently not implemented for all elements")
@@ -241,6 +267,7 @@ class Element:
     Returns:
         True if the point is within the element (or on the boundary), otherwise False
     """
+
     def is_in(self, x, include_boundary=True):
         return self.is_in_ref(self.get_xi(x))
 
@@ -254,14 +281,17 @@ class Element:
     Returns:
         q_x: Quantity at x projected with the shape functions
     """
+
     def project_quantity(self, x: np.ndarray, q: np.ndarray):
         shapefcns = self.shape_fcns(self.get_xi(x))
 
         if q.shape[0] != self.get_num_nodes():
-            raise ValueError('Expecting nodal values of the quantities, expected {0} got {1}'.format(
-                self.get_num_nodes(), q.shape[0]
-            ))
-        
+            raise ValueError(
+                "Expecting nodal values of the quantities, expected {0} got {1}".format(
+                    self.get_num_nodes(), q.shape[0]
+                )
+            )
+
         return np.dot(shapefcns, q)
 
     """
@@ -273,36 +303,39 @@ class Element:
     Returngs:
         int: number of nodes
     """
+
     @staticmethod
     def num_nodes_by_shape(shape: str):
         shape_dict = {
-            "TET4"    : 4,
-            "TET10"   : 10,
+            "TET4": 4,
+            "TET10": 10,
             "PYRAMID5": 5,
-            "HEX8"    : 8,
-            "HEX20"   : 20,
-            "HEX27"   : 27,
-            "WEDGE6"  : 6,
-            "QUAD4"   : 4,
-            "TRI3"    : 3,
-            "TRI6"    : 6,
-            "LINE2"   : 2,
-            "LINE3"   : 3,
-            "QUAD8"   : 8,
-            "QUAD9"   : 9,
+            "HEX8": 8,
+            "HEX20": 20,
+            "HEX27": 27,
+            "WEDGE6": 6,
+            "QUAD4": 4,
+            "TRI3": 3,
+            "TRI6": 6,
+            "LINE2": 2,
+            "LINE3": 3,
+            "QUAD8": 8,
+            "QUAD9": 9,
         }
 
         if shape not in shape_dict:
-            raise ValueError('Element of shape {0} is unknown'.format(shape))
+            raise ValueError("Element of shape {0} is unknown".format(shape))
 
         return shape_dict[shape]
 
         """
     Returns the value of the shape functions at the local coordinate xi
     """
+
     @staticmethod
     def shape_fcns(xi):
         raise NotImplementedError("This element has not implemented shape functions")
+
 
 class Element1D(Element):
 
@@ -312,8 +345,10 @@ class Element1D(Element):
     Returns:
         Number of space dimensions
     """
+
     def get_space_dim(self):
         return 1
+
 
 class Element2D(Element):
     """
@@ -322,8 +357,10 @@ class Element2D(Element):
     Returns:
         Number of space dimensions
     """
+
     def get_space_dim(self):
         return 2
+
 
 class Element3D(Element):
     """
@@ -332,41 +369,42 @@ class Element3D(Element):
     Returns:
         Number of space dimensions
     """
+
     def get_space_dim(self):
         return 3
 
-class ElementTet(Element3D):
 
+class ElementTet(Element3D):
     @staticmethod
     def is_in_ref(xi, include_boundary=True):
         if include_boundary:
             lop = lambda x, y: x >= y
         else:
             lop = lambda x, y: x > y
-        
+
         if not all([lop(xi[i], 0) for i in range(3)]):
             return False
-        
+
         if not lop(1, xi[0]):
             return False
-        
-        if not lop(1-xi[0], xi[1]):
+
+        if not lop(1 - xi[0], xi[1]):
             return False
-        
-        if not lop(1-xi[0]-xi[1], xi[2]):
+
+        if not lop(1 - xi[0] - xi[1], xi[2]):
             return False
 
         return True
 
-class ElementHex(Element3D):
 
+class ElementHex(Element3D):
     @staticmethod
     def is_in_ref(xi, include_boundary=True):
         if include_boundary:
             lop = lambda x, y: x >= y
         else:
             lop = lambda x, y: x > y
-        
+
         if not all([lop(xi[i], -1.0) for i in range(3)]):
             return False
 
