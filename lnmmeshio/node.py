@@ -1,7 +1,10 @@
-import numpy as np
-from typing import Dict, List
-from .fiber import Fiber
 import io
+from typing import Dict
+
+import numpy as np
+
+from .fiber import Fiber
+
 
 """
 Class that holds all information of nodes like coords, fibers, nodesets (and additional data)

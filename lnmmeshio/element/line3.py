@@ -1,7 +1,10 @@
-from .element import Element1D
-from ..node import Node
-from typing import List, Dict
+from typing import List
+
 import numpy as np
+
+from ..node import Node
+from .element import Element1D
+
 
 """
 Implementation of a line3 element

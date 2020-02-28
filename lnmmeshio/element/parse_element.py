@@ -1,30 +1,30 @@
-from ..ioutils import (
-    write_title,
-    write_option_list,
-    write_option,
-    read_option_item,
-    read_next_option,
-    read_next_key,
-    read_next_value,
-)
+import re
 from typing import List
+
+from ..fiber import Fiber
+from ..ioutils import (
+    read_next_key,
+    read_next_option,
+    read_next_value,
+    read_option_item,
+    write_option,
+    write_option_list,
+    write_title,
+)
+from ..node import Node
 from .element import Element
+from .hex8 import Hex8
+from .hex20 import Hex20
+from .hex27 import Hex27
 from .line2 import Line2
 from .line3 import Line3
-from .tri3 import Tri3
-from .tri6 import Tri6
 from .quad4 import Quad4
 from .quad8 import Quad8
 from .quad9 import Quad9
 from .tet4 import Tet4
 from .tet10 import Tet10
-from .hex8 import Hex8
-from .hex20 import Hex20
-from .hex27 import Hex27
-import re
-from ..fiber import Fiber
-from ..node import Node
-
+from .tri3 import Tri3
+from .tri6 import Tri6
 
 RegExEle = re.compile(r"^[ ]*([0-9]+)[ ]+(\S+)[ ]+(\S+)[ ]+")
 

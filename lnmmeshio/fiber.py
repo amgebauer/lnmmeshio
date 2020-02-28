@@ -1,14 +1,16 @@
 import numpy as np
+
 from .ioutils import (
-    write_title,
-    write_option_list,
-    write_option,
-    read_option_item,
-    read_next_option,
-    read_next_key,
-    read_next_value,
     line_option_list,
+    read_next_key,
+    read_next_option,
+    read_next_value,
+    read_option_item,
+    write_option,
+    write_option_list,
+    write_title,
 )
+
 
 """
 Class that holds all information of fibers
@@ -71,7 +73,7 @@ class Fiber:
 
     Args:
         fstr: Fiber name as defined in the dat file
-    
+
     Returns:
         Fiber enum as defined on top of the class
     """
@@ -94,7 +96,7 @@ class Fiber:
 
     Args:
         line: String of the line
-    
+
     Returns:
         dict with fiber type as key and fiber object as value
     """

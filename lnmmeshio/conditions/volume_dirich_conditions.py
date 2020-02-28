@@ -1,7 +1,6 @@
+
 from . import condition as c
-from ..ioutils import read_option_item
-import numpy as np
-from .common_condition import CommonCondition, CommonConditions
+from .common_condition import CommonConditions
 
 
 class VolumeDirichletConditions(CommonConditions):

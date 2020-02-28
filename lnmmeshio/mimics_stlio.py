@@ -4,8 +4,8 @@ I/O for the STL format, cf.
 """
 import logging
 import struct
-import numpy
 
+import numpy
 from meshio import Mesh
 
 

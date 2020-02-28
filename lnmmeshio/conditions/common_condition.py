@@ -1,6 +1,7 @@
-from . import condition as c
-from ..ioutils import read_option_item
 import numpy as np
+
+from ..ioutils import read_option_item
+from . import condition as c
 
 
 class CommonCondition(c.Condition):
@@ -28,7 +29,7 @@ class CommonCondition(c.Condition):
         return "E {0} - NUMDOF {1} ONOFF {2} VAL {3} FUNCT {4}".format(
             self.nodeset.id,
             len(self.onoff),
-            " ".join(["1" if i == True else "0" for i in self.onoff]),
+            " ".join(["1" if i else "0" for i in self.onoff]),
             " ".join([str(i) for i in self.value]),
             " ".join([str(i) for i in fcns]),
         )

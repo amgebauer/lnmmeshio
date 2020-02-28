@@ -1,8 +1,10 @@
-from collections import OrderedDict
-import re
-import numpy as np
-import struct
 import io
+import re
+import struct
+from collections import OrderedDict
+
+import numpy as np
+
 from .progress import progress
 
 
@@ -12,7 +14,7 @@ def read_dat_sections(origin):
 
     Args:
         origin: File hander to read from
-    
+
     Returns:
         dict: Dictionary with section names as key and lines as value
     """
@@ -147,8 +149,8 @@ def read_next_option(line: str, num: int = 1):
 
     # shorten line by parsed option
     line = line[match.span(0)[1] :]
-    key = match.group(1)
-    value = match.group(2)
+    match.group(1)
+    match.group(2)
 
     return line, match.group(1), [match.group(i) for i in range(2, num + 2)]
 

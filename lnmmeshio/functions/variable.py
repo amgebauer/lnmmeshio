@@ -1,4 +1,4 @@
-from ..ioutils import read_option_item, write_option_list, line_option_list
+from ..ioutils import line_option_list
 
 
 class BaseVariable:

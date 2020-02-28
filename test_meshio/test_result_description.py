@@ -1,11 +1,15 @@
-import lnmmeshio, os, unittest, copy
-from lnmmeshio.result_description import ResultDescription, StructureResultDescription
+import copy
+import os
+import unittest
+
 from lnmmeshio.datfile import Datfile
 from lnmmeshio.discretization import Discretization
-from lnmmeshio.node import Node
 from lnmmeshio.element.element import Element
 from lnmmeshio.element.tri3 import Tri3
 from lnmmeshio.functions.function import Function
+from lnmmeshio.node import Node
+from lnmmeshio.result_description import (ResultDescription,
+                                          StructureResultDescription)
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 

@@ -1,9 +1,11 @@
-from .discretization import Discretization, Element, Node
-from .datfile import Datfile
-from . import ioutils as io
-import numpy as np
 import os
-from typing import List, Dict, Tuple
+from typing import Dict
+
+import numpy as np
+
+from . import ioutils as io
+from .datfile import Datfile
+from .discretization import Discretization
 from .progress import progress
 
 shape_to_eletype: Dict[str, str] = {
@@ -269,7 +271,8 @@ def write_geometry(fstream, dis: Discretization, binary=True, out=True):
             eletype = shape_to_eletype[ele.shape]
 
             if eletype not in elegroups:
-                elegroups[eletype] = []  # np.zeros((0,len(ele.nodes)), dtype=int)
+                # np.zeros((0,len(ele.nodes)), dtype=int)
+                elegroups[eletype] = []
 
             elegroups[eletype].append(np.array([n.id for n in ele.nodes]))
 
