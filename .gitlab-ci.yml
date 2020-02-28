@@ -24,7 +24,7 @@ version_check:
     - VERSION=$(cat VERSION)
     - echo Version is $VERSION
     - echo Try to install this version via pip
-    - pip install lnmmeshio==$VERSION --index-url=https://pypi.python.org/simple/ --extra-index-url=https://lnm-heartgroup.pages.gitlab.lrz.de/packages/; if [[ $? == 0 ]]; then echo "Version does already exist"; exit 1; fi
+    - if pip install lnmmeshio==$VERSION --index-url=https://pypi.python.org/simple/ --extra-index-url=https://lnm-heartgroup.pages.gitlab.lrz.de/packages/; then echo Version does already exist; exit 1; else echo Version is unique; fi
   rules:
     - if: $CI_MERGE_REQUEST_ID
       when: on_success
