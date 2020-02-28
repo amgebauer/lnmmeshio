@@ -22,7 +22,7 @@ version_check:
     - VERSION=$(cat VERSION)
     - echo Version is $VERSION
     - echo Try to install this version via pip
-    - ! pip install lnmmeshio==$VERSION --index-url=https://pypi.python.org/simple/ --extra-index-url=https://lnm-heartgroup.pages.gitlab.lrz.de/packages/
+    - pip install lnmmeshio==$VERSION --index-url=https://pypi.python.org/simple/ --extra-index-url=https://lnm-heartgroup.pages.gitlab.lrz.de/packages/; if [[ $? == 0 ]]; then exit 1; fi
   only:
   - merge_requests
 
