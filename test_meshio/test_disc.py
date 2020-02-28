@@ -2,8 +2,9 @@ import io
 import os
 import unittest
 
-import lnmmeshio
 import numpy as np
+
+import lnmmeshio
 from lnmmeshio import ioutils
 from lnmmeshio.nodeset import LineNodeset, PointNodeset, SurfaceNodeset, VolumeNodeset
 

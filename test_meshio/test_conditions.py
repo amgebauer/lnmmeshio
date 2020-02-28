@@ -1,8 +1,9 @@
 import os
 import unittest
 
-import lnmmeshio as mio
 import numpy as np
+
+import lnmmeshio as mio
 from lnmmeshio.conditions.common_condition import CommonCondition
 from lnmmeshio.conditions.condition import ConditionsType
 from lnmmeshio.conditions.conditionreader import read_conditions

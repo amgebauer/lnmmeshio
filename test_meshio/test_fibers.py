@@ -2,6 +2,7 @@ import os
 import unittest
 
 import numpy as np
+
 from lnmmeshio import Fiber
 
 script_dir = os.path.dirname(os.path.realpath(__file__))

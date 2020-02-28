@@ -4,11 +4,6 @@ repos:
   hooks:
   - id: black
     args: [--check]
-- repo: https://github.com/timothycrosley/isort
-  rev: 4.3.21
-  hooks:
-  - id: isort
-    args: ['--check -tc -m 3 -w 88']
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v1.2.3
   hooks:
