@@ -1,21 +1,16 @@
-import unittest
-import lnmmeshio
-import os
-import filecmp
-import io
-import numpy as np
-from lnmmeshio.nodeset import PointNodeset, LineNodeset, SurfaceNodeset, VolumeNodeset
-from collections import OrderedDict
-from lnmmeshio.datfile import Datfile
-from lnmmeshio.head import Head, Section
-from lnmmeshio.conditions.surf_dirich_condition import SurfaceDirichletConditions
-from lnmmeshio.result_description import StructureResultDescription
-from lnmmeshio.discretization import Discretization
-from lnmmeshio.node import Node
-from lnmmeshio.element.tri3 import Tri3
 import copy
-from lnmmeshio.head import TextSection
+import os
+import unittest
+from collections import OrderedDict
+
+from lnmmeshio.conditions.surf_dirich_condition import SurfaceDirichletConditions
+from lnmmeshio.datfile import Datfile
+from lnmmeshio.discretization import Discretization
+from lnmmeshio.element.tri3 import Tri3
 from lnmmeshio.functions.function import Function
+from lnmmeshio.head import TextSection
+from lnmmeshio.node import Node
+from lnmmeshio.result_description import StructureResultDescription
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 
@@ -125,4 +120,4 @@ class TestDat(unittest.TestCase):
 
         dat = TestDat.get_generic()
 
-        sections = dat.get_sections()
+        dat.get_sections()

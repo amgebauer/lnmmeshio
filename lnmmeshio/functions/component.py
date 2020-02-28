@@ -1,4 +1,4 @@
-from ..ioutils import read_option_item, write_option_list, read_int, line_option_list
+from ..ioutils import line_option_list, read_int, read_option_item
 
 
 class Component:

@@ -1,12 +1,12 @@
-from .variable import BaseVariable
 from ..ioutils import (
-    read_option_item,
+    line_option_list,
+    read_floats,
     read_int,
     read_ints,
-    read_floats,
+    read_option_item,
     write_option_list,
-    line_option_list,
 )
+from .variable import BaseVariable
 
 
 class LinearInterpolationVariable(BaseVariable):

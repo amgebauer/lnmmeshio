@@ -1,9 +1,12 @@
-from .element import ElementHex
-from ..node import Node
-from typing import List, Dict
-from .quad9 import Quad9
-from .line3 import Line3
+from typing import List
+
 import numpy as np
+
+from ..node import Node
+from .element import ElementHex
+from .line3 import Line3
+from .quad9 import Quad9
+
 
 """
 Implementation of a HEX27 element

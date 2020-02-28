@@ -1,25 +1,19 @@
-import unittest
-import lnmmeshio
-import os
-import filecmp
 import io
-import numpy as np
-import shutil
-import filecmp
-import meshio
+import os
+import re
+import unittest
+from collections import OrderedDict
+
+from lnmmeshio import ioutils
 from lnmmeshio.head import (
-    Head,
     CommentLine,
+    Head,
     MultipleOptionsLine,
-    SingleOptionLine,
     MultipleOptionsSection,
+    SingleOptionLine,
     SingleOptionSection,
     TextSection,
 )
-from lnmmeshio.datfile import Datfile
-from lnmmeshio import ioutils
-from collections import OrderedDict
-import re
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 
@@ -114,7 +108,7 @@ class TestHead(unittest.TestCase):
     def assertRegexListEqual(self, l1, regex):
         self.assertEqual(len(l1), len(regex))
         for l, r in zip(l1, regex):
-            self.assertRegexpMatches(l, r)
+            self.assertRegex(l, r)
 
     def test_single_option_line(self):
         m = SingleOptionLine("key", "value")

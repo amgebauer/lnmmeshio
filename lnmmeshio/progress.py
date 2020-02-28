@@ -1,5 +1,6 @@
-from progress import bar, spinner
 import time
+
+from progress import bar, spinner
 
 
 def progress(iterator, out=True, label=None, btype="bar"):

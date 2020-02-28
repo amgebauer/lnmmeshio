@@ -1,11 +1,11 @@
-import unittest
-import lnmmeshio
+import filecmp
 import os
-import filecmp
-import io
-import numpy as np
 import shutil
-import filecmp
+import unittest
+
+import numpy as np
+
+import lnmmeshio
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 

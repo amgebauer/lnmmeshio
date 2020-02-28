@@ -1,27 +1,24 @@
-import numpy as np
-from typing import List, Dict
-from .ioutils import (
-    write_title,
-    write_option_list,
-    write_option,
-    read_option_item,
-    read_next_option,
-    read_next_key,
-    read_next_value,
-)
-from collections import OrderedDict
 import re
-from .element.element import Element
-from .element.element_container import ElementContainer
-from .node import Node
-from .fiber import Fiber
-from .progress import progress
-from .discretization import Discretization
-from .functions.function import Function
+from collections import OrderedDict
+from typing import Dict, List
+
 from .conditions.condition import ConditionsType
 from .conditions.conditionreader import read_conditions
+from .discretization import Discretization
+from .functions.function import Function
 from .head import Head
+from .ioutils import (
+    read_next_key,
+    read_next_option,
+    read_next_value,
+    read_option_item,
+    write_option,
+    write_option_list,
+    write_title,
+)
+from .progress import progress
 from .result_description import ResultDescription
+
 
 """
 This class holds all information in the datfiles, consisting out of the discretization, conditions
@@ -46,7 +43,7 @@ class Datfile:
         self.head: Head = Head()
 
     """
-    Computes the ids of the elements and nodes. 
+    Computes the ids of the elements and nodes.
 
     Args:
         zero_based: If true, the first node id is 0, otherwise 1
@@ -129,7 +126,7 @@ class Datfile:
 
     Args:
         sections: Dictionary of sections as keys and section lines as values
-    
+
     Return:
         ordered dictionary of sections as keys and section lines as values
     """
@@ -194,7 +191,7 @@ class Datfile:
 
     Args:
         sections: Dictionary with header titles as keys and list of lines as value
-    
+
     Retuns:
         Discretization object
     """

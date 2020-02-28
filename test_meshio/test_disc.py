@@ -1,12 +1,12 @@
-import unittest
-import lnmmeshio
-import os
-import filecmp
 import io
-from lnmmeshio import ioutils
-import numpy as np
-from lnmmeshio.nodeset import PointNodeset, LineNodeset, SurfaceNodeset, VolumeNodeset
+import os
+import unittest
 
+import numpy as np
+
+import lnmmeshio
+from lnmmeshio import ioutils
+from lnmmeshio.nodeset import LineNodeset, PointNodeset, SurfaceNodeset, VolumeNodeset
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 

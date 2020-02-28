@@ -1,4 +1,4 @@
-from ..ioutils import read_int, read_ints, read_floats, read_option_item
+from ..ioutils import read_int, read_option_item
 from .linear_interpolation_variable import LinearInterpolationVariable
 
 

@@ -1,8 +1,11 @@
-from .element import Element2D
-from ..node import Node
-from typing import List, Dict
-from .line2 import Line2
+from typing import List
+
 import numpy as np
+
+from ..node import Node
+from .element import Element2D
+from .line2 import Line2
+
 
 """
 Implementation of a quad4 element

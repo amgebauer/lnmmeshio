@@ -2,38 +2,35 @@
 # Maintainer: Amadeus Gebauer
 #
 
-import sys, os
+import os
+import sys
 
-from meshio import Mesh, read as _meshioread, write as _meshiowrite
-from . import meshio_to_discretization
-from .node import Node
-from .fiber import Fiber
-from . import element
+import numpy as np
+from meshio import Mesh
+from meshio import read as _meshioread
+from meshio import write as _meshiowrite
+
+from . import element, ensightio, ioutils, meshio_to_discretization, mimics_stlio
+from .conditions import condition, conditionreader, surf_dirich_condition
+from .datfile import Datfile
+from .discretization import Discretization
+from .element.element import Element
 from .element.element_container import ElementContainer
 from .element.hex8 import Hex8
 from .element.hex20 import Hex20
 from .element.hex27 import Hex27
-from .element.tet10 import Tet10
-from .element.tet4 import Tet4
+from .element.line2 import Line2
+from .element.line3 import Line3
 from .element.quad4 import Quad4
 from .element.quad8 import Quad8
 from .element.quad9 import Quad9
-from .element.tri6 import Tri6
+from .element.tet4 import Tet4
+from .element.tet10 import Tet10
 from .element.tri3 import Tri3
-from .element.line2 import Line2
-from .element.line3 import Line3
-from .element.element import Element
-from .discretization import Discretization
-from . import ioutils
-from . import ensightio
-from . import mimics_stlio
-from .conditions import condition
-from .conditions import surf_dirich_condition
-from .conditions import conditionreader
-from .datfile import Datfile
-from .nodeset import PointNodeset, LineNodeset, SurfaceNodeset, VolumeNodeset
-
-import numpy as np
+from .element.tri6 import Tri6
+from .fiber import Fiber
+from .node import Node
+from .nodeset import LineNodeset, PointNodeset, SurfaceNodeset, VolumeNodeset
 
 __TYPE_BACI = 1
 __TYPE_BACI_DISCR = 2
@@ -74,7 +71,7 @@ def read(filename, file_format=None, out=True):
     Args:
         filename: The file to read from
         file_format: The file format of the file
-    
+
     Returns:
         Discretization: Returns the discretization in BACI format
     """
@@ -111,7 +108,7 @@ def read_discr(filename, file_format=None, out=True):
     Args:
         filename: The file to read from
         file_format: The file format of the file
-    
+
     Returns:
         Discretization: Returns the discretization in BACI format
     """
@@ -199,7 +196,7 @@ def read_mesh(filename, file_format=None):
     Args:
         filename: The file to read from
         file_format: The file format of the file
-    
+
     Returns:
         Mesh: Returns the discretization in BACI format
     """
@@ -261,7 +258,7 @@ def read_sections(filename):
 
     Args:
         filename: Path to the datfile
-    
+
     Returns:
         dict: keys are the section names and value is a list of the lines
     """

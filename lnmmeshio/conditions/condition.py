@@ -1,6 +1,5 @@
-from enum import Enum
-from .. import ioutils
 from collections import OrderedDict
+from enum import Enum
 
 
 class Condition:

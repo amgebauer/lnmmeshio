@@ -1,12 +1,8 @@
-import unittest
-import lnmmeshio
 import os
-import filecmp
-import io
-import numpy as np
 import shutil
-import filecmp
-import meshio
+import unittest
+
+import lnmmeshio
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 
@@ -36,7 +32,7 @@ class TestOverride(unittest.TestCase):
 
     def test_override_write_mesh(self):
         self.setUp()
-        d = mesh = lnmmeshio.read_mesh(os.path.join(script_dir, "data", "dummy.mesh"))
+        d = lnmmeshio.read_mesh(os.path.join(script_dir, "data", "dummy.mesh"))
 
         with self.assertRaises(FileExistsError):
             lnmmeshio.write_mesh(

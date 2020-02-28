@@ -1,7 +1,9 @@
-import lnmmeshio as mio
-import os, unittest, io
+import io
+import os
+import unittest
+
 import numpy as np
-from lnmmeshio.nodeset import LineNodeset, PointNodeset, VolumeNodeset, SurfaceNodeset
+
 from lnmmeshio.functions.component import Component
 from lnmmeshio.functions.function import Function
 from lnmmeshio.functions.linear_interpolation_variable import (

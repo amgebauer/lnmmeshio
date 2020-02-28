@@ -1,18 +1,21 @@
-import lnmmeshio as mio
-import os, unittest, io
+import os
+import unittest
+
 import numpy as np
-from lnmmeshio.nodeset import LineNodeset, PointNodeset, VolumeNodeset, SurfaceNodeset
-from lnmmeshio.conditions.conditionreader import read_conditions
-from lnmmeshio.conditions.surf_dirich_condition import SurfaceDirichletConditions
-from lnmmeshio.conditions.point_dirich_condition import PointDirichletConditions
-from lnmmeshio.conditions.line_dirich_conditions import LineDirichletConditions
-from lnmmeshio.conditions.volume_dirich_conditions import VolumeDirichletConditions
-from lnmmeshio.conditions.surf_neumann_condition import SurfaceNeumannConditions
-from lnmmeshio.conditions.point_neumann_conditions import PointNeumannConditions
-from lnmmeshio.conditions.line_neumann_conditions import LineNeumannConditions
-from lnmmeshio.conditions.volume_neumann_conditions import VolumeNeumannConditions
+
+import lnmmeshio as mio
 from lnmmeshio.conditions.common_condition import CommonCondition
 from lnmmeshio.conditions.condition import ConditionsType
+from lnmmeshio.conditions.conditionreader import read_conditions
+from lnmmeshio.conditions.line_dirich_conditions import LineDirichletConditions
+from lnmmeshio.conditions.line_neumann_conditions import LineNeumannConditions
+from lnmmeshio.conditions.point_dirich_condition import PointDirichletConditions
+from lnmmeshio.conditions.point_neumann_conditions import PointNeumannConditions
+from lnmmeshio.conditions.surf_dirich_condition import SurfaceDirichletConditions
+from lnmmeshio.conditions.surf_neumann_condition import SurfaceNeumannConditions
+from lnmmeshio.conditions.volume_dirich_conditions import VolumeDirichletConditions
+from lnmmeshio.conditions.volume_neumann_conditions import VolumeNeumannConditions
+from lnmmeshio.nodeset import LineNodeset, PointNodeset, SurfaceNodeset, VolumeNodeset
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 
@@ -111,7 +114,7 @@ class TestConditions(unittest.TestCase):
         bcs.add(bc1)
         bcs.add(bc2)
 
-        sections = bcs.get_sections()
+        bcs.get_sections()
 
         self.assertDictEqual(
             dict(bcs.get_sections()),
@@ -218,7 +221,7 @@ class TestConditions(unittest.TestCase):
         )
 
         with self.assertRaises(NotImplementedError):
-            bcs = read_conditions(sections, dat)
+            read_conditions(sections, dat)
 
     def test_read_surfdirich_multiple(self):
         self.read_common_multiple("SURF", "DIRICH")

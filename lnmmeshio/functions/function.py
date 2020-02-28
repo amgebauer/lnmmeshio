@@ -1,8 +1,9 @@
+from collections import OrderedDict
+
+from ..ioutils import read_option_item, write_title
 from .component import Component
-from ..ioutils import read_option_item, write_option_list, write_title
 from .variable import BaseVariable
 from .variablereader import read_variable
-from collections import OrderedDict
 
 
 class Function:

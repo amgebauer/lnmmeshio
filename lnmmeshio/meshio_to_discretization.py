@@ -4,26 +4,27 @@
 # This is the interface between the meshio package and our Discretization description
 # May not work perfectly
 #
-import numpy as np
 import meshio
-from .discretization import Element, Discretization, Node
-from .element.parse_element import create_element
-from .progress import progress
+import numpy as np
+
+from .discretization import Discretization, Node
 from .element.line2 import Line2
 from .element.line3 import Line3
+from .element.parse_element import create_element
+from .element.quad4 import Quad4
 from .element.tri3 import Tri3
 from .element.tri6 import Tri6
-from .element.quad4 import Quad4
 from .nodeset import (
-    PointNodeset,
-    PointNodesetBuilder,
     LineNodeset,
     LineNodesetBuilder,
+    PointNodeset,
+    PointNodesetBuilder,
     SurfaceNodeset,
     SurfaceNodesetBuilder,
     VolumeNodeset,
     VolumeNodesetBuilder,
 )
+from .progress import progress
 
 cell_nodes = {
     "line": 2,
@@ -201,7 +202,8 @@ def mesh2Discretization(mesh: meshio.Mesh) -> Discretization:
                 nodes.append(disc.nodes[nodeids])
 
             # cells with the same dimension as the mesh dimensions are normal cells
-            # cells with a lower dimension are treated as surface, line or node definitions
+            # cells with a lower dimension are treated as surface, line or node
+            # definitions
             eledim = cell_to_dim[celltype]
             if maxdim == eledim:
                 # this is a normal element

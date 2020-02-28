@@ -1,26 +1,27 @@
+from collections import OrderedDict
+from typing import Dict, List
+
 import numpy as np
-from typing import List, Dict
+
+from .element.element_container import ElementContainer
+from .fiber import Fiber
 from .ioutils import (
-    write_title,
-    write_option_list,
-    write_option,
-    read_option_item,
-    read_next_option,
-    read_next_key,
-    read_next_value,
-    line_option,
     line_comment,
+    line_option,
     line_option_list,
     line_title,
+    read_next_key,
+    read_next_option,
+    read_next_value,
+    read_option_item,
+    write_option,
+    write_option_list,
+    write_title,
 )
-from collections import OrderedDict
-import re
-from .element.element import Element
-from .element.element_container import ElementContainer
 from .node import Node
-from .fiber import Fiber
+from .nodeset import LineNodeset, PointNodeset, SurfaceNodeset, VolumeNodeset
 from .progress import progress
-from .nodeset import PointNodeset, LineNodeset, SurfaceNodeset, VolumeNodeset
+
 
 """
 This class holds the discretization, consisting out of nodes and elements. The nodes and
@@ -45,7 +46,7 @@ class Discretization:
         self.volumenodesets: List[VolumeNodeset] = []
 
     """
-    Computes the ids of the elements and nodes. 
+    Computes the ids of the elements and nodes.
 
     Args:
         zero_based: If true, the first node id is 0, otherwise 1
@@ -242,7 +243,7 @@ class Discretization:
 
     Args:
         sections: Dictionary with header titles as keys and list of lines as value
-    
+
     Retuns:
         Discretization object
     """

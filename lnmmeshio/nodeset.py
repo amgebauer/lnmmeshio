@@ -1,4 +1,4 @@
-from .ioutils import write_title, read_option_item
+from .ioutils import read_option_item, write_title
 from .progress import progress
 
 

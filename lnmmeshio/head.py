@@ -1,5 +1,10 @@
-import re, io
+import re
+from collections import OrderedDict
+
 from .ioutils import (
+    line_comment,
+    line_option,
+    line_option_list,
     read_next_key,
     read_next_option,
     read_next_value,
@@ -7,11 +12,7 @@ from .ioutils import (
     write_option,
     write_option_list,
     write_title,
-    line_comment,
-    line_option,
-    line_option_list,
 )
-from collections import OrderedDict
 
 EXCLUDE_SECTIONS = [
     re.compile(r"^FUNCT\d+$"),
@@ -202,7 +203,7 @@ class Section:
         d = OrderedDict()
         d[self.name] = []
 
-        if self.comment != None:
+        if self.comment is not None:
             d[self.name] = "// {0}".format(self.comment)
 
         return d
@@ -257,10 +258,10 @@ class SingleOptionSection(Section):
         return len(self.lines)
 
     def __getitem__(self, i):
-        if type(i) == int:
+        if isinstance(i, int):
             return self.lines[i]
         else:
-            for l in [l for l in self.lines if type(l) == SingleOptionLine]:
+            for l in [l for l in self.lines if isinstance(l, SingleOptionLine)]:
                 if l.key == i:
                     return l
 

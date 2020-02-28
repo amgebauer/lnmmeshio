@@ -1,8 +1,8 @@
-from enum import Enum
 import io
+
 from .element.element import Element
+from .ioutils import read_float, read_int, read_option_item
 from .node import Node
-from .ioutils import read_option_item, read_float, read_int
 
 
 class ResultDescription:

@@ -1,9 +1,7 @@
-import unittest
-import lnmmeshio
 import os
-import meshio
-import numpy as np
-from typing import List
+import unittest
+
+import lnmmeshio
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 

@@ -1,14 +1,15 @@
-from typing import List
-from .condition import ConditionsType
-from .surf_dirich_condition import SurfaceDirichletConditions
-from .point_dirich_condition import PointDirichletConditions
-from .line_dirich_conditions import LineDirichletConditions
-from .volume_dirich_conditions import VolumeDirichletConditions
-from .surf_neumann_condition import SurfaceNeumannConditions
-from .point_neumann_conditions import PointNeumannConditions
-from .line_neumann_conditions import LineNeumannConditions
-from .volume_neumann_conditions import VolumeNeumannConditions
 import re
+from typing import List
+
+from .condition import ConditionsType
+from .line_dirich_conditions import LineDirichletConditions
+from .line_neumann_conditions import LineNeumannConditions
+from .point_dirich_condition import PointDirichletConditions
+from .point_neumann_conditions import PointNeumannConditions
+from .surf_dirich_condition import SurfaceDirichletConditions
+from .surf_neumann_condition import SurfaceNeumannConditions
+from .volume_dirich_conditions import VolumeDirichletConditions
+from .volume_neumann_conditions import VolumeNeumannConditions
 
 REGEX_CONDITION = re.compile(r".*\sCONDITIONS$")
 

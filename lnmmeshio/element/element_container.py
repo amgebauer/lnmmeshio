@@ -1,20 +1,20 @@
-from ..ioutils import (
-    write_title,
-    write_option_list,
-    write_option,
-    read_option_item,
-    read_next_option,
-    read_next_key,
-    read_next_value,
-)
-from .element import Element
-from ..fiber import Fiber
-from ..node import Node
-from typing import List, Dict
-import re
-from .parse_element import parse as parse_ele
-from ..progress import progress
 from collections import OrderedDict
+from typing import Dict, List
+
+from ..ioutils import (
+    read_next_key,
+    read_next_option,
+    read_next_value,
+    read_option_item,
+    write_option,
+    write_option_list,
+    write_title,
+)
+from ..node import Node
+from ..progress import progress
+from .element import Element
+from .parse_element import parse as parse_ele
+
 
 """
 Class holding all elements in different categories. Current implemented categories are
@@ -341,7 +341,7 @@ class ElementContainer:
     Args:
         nodes: List of nodes (order is important: first node in list must be the one with id 1)
         lines: List of string that represent the lines of the corresponding element section
-    
+
     Returns:
         List of elements
     """

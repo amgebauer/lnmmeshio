@@ -1,18 +1,21 @@
-from typing import List
-import numpy as np
 import io
-from ..ioutils import (
-    write_title,
-    write_option_list,
-    write_option,
-    read_option_item,
-    read_next_option,
-    read_next_key,
-    read_next_value,
-    line_option_list,
-)
 from collections import OrderedDict
+from typing import List
+
+import numpy as np
+
+from ..ioutils import (
+    line_option_list,
+    read_next_key,
+    read_next_option,
+    read_next_value,
+    read_option_item,
+    write_option,
+    write_option_list,
+    write_title,
+)
 from ..node import Node
+
 
 """
 Class holding the data of one element
@@ -248,7 +251,7 @@ class Element:
 
     Args:
         xi: Point in reference coordinates
-    
+
     Returns:
         True if the point is within the element (or on the bounrary), otherwise False
     """
@@ -263,7 +266,7 @@ class Element:
     Args:
         x: Point in space
         include_boundary: bool, Whether or not to include the boundary
-    
+
     Returns:
         True if the point is within the element (or on the boundary), otherwise False
     """
@@ -277,7 +280,7 @@ class Element:
     Args:
         x: Point in space
         q: Nodal values of the quantities
-    
+
     Returns:
         q_x: Quantity at x projected with the shape functions
     """
@@ -378,9 +381,14 @@ class ElementTet(Element3D):
     @staticmethod
     def is_in_ref(xi, include_boundary=True):
         if include_boundary:
-            lop = lambda x, y: x >= y
+
+            def lop(x, y):
+                return x >= y
+
         else:
-            lop = lambda x, y: x > y
+
+            def lop(x, y):
+                return x > y
 
         if not all([lop(xi[i], 0) for i in range(3)]):
             return False
@@ -401,9 +409,14 @@ class ElementHex(Element3D):
     @staticmethod
     def is_in_ref(xi, include_boundary=True):
         if include_boundary:
-            lop = lambda x, y: x >= y
+
+            def lop(x, y):
+                return x >= y
+
         else:
-            lop = lambda x, y: x > y
+
+            def lop(x, y):
+                return x > y
 
         if not all([lop(xi[i], -1.0) for i in range(3)]):
             return False

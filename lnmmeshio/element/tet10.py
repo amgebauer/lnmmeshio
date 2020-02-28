@@ -1,9 +1,12 @@
-from .element import ElementTet
-from ..node import Node
-from typing import List, Dict
-from .tri6 import Tri6
-from .line3 import Line3
+from typing import List
+
 import numpy as np
+
+from ..node import Node
+from .element import ElementTet
+from .line3 import Line3
+from .tri6 import Tri6
+
 
 """
 Implementation of a tet4 element

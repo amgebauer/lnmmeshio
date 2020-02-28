@@ -1,9 +1,12 @@
-from .element import ElementHex
-from ..node import Node
-from typing import List, Dict
-from .quad4 import Quad4
-from .line2 import Line2
+from typing import List
+
 import numpy as np
+
+from ..node import Node
+from .element import ElementHex
+from .line2 import Line2
+from .quad4 import Quad4
+
 
 """
 Implementation of a HEX8 element
