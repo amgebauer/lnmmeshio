@@ -1,0 +1,20 @@
+repos:
+- repo: https://github.com/psf/black
+  rev: 19.10b0
+  hooks:
+  - id: black
+    args: [--check]
+- repo: https://github.com/timothycrosley/isort
+  rev: 4.3.21
+  hooks:
+  - id: isort
+    args: ['--check -tc -m 3 -w 88']
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v1.2.3
+  hooks:
+  - id: trailing-whitespace
+  - id: check-yaml
+  - id: end-of-file-fixer
+  - id: check-merge-conflict
+  - id: debug-statements
+  - id: check-added-large-files

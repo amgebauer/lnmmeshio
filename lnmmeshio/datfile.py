@@ -2,7 +2,6 @@ import re
 from collections import OrderedDict
 from typing import Dict, List
 
-
 from .conditions.condition import ConditionsType
 from .conditions.conditionreader import read_conditions
 from .discretization import Discretization

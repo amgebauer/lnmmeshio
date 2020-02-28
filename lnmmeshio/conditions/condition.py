@@ -2,7 +2,6 @@ from collections import OrderedDict
 from enum import Enum
 
 
-
 class Condition:
     def get_line(self):
         raise NotImplementedError("The condition needs to implement get_line!")

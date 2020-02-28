@@ -1,9 +1,8 @@
 import os
 import unittest
 
-import numpy as np
-
 import lnmmeshio
+import numpy as np
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 

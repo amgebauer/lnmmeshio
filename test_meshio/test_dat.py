@@ -3,8 +3,7 @@ import os
 import unittest
 from collections import OrderedDict
 
-from lnmmeshio.conditions.surf_dirich_condition import \
-    SurfaceDirichletConditions
+from lnmmeshio.conditions.surf_dirich_condition import SurfaceDirichletConditions
 from lnmmeshio.datfile import Datfile
 from lnmmeshio.discretization import Discretization
 from lnmmeshio.element.tri3 import Tri3

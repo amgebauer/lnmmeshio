@@ -10,8 +10,7 @@ from meshio import Mesh
 from meshio import read as _meshioread
 from meshio import write as _meshiowrite
 
-from . import (element, ensightio, ioutils, meshio_to_discretization,
-               mimics_stlio)
+from . import element, ensightio, ioutils, meshio_to_discretization, mimics_stlio
 from .conditions import condition, conditionreader, surf_dirich_condition
 from .datfile import Datfile
 from .discretization import Discretization
@@ -72,7 +71,7 @@ def read(filename, file_format=None, out=True):
     Args:
         filename: The file to read from
         file_format: The file format of the file
-    
+
     Returns:
         Discretization: Returns the discretization in BACI format
     """
@@ -109,7 +108,7 @@ def read_discr(filename, file_format=None, out=True):
     Args:
         filename: The file to read from
         file_format: The file format of the file
-    
+
     Returns:
         Discretization: Returns the discretization in BACI format
     """
@@ -197,7 +196,7 @@ def read_mesh(filename, file_format=None):
     Args:
         filename: The file to read from
         file_format: The file format of the file
-    
+
     Returns:
         Mesh: Returns the discretization in BACI format
     """
@@ -259,7 +258,7 @@ def read_sections(filename):
 
     Args:
         filename: Path to the datfile
-    
+
     Returns:
         dict: keys are the section names and value is a list of the lines
     """

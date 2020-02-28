@@ -5,9 +5,15 @@ import unittest
 from collections import OrderedDict
 
 from lnmmeshio import ioutils
-from lnmmeshio.head import (CommentLine, Head, MultipleOptionsLine,
-                            MultipleOptionsSection, SingleOptionLine,
-                            SingleOptionSection, TextSection)
+from lnmmeshio.head import (
+    CommentLine,
+    Head,
+    MultipleOptionsLine,
+    MultipleOptionsSection,
+    SingleOptionLine,
+    SingleOptionSection,
+    TextSection,
+)
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 

@@ -3,11 +3,11 @@ import os
 import unittest
 
 import numpy as np
-
 from lnmmeshio.functions.component import Component
 from lnmmeshio.functions.function import Function
-from lnmmeshio.functions.linear_interpolation_variable import \
-    LinearInterpolationVariable
+from lnmmeshio.functions.linear_interpolation_variable import (
+    LinearInterpolationVariable,
+)
 from lnmmeshio.functions.variablereader import read_variable
 
 script_dir = os.path.dirname(os.path.realpath(__file__))

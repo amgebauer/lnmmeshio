@@ -2,13 +2,24 @@ import os
 import unittest
 
 import numpy as np
-
-from lnmmeshio import (Element, Hex8, Hex20, Hex27, Line2, Line3, Quad4, Quad8,
-                       Quad9, Tet4, Tet10, Tri3, Tri6)
+from lnmmeshio import (
+    Element,
+    Hex8,
+    Hex20,
+    Hex27,
+    Line2,
+    Line3,
+    Quad4,
+    Quad8,
+    Quad9,
+    Tet4,
+    Tet10,
+    Tri3,
+    Tri6,
+)
 from lnmmeshio.element.parse_element import parse as parse_ele
 from lnmmeshio.node import Node
-from lnmmeshio.nodeset import (LineNodeset, PointNodeset, SurfaceNodeset,
-                               VolumeNodeset)
+from lnmmeshio.nodeset import LineNodeset, PointNodeset, SurfaceNodeset, VolumeNodeset
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 

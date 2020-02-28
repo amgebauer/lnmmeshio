@@ -1,4 +1,3 @@
-
 from . import condition as c
 from .common_condition import CommonConditions
 

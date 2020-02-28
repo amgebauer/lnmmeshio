@@ -2,12 +2,10 @@ import io
 import os
 import unittest
 
-import numpy as np
-
 import lnmmeshio
+import numpy as np
 from lnmmeshio import ioutils
-from lnmmeshio.nodeset import (LineNodeset, PointNodeset, SurfaceNodeset,
-                               VolumeNodeset)
+from lnmmeshio.nodeset import LineNodeset, PointNodeset, SurfaceNodeset, VolumeNodeset
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 
