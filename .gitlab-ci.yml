@@ -28,7 +28,7 @@ version_check:
   rules:
     - if: $CI_MERGE_REQUEST_ID
       when: on_success
-    - when: manual
+    - when: never
 
 pages:
   stage: deploy
