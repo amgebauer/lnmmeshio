@@ -35,6 +35,7 @@ from .nodeset import LineNodeset, PointNodeset, SurfaceNodeset, VolumeNodeset
 __TYPE_BACI = 1
 __TYPE_BACI_DISCR = 2
 __TYPE_CASE = 3
+__TYPE_CASE_ASCII = 5
 __TYPE_MIMICS_STL = 4
 __TYPE_OTHER = 0
 
@@ -58,6 +59,8 @@ def _get_type(filename, file_format=None) -> bool:
         return __TYPE_BACI_DISCR
     elif file_format == "case" or file_format == "ensight":
         return __TYPE_CASE
+    elif file_format == "case_ascii":
+        return __TYPE_CASE_ASCI
     elif file_format == "mimicsstl":
         return __TYPE_MIMICS_STL
 
@@ -120,7 +123,7 @@ def read_discr(filename, file_format=None, out=True):
         # this is a BACI file format
         with open(filename, "r") as f:
             return read_baci_discr(f, out=out)
-    elif ftype == __TYPE_CASE:
+    elif ftype == __TYPE_CASE or ftype == __TYPE_CASE_ASCII:
         # this is ensight gold file format
         raise NotImplementedError("Case file reading is not implemented yet")
     elif ftype == __TYPE_MIMICS_STL:
@@ -173,6 +176,9 @@ def write(filename: str, dat: Datfile, file_format=None, override=True, out=True
     elif ftype == __TYPE_CASE:
         # this is ensight gold file format
         ensightio.write_case(filename, dat, out=out)
+    elif ftype == __TYPE_CASE_ASCII:
+        # this is ensight gold file format
+        ensightio.write_case(filename, dat, out=out, binary=False)
     elif ftype == __TYPE_MIMICS_STL:
         raise NotImplementedError("Writing in Mimics stl is currently not supported")
     else:
