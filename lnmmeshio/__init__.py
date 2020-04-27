@@ -60,7 +60,7 @@ def _get_type(filename, file_format=None) -> bool:
     elif file_format == "case" or file_format == "ensight":
         return __TYPE_CASE
     elif file_format == "case_ascii":
-        return __TYPE_CASE_ASCI
+        return __TYPE_CASE_ASCII
     elif file_format == "mimicsstl":
         return __TYPE_MIMICS_STL
 
