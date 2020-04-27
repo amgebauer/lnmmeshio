@@ -12,7 +12,10 @@ shape_to_eletype: Dict[str, str] = {
     "TET4": "tetra4",
     "TET10": "tetra10",
     "HEX8": "hexa8",
+    "HEX20": "hexa20",
+    "HEX27": "hexa27",
     "TRI3": "tria3",
+    "LINE2": "bar2",
 }
 
 
