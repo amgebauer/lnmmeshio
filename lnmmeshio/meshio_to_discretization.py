@@ -219,12 +219,18 @@ def mesh2Discretization(mesh: meshio.Mesh) -> Discretization:
                 disc.elements.structure.append(ele)
 
                 # extract material info from cell data
-                matid: int = _get_id_from_cell_data(mesh.cell_data[celltype])[cellindex]
+                if celltype in mesh.cell_data:
+                    matid: int = _get_id_from_cell_data(mesh.cell_data[celltype])[
+                        cellindex
+                    ]
+                else:
+                    matid: int = 1
                 ele.options["MAT"] = matid
 
                 # extract cell data
-                for key, value in mesh.cell_data[celltype].items():
-                    ele.data[key] = value[cellindex]
+                if celltype in mesh.cell_data:
+                    for key, value in mesh.cell_data[celltype].items():
+                        ele.data[key] = value[cellindex]
 
             else:
                 # this is a lower-dimensional element
