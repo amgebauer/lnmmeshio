@@ -8,3 +8,4 @@ htmlcov
 .coverage
 .tox/*
 .pytest_cache
+junit.xml
