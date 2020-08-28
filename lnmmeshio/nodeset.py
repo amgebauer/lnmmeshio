@@ -205,6 +205,14 @@ class NodesetBuilder:
 
         self.nodesets[self.id2pos[id]].add_node(node)
 
+    def get_unused_id(self):
+
+        nsid = 1
+        while nsid in self.id2pos.keys():
+            nsid += 1
+
+        return nsid
+
     def finalize(self):
         # return nodeset sorted by its id to preserve the id
         return [self.nodesets[self.id2pos[i]] for i in sorted(list(self.id2pos))]

@@ -105,8 +105,6 @@ def _write_binary(filename, points, cells, cell_data=None):
     if pts is None:
         raise RuntimeError("Could not find triangled")
 
-    print(pts, cells)
-
     if attrs is None:
         attrs = numpy.zeros((len(pts)), dtype=numpy.uint16)
 

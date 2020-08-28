@@ -183,6 +183,7 @@ def mesh2Discretization(mesh: meshio.Mesh) -> Discretization:
     pointnsbuilder = PointNodesetBuilder()
     linensbuilder = LineNodesetBuilder()
     surfnsbuilder = SurfaceNodesetBuilder()
+    volumensbuilder = VolumeNodesetBuilder()
 
     for cellgroupid, (celltype, cells) in enumerate(mesh.cells):
         if celltype not in cell_nodes:
@@ -196,10 +197,9 @@ def mesh2Discretization(mesh: meshio.Mesh) -> Discretization:
             # read nodes that belong to the cells
             nodes = []
 
-            print(cell)
             # in case of a vertex, cell is just an integer
             cell = np.array(cell).reshape((-1))
-            print(cell)
+
             for nodeids in cell:
                 nodes.append(disc.nodes[nodeids])
 
@@ -221,12 +221,11 @@ def mesh2Discretization(mesh: meshio.Mesh) -> Discretization:
                 disc.elements.structure.append(ele)
 
                 # extract material info from cell data
-                if celltype in mesh.cell_data:
-                    matid: int = _get_material_from_cell_data(
-                        mesh.cell_data, cellgroupid, cellid
-                    )
-                else:
-                    matid: int = 1
+                matid: int = _get_material_from_cell_data(
+                    mesh.cell_data, cellgroupid, cellid
+                )
+                if matid == None:
+                    matid = 1
                 ele.options["MAT"] = matid
 
                 # extract cell data
@@ -250,6 +249,26 @@ def mesh2Discretization(mesh: meshio.Mesh) -> Discretization:
                     elif eledim == 2:
                         surfnsbuilder.add(node, nsid)
 
+    # go through nodesets
+    for name, nodes in mesh.point_sets.items():
+        if "volume" in name:
+            nsid = volumensbuilder.get_unused_id()
+            for n in nodes:
+                volumensbuilder.add(disc.nodes[n], nsid)
+        if "surface" in name:
+            nsid = surfnsbuilder.get_unused_id()
+            for n in nodes:
+                surfnsbuilder.add(disc.nodes[n], nsid)
+        elif "line" in name:
+            nsid = linensbuilder.get_unused_id()
+            for n in nodes:
+                linensbuilder.add(disc.nodes[n], nsid)
+        elif "point" in name:
+            nsid = pointnsbuilder.get_unused_id()
+            for n in nodes:
+                pointnsbuilder.add(disc.nodes[n], nsid)
+
+    disc.volumenodesets = volumensbuilder.finalize()
     disc.pointnodesets = pointnsbuilder.finalize()
     disc.linenodesets = linensbuilder.finalize()
     disc.surfacenodesets = surfnsbuilder.finalize()
@@ -305,7 +324,7 @@ def discretization2mesh(dis: Discretization) -> meshio.Mesh:
                 cell_data[variable_name][-1] = np.append(
                     cell_data[variable_name][-1], int(ele.options["MAT"][0])
                 )
-    print(cells)
+
     # store nodesets
     print("Exporting of nodesets from dat to other file formats does not work")
 
@@ -323,7 +342,7 @@ def discretization2mesh(dis: Discretization) -> meshio.Mesh:
 def _get_material_from_cell_data(celldata, cellgroupid, cellid):
     for name in _cell_data_id_names:
         if name in celldata:
-            return int(celldata[name][cellgroupid, cellid])
+            return int(celldata[name][cellgroupid][cellid])
 
     return None
 
@@ -331,6 +350,6 @@ def _get_material_from_cell_data(celldata, cellgroupid, cellid):
 def _get_nodesetid_from_cell_data(celldata, cellgroupid, cellid):
     for name in _cell_data_id_names:
         if name in celldata:
-            return int(celldata[name][cellgroupid, cellid])
+            return int(celldata[name][cellgroupid][cellid])
 
     return None
