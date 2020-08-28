@@ -23,14 +23,15 @@ class TestDiscretizationIO(unittest.TestCase):
         self.assertEqual(mesh.points.shape, (224, 3))
 
         # check, whether all tet elements were read correctly
-        self.assertEqual(mesh.cells["tetra"].shape, (12, 4))
-        self.assertEqual(mesh.cells["tetra10"].shape, (12, 10))
-        self.assertEqual(mesh.cell_data["tetra"]["medit:ref"][0], 4)
-        self.assertEqual(mesh.cell_data["tetra10"]["medit:ref"][0], 5)
-        self.assertEqual(mesh.cell_data["hexahedron"]["medit:ref"][0], 1)
+        self.assertEqual(mesh.get_cells_type("tetra").shape, (12, 4))
+        self.assertEqual(mesh.get_cells_type("tetra10").shape, (12, 10))
+        self.assertEqual(mesh.cell_data["medit:ref"][0][0], 1)
+        self.assertEqual(mesh.cell_data["medit:ref"][1][0], 4)
+        self.assertEqual(mesh.cell_data["medit:ref"][2][0], 5)
+        self.assertEqual(mesh.cell_data["medit:ref"][3][0], 6)
 
         # check, whether all hex elements were read correctly
-        self.assertEqual(mesh.cells["hexahedron"].shape, (65, 8))
+        self.assertEqual(mesh.get_cells_type("hexahedron").shape, (65, 8))
 
     def test_write(self):
         # read dat file

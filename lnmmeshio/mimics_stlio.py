@@ -41,7 +41,7 @@ def data_from_facets(facets):
     k = numpy.argsort(idx)
     points = pts[idx[k]]
     inv_k = numpy.argsort(k)
-    cells = {"triangle": inv_k[inv].reshape(-1, 3)}
+    cells = [("triangle", inv_k[inv].reshape(-1, 3))]
     return points, cells
 
 
@@ -61,13 +61,13 @@ def _read_binary(f):
 
     points, cells = data_from_facets(numpy.array(facets))
 
-    cell_data = {"triangle": {"medit:ref": numpy.array(facet_data)}}
+    cell_data = {"medit:ref": [numpy.array(facet_data)]}
     return Mesh(points, cells, cell_data=cell_data)
 
 
 def write(filename, mesh):
     assert (
-        len(mesh.cells.keys()) == 1 and list(mesh.cells.keys())[0] == "triangle"
+        len(mesh.cells) == 1 and mesh.cells[0][0] == "triangle"
     ), "STL can only write triangle cells."
 
     if mesh.points.shape[1] == 2:
@@ -92,16 +92,23 @@ def _compute_normals(pts):
 
 
 def _write_binary(filename, points, cells, cell_data=None):
-    pts = points[cells["triangle"]]
-    normals = _compute_normals(pts)
-    attrs = numpy.zeros((len(pts)), dtype=numpy.uint16)
+    pts = None
+    attrs = None
+    for i, t in enumerate(cells):
+        if t[0] == "triangle":
+            pts = points[t[1]]
 
-    if (
-        cell_data is not None
-        and "triangle" in cell_data
-        and "medit:ref" in cell_data["triangle"]
-    ):
-        attrs = cell_data["triangle"]["medit:ref"].astype(numpy.uint16)
+            if cell_data is not None and "medit:ref" in cell_data:
+                attrs = cell_data["medit:ref"][i].astype(numpy.uint16)
+            break
+
+    if pts is None:
+        raise RuntimeError("Could not find triangled")
+
+    if attrs is None:
+        attrs = numpy.zeros((len(pts)), dtype=numpy.uint16)
+
+    normals = _compute_normals(pts)
 
     with open(filename, "wb") as fh:
         # 80 character header data
@@ -109,7 +116,7 @@ def _write_binary(filename, points, cells, cell_data=None):
         msg += (79 - len(msg)) * "X"
         msg += "\n"
         fh.write(msg.encode("utf-8"))
-        fh.write(numpy.uint32(len(cells["triangle"])))
+        fh.write(numpy.uint32(len(cells[0][1])))
         for pt, normal, attr in zip(pts, normals, attrs):
             fh.write(normal.astype(numpy.float32))
             fh.write(pt.astype(numpy.float32))
