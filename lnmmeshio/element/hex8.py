@@ -8,19 +8,17 @@ from .line2 import Line2
 from .quad4 import Quad4
 
 
-"""
-Implementation of a HEX8 element
-"""
-
-
 class Hex8(ElementHex):
+    """
+    Implementation of a HEX8 element
+    """
+
     ShapeName: str = "HEX8"
 
-    """
-    Base constructor of a Hex8 element
-    """
-
     def __init__(self, el_type: str, nodes: List[Node]):
+        """
+        Base constructor of a Hex8 element
+        """
         super(Hex8, self).__init__(el_type, Hex8.ShapeName, nodes)
 
         if len(nodes) != self.get_num_nodes():
@@ -28,24 +26,22 @@ class Hex8(ElementHex):
                 "You tried to created a HEX8 element with {0} nodes".format(len(nodes))
             )
 
-    """
-    Get number of nodes of a HEX8 element
-
-    Returns:
-        Number of nodes of a Hex8 element = 8
-    """
-
     def get_num_nodes(self) -> int:
+        """
+        Get number of nodes of a HEX8 element
+
+        Returns:
+            Number of nodes of a Hex8 element = 8
+        """
         return 8
 
-    """
-    Returns a list of faces of the Hex8 element
-
-    Returns:
-        List of faces
-    """
-
     def get_faces(self) -> List[Quad4]:
+        """
+        Returns a list of faces of the Hex8 element
+
+        Returns:
+            List of faces
+        """
         face_node_ids = [
             [0, 1, 2, 3],
             [0, 1, 5, 4],
@@ -57,14 +53,13 @@ class Hex8(ElementHex):
 
         return [Quad4(None, [self.nodes[i] for i in nodes]) for nodes in face_node_ids]
 
-    """
-    Returns the list of all edges
-
-    Returns:
-        List of edges
-    """
-
     def get_edges(self) -> List[Line2]:
+        """
+        Returns the list of all edges
+
+        Returns:
+            List of edges
+        """
         edge_node_ids = [
             [0, 1],
             [1, 2],
@@ -81,12 +76,11 @@ class Hex8(ElementHex):
         ]
         return [Line2(None, [self.nodes[i] for i in nodes]) for nodes in edge_node_ids]
 
-    """
-    Returns the value of the shape functions at the local coordinate xi
-    """
-
     @staticmethod
     def shape_fcns(xi):
+        """
+        Returns the value of the shape functions at the local coordinate xi
+        """
 
         return np.array(
             [
@@ -114,5 +108,20 @@ class Hex8(ElementHex):
                 Line2.shape_fcns(xi[0])[0]
                 * Line2.shape_fcns(xi[1])[1]
                 * Line2.shape_fcns(xi[2])[1],
+            ]
+        )
+
+    @staticmethod
+    def nodal_reference_coordinates():
+        return np.array(
+            [
+                [-1.0, -1.0, -1.0],
+                [1.0, -1.0, -1.0],
+                [1.0, 1.0, -1.0],
+                [-1.0, 1.0, -1.0],
+                [-1.0, -1.0, 1.0],
+                [1.0, -1.0, 1.0],
+                [1.0, 1.0, 1.0],
+                [-1.0, 1.0, 1.0],
             ]
         )

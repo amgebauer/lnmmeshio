@@ -84,3 +84,9 @@ class Tet4(ElementTet):
             ),
             np.array([1.0, 0.0, 0.0, 0.0]),
         )
+
+    @staticmethod
+    def nodal_reference_coordinates():
+        return np.array(
+            [[0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
+        )
