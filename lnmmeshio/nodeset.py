@@ -33,6 +33,9 @@ class Nodeset:
     def __iter__(self):
         return iter(self.nodes)
 
+    def __getitem__(self, x):
+        return list(self.nodes)[x]
+
     def get_lines(self):
         lines = []
         for n in self:
