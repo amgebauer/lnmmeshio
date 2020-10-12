@@ -14,10 +14,7 @@ from . import element, ensightio, ioutils, meshio_to_discretization, mimics_stli
 from .conditions import condition, conditionreader, surf_dirich_condition
 from .datfile import Datfile
 from .discretization import Discretization
-from .element.element import Element
-from .element.element import Element1D
-from .element.element import Element2D
-from .element.element import Element3D
+from .element.element import Element, Element1D, Element2D, Element3D
 from .element.element_container import ElementContainer
 from .element.hex8 import Hex8
 from .element.hex20 import Hex20
