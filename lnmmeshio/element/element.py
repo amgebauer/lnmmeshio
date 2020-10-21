@@ -228,7 +228,8 @@ class Element:
         Number of space dimensions
     """
 
-    def get_space_dim(self):
+    @staticmethod
+    def get_space_dim():
         raise NotImplementedError(
             "This element is not correctly implemented. It needs to be derived from Element{1,2,3}D"
         )
@@ -349,7 +350,8 @@ class Element1D(Element):
         Number of space dimensions
     """
 
-    def get_space_dim(self):
+    @staticmethod
+    def get_space_dim():
         return 1
 
 
@@ -361,7 +363,8 @@ class Element2D(Element):
         Number of space dimensions
     """
 
-    def get_space_dim(self):
+    @staticmethod
+    def get_space_dim():
         return 2
 
 
@@ -373,7 +376,8 @@ class Element3D(Element):
         Number of space dimensions
     """
 
-    def get_space_dim(self):
+    @staticmethod
+    def get_space_dim():
         return 3
 
 

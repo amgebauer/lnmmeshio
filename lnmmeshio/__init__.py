@@ -10,11 +10,11 @@ from meshio import Mesh
 from meshio import read as _meshioread
 from meshio import write as _meshiowrite
 
-from . import element, ensightio, ioutils, meshio_to_discretization, mimics_stlio
+from . import element, ensightio, ioutils, meshio_to_discretization, mimics_stlio, utils
 from .conditions import condition, conditionreader, surf_dirich_condition
 from .datfile import Datfile
 from .discretization import Discretization
-from .element.element import Element
+from .element.element import Element, Element1D, Element2D, Element3D
 from .element.element_container import ElementContainer
 from .element.hex8 import Hex8
 from .element.hex20 import Hex20
