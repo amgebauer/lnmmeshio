@@ -15,7 +15,6 @@ from ..progress import progress
 from .element import Element
 from .parse_element import parse as parse_ele
 
-
 """
 Class holding all elements in different categories. Current implemented categories are
 

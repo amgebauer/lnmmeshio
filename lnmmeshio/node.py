@@ -5,7 +5,6 @@ import numpy as np
 
 from .fiber import Fiber
 
-
 """
 Class that holds all information of nodes like coords, fibers, nodesets (and additional data)
 """

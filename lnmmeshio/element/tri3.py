@@ -6,7 +6,6 @@ from ..node import Node
 from .element import Element2D
 from .line2 import Line2
 
-
 """
 Implementation of a tri3 element
 """

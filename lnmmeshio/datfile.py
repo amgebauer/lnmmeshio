@@ -19,7 +19,6 @@ from .ioutils import (
 from .progress import progress
 from .result_description import ResultDescription
 
-
 """
 This class holds all information in the datfiles, consisting out of the discretization, conditions
 and options.

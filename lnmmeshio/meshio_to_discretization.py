@@ -4,8 +4,9 @@
 # This is the interface between the meshio package and our Discretization description
 # May not work perfectly
 #
-import meshio
 import numpy as np
+
+import meshio
 
 from .discretization import Discretization, Node
 from .element.line2 import Line2

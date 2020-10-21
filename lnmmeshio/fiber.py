@@ -11,7 +11,6 @@ from .ioutils import (
     write_title,
 )
 
-
 """
 Class that holds all information of fibers
 """
