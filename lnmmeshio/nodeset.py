@@ -83,11 +83,12 @@ class Nodeset:
                 id2pos[dpoint] = next_number
                 next_number += 1
                 if int(dpoint) != next_number:
-                    raise RuntimeError(
-                        "The nodeset numbering will not be preserved during read! Expecting {0}, got {1}".format(
-                            next_number, dpoint
-                        )
-                    )
+                    pass
+                    # raise RuntimeError(
+                    #    "The nodeset numbering will not be preserved during read! Expecting {0}, got {1}".format(
+                    #        next_number, dpoint
+                    #    )
+                    # )
                 nodesets.append(nodeset_cls(dpoint))
 
             nodesets[id2pos[dpoint]].add_node(nodes[nodeid - 1])

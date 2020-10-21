@@ -6,6 +6,7 @@ from ..node import Node
 from .element import ElementTet
 from .line2 import Line2
 from .tri3 import Tri3
+from .. import utils
 
 
 """
@@ -15,6 +16,13 @@ Implementation of a tet4 element
 
 class Tet4(ElementTet):
     ShapeName: str = "TET4"
+    ShapeFunctionsN: np.array = np.array(
+        [[-1.0, -1.0, -1.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
+    )
+    ShapeFunctionsB: np.array = np.array([1.0, 0.0, 0.0, 0.0])
+    NodalReferenceCoordinates: np.array = np.array(
+        [[0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
+    )
 
     """
     Base constructor of a tet4 element
@@ -79,14 +87,10 @@ class Tet4(ElementTet):
     @staticmethod
     def shape_fcns_mv():
         return (
-            np.array(
-                [[-1.0, -1.0, -1.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
-            ),
-            np.array([1.0, 0.0, 0.0, 0.0]),
+            Tet4.ShapeFunctionsN,
+            Tet4.ShapeFunctionsB,
         )
 
     @staticmethod
     def nodal_reference_coordinates():
-        return np.array(
-            [[0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
-        )
+        return Tet4.NodalReferenceCoordinates

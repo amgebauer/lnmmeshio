@@ -10,7 +10,7 @@ from meshio import Mesh
 from meshio import read as _meshioread
 from meshio import write as _meshiowrite
 
-from . import element, ensightio, ioutils, meshio_to_discretization, mimics_stlio
+from . import element, ensightio, ioutils, meshio_to_discretization, mimics_stlio, utils
 from .conditions import condition, conditionreader, surf_dirich_condition
 from .datfile import Datfile
 from .discretization import Discretization
