@@ -7,6 +7,7 @@ from .element import ElementHex
 from .line3 import Line3
 from .quad9 import Quad9
 
+
 """
 Implementation of a HEX27 element
 """

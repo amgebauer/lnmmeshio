@@ -5,6 +5,7 @@ import numpy as np
 from ..node import Node
 from .element import Element1D
 
+
 """
 Implementation of a line2 element
 """

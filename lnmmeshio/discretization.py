@@ -22,6 +22,7 @@ from .node import Node
 from .nodeset import LineNodeset, PointNodeset, SurfaceNodeset, VolumeNodeset
 from .progress import progress
 
+
 """
 This class holds the discretization, consisting out of nodes and elements. The nodes and
 elements itself hold their data (coords, element type, ...)

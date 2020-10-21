@@ -6,7 +6,6 @@ import os
 import sys
 
 import numpy as np
-
 from meshio import Mesh
 from meshio import read as _meshioread
 from meshio import write as _meshiowrite

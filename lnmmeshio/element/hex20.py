@@ -7,6 +7,7 @@ from .element import ElementHex
 from .line3 import Line3
 from .quad8 import Quad8
 
+
 """
 Implementation of a HEX20 element
 """

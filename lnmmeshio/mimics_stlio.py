@@ -6,7 +6,6 @@ import logging
 import struct
 
 import numpy
-
 from meshio import Mesh
 
 
