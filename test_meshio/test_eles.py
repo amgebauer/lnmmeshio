@@ -100,6 +100,11 @@ class TestEles(unittest.TestCase):
         self.assertListEqual(sorted([ns.id for ns in ele.get_dlines()]), [20, 21])
         self.assertListEqual(sorted([ns.id for ns in ele.get_dpoints()]), [30, 31])
 
+        for i, n in enumerate(ele.nodes):
+            n.id = i
+
+        self.assertListEqual(list(ele.get_node_ids()), list(range(0, 3)))
+
     def __test_shape_functions_sum(self, ele):
         # check whether the sum of all shape functions is 1 everywhere
         if issubclass(ele, Element1D):
@@ -151,6 +156,15 @@ class TestEles(unittest.TestCase):
                     sp.simplify(self._subs(shapefcn, xi, ref_coords)),
                     1 if i == j else 0,
                 )
+
+    def __test_point_in_ref(self, cls):
+        self.assertTrue(cls.is_in_ref(np.array([0.1, 0.1, 0.1])))
+        self.assertTrue(cls.is_in_ref(np.array([1.0, 0.0, 0.0])))
+        self.assertTrue(cls.is_in_ref(np.array([1.0, 0.0, 0.0]), include_boundary=True))
+        self.assertFalse(
+            cls.is_in_ref(np.array([1.0, 0.0, 0.0]), include_boundary=False)
+        )
+        self.assertFalse(cls.is_in_ref(np.array([-100, -100, -100])))
 
     def __test_ele(
         self, shape, cls, nnodes, faces, facetype, edges, edgetype, test_get_xi=False
@@ -260,10 +274,44 @@ class TestEles(unittest.TestCase):
         self.__test_shape_functions_sum(Tri3)
         self.__test_shape_functions_sum(Tri6)
 
+    def test_space_dim(self):
+        self.__test_shape_functions_sum(Hex8)
+        self.__test_shape_functions_sum(Hex20)
+        self.__test_shape_functions_sum(Hex27)
+        self.__test_shape_functions_sum(Tet4)
+        self.__test_shape_functions_sum(Tet10)
+        self.__test_shape_functions_sum(Line2)
+        self.__test_shape_functions_sum(Line3)
+        self.__test_shape_functions_sum(Quad4)
+        self.__test_shape_functions_sum(Quad8)
+        self.__test_shape_functions_sum(Quad9)
+        self.__test_shape_functions_sum(Tri3)
+        self.__test_shape_functions_sum(Tri6)
+
+        self.assertEqual(Hex8.get_space_dim(), 3)
+        self.assertEqual(Hex20.get_space_dim(), 3)
+        self.assertEqual(Hex27.get_space_dim(), 3)
+        self.assertEqual(Tet4.get_space_dim(), 3)
+        self.assertEqual(Tet10.get_space_dim(), 3)
+        self.assertEqual(Line2.get_space_dim(), 1)
+        self.assertEqual(Line3.get_space_dim(), 1)
+        self.assertEqual(Quad4.get_space_dim(), 2)
+        self.assertEqual(Quad8.get_space_dim(), 2)
+        self.assertEqual(Quad9.get_space_dim(), 2)
+        self.assertEqual(Tri3.get_space_dim(), 2)
+        self.assertEqual(Tri6.get_space_dim(), 2)
+
     def test_nodal_reference_coordinates(self):
         self.__test_nodal_reference_coordinates(Hex8)
         self.__test_nodal_reference_coordinates(Tet4)
         self.__test_nodal_reference_coordinates(Tet10)
+
+    def test_is_in_ref(self):
+        self.__test_point_in_ref(Hex8)
+        self.__test_point_in_ref(Hex20)
+        self.__test_point_in_ref(Hex27)
+        self.__test_point_in_ref(Tet4)
+        self.__test_point_in_ref(Tet10)
 
     def test_hex8(self):
         FACES = [

@@ -2,12 +2,11 @@ from typing import List
 
 import numpy as np
 
+from .. import utils
 from ..node import Node
 from .element import ElementTet
 from .line2 import Line2
 from .tri3 import Tri3
-from .. import utils
-
 
 """
 Implementation of a tet4 element
