@@ -23,19 +23,16 @@ from .nodeset import LineNodeset, PointNodeset, SurfaceNodeset, VolumeNodeset
 from .progress import progress
 
 
-"""
-This class holds the discretization, consisting out of nodes and elements. The nodes and
-elements itself hold their data (coords, element type, ...)
-"""
-
-
 class Discretization:
-
     """
-    Initialize Discretization class with empty nodes and zero elements
+    This class holds the discretization, consisting out of nodes and elements. The nodes and
+    elements itself hold their data (coords, element type, ...)
     """
 
     def __init__(self):
+        """
+        Initialize Discretization class with empty nodes and zero elements
+        """
         self.nodes: List[Node] = []
         self.elements: ElementContainer = ElementContainer()
 
@@ -45,14 +42,13 @@ class Discretization:
         self.surfacenodesets: List[SurfaceNodeset] = []
         self.volumenodesets: List[VolumeNodeset] = []
 
-    """
-    Computes the ids of the elements and nodes.
-
-    Args:
-        zero_based: If true, the first node id is 0, otherwise 1
-    """
-
     def compute_ids(self, zero_based: bool):
+        """
+        Computes the ids of the elements and nodes.
+
+        Args:
+            zero_based: If true, the first node id is 0, otherwise 1
+        """
 
         id: int = 0 if zero_based else 1
         for node in self.nodes:
@@ -85,11 +81,10 @@ class Discretization:
             ns.id = id
             id += 1
 
-    """
-    Resets the computed ids
-    """
-
     def reset(self):
+        """
+        Resets the computed ids
+        """
         for node in self.nodes:
             node.reset()
 
@@ -106,11 +101,10 @@ class Discretization:
         for ns in self.volumenodesets:
             ns.reset()
 
-    """
-    Returns an np.array((num_node, 3)) with the coordinates of each node
-    """
-
     def get_node_coords(self):
+        """
+        Returns an np.array((num_node, 3)) with the coordinates of each node
+        """
         arr: np.array = np.zeros((len(self.nodes), 3))
 
         i: int = 0
@@ -119,6 +113,28 @@ class Discretization:
             i += 1
 
         return arr
+
+    def get_dsurf_elements(self, id):
+        """
+        Returns a list of surface elements that belong to a dsurf
+        """
+        face_elements = []
+        added_faces = set()
+
+        self.compute_ids(True)
+        nodeset_ids = set([n.id for n in self.surfacenodesets[id]])
+
+        for ele in self.elements.structure:
+
+            for face in ele.get_faces():
+                node_ids = [n.id for n in face.nodes]
+                if all([node_id in nodeset_ids for node_id in node_ids]):
+                    face_id = "/".join(sorted([str(nid) for nid in node_ids]))
+                    if face_id not in added_faces:
+                        face_elements.append(face)
+                        added_faces.add(face_id)
+
+        return face_elements
 
     def get_sections(self, out=True):
         self.compute_ids(zero_based=False)
@@ -190,14 +206,13 @@ class Discretization:
 
         return sections
 
-    """
-    Writes the discretization related sections into the stream variable dest
-
-    Args:
-        dest: stream variable (could for example be: with open('file.dat', 'w') as dest: ...)
-    """
-
     def write(self, dest, out=True):
+        """
+        Writes the discretization related sections into the stream variable dest
+
+        Args:
+            dest: stream variable (could for example be: with open('file.dat', 'w') as dest: ...)
+        """
         sections = self.get_sections(out=out)
 
         for key, lines in progress(sections.items(), out=out, label="Write sections"):
@@ -205,11 +220,10 @@ class Discretization:
             for l in lines:
                 dest.write("{0}\n".format(l))
 
-    """
-    Finalizes the discretization by creating internal references
-    """
-
     def finalize(self):
+        """
+        Finalizes the discretization by creating internal references
+        """
 
         # remove old nodesets
         for n in self.nodes:
@@ -238,18 +252,17 @@ class Discretization:
             for n in ns:
                 n.volumenodesets.append(ns)
 
-    """
-    Static method that creates the discretizations file from the input lines of a .dat file
-
-    Args:
-        sections: Dictionary with header titles as keys and list of lines as value
-
-    Retuns:
-        Discretization object
-    """
-
     @staticmethod
     def read(sections: Dict[str, List[str]], out: bool = False) -> "Discretization":
+        """
+        Static method that creates the discretizations file from the input lines of a .dat file
+
+        Args:
+            sections: Dictionary with header titles as keys and list of lines as value
+
+        Retuns:
+            Discretization object
+        """
         disc = Discretization()
 
         # read nodes
