@@ -288,7 +288,9 @@ def discretization2mesh(dis: Discretization) -> meshio.Mesh:
 
         for k, v in n.data.items():
             if k not in point_data:
-                point_data[k] = np.zeros(tuple([len(dis.nodes)] + list(v.shape)))
+                point_data[k] = np.zeros(
+                    tuple([len(dis.nodes)] + list(np.array(v).shape))
+                )
 
             point_data[k][i] = v
 
@@ -322,7 +324,29 @@ def discretization2mesh(dis: Discretization) -> meshio.Mesh:
                     cell_data[variable_name].append(np.array([], dtype=int))
 
                 cell_data[variable_name][-1] = np.append(
-                    cell_data[variable_name][-1], int(ele.options["MAT"][0])
+                    cell_data[variable_name][-1],
+                    int(
+                        ele.options["MAT"][0]
+                        if _isiter(ele.options["MAT"])
+                        else ele.options["MAT"]
+                    ),
+                )
+
+            for variable_name, value in ele.data.items():
+                value_reshaped = np.array(value).reshape((-1))
+                if variable_name not in cell_data:
+                    cell_data[variable_name] = []
+
+                if newgroup:
+                    cell_data[variable_name].append(
+                        np.zeros(
+                            tuple([0] + list(value_reshaped.shape)),
+                            dtype=value_reshaped.dtype,
+                        )
+                    )
+
+                cell_data[variable_name][-1] = np.append(
+                    cell_data[variable_name][-1], value_reshaped.reshape(1, -1), axis=0
                 )
 
     # store nodesets
@@ -353,3 +377,12 @@ def _get_nodesetid_from_cell_data(celldata, cellgroupid, cellid):
             return int(celldata[name][cellgroupid][cellid])
 
     return None
+
+
+def _isiter(list):
+    try:
+        iter(list)
+    except TypeError:
+        return False
+
+    return True

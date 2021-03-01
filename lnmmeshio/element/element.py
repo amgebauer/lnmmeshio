@@ -1,4 +1,5 @@
 import io
+import math
 from collections import OrderedDict
 from typing import List
 
@@ -332,13 +333,19 @@ class Element:
 
         return shape_dict[shape]
 
-        """
-    Returns the value of the shape functions at the local coordinate xi
-    """
-
     @staticmethod
     def shape_fcns(xi):
+        """
+        Returns the value of the shape functions at the local coordinate xi
+        """
         raise NotImplementedError("This element has not implemented shape functions")
+
+    @staticmethod
+    def int_points(num_points):
+        """
+        Returns the position of the integration points for a given number of integration points
+        """
+        raise NotImplementedError("This element has not implemented integration points")
 
 
 class Element1D(Element):
@@ -407,6 +414,29 @@ class ElementTet(Element3D):
             return False
 
         return True
+
+    @staticmethod
+    def int_points(num_points):
+        """
+        Returns the position of the integration points for a given number of integration points
+        """
+        if num_points == 4:
+            palpha = (5.0 + 3.0 * math.sqrt(5.0)) / 20.0
+            pbeta = (5.0 - math.sqrt(5.0)) / 20.0
+
+            return np.array(
+                [
+                    [pbeta, pbeta, pbeta],
+                    [palpha, pbeta, pbeta],
+                    [pbeta, palpha, pbeta],
+                    [pbeta, pbeta, palpha],
+                ]
+            )
+        raise RuntimeError(
+            "The number of integration points provided ({0}) is not supported for TET elements".format(
+                num_points
+            )
+        )
 
 
 class ElementHex(Element3D):
