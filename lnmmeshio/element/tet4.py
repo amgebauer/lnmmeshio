@@ -82,7 +82,9 @@ class Tet4(ElementTet):
     @staticmethod
     def shape_fcns(xi):
         N, b = Tet4.shape_fcns_mv()
-        return np.dot(N, xi) + b
+        if len(xi.shape) == 2:
+            b = b.reshape((4, 1))
+        return np.matmul(N, xi) + b
 
     @staticmethod
     def shape_fcns_mv():
