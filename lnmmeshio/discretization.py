@@ -136,6 +136,26 @@ class Discretization:
 
         return face_elements
 
+    def get_dvol_elements(self, id):
+        """
+        Returns a list of volume elements that belong to a dvol
+        """
+        vol_elements = []
+        added_vols = set()
+
+        self.compute_ids(True)
+        nodeset_ids = set([n.id for n in self.volumenodesets[id]])
+
+        for ele in self.elements.structure:
+
+            node_ids = [n.id for n in ele.nodes]
+            if all([node_id in nodeset_ids for node_id in node_ids]):
+                vol_id = "/".join(sorted([str(nid) for nid in node_ids]))
+                if vol_id not in added_vols:
+                    vol_elements.append(ele)
+                    added_vols.add(vol_id)
+        return vol_elements
+
     def get_sections(self, out=True):
         self.compute_ids(zero_based=False)
 
