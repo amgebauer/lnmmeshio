@@ -146,10 +146,10 @@ class Discretization:
         self.compute_ids(True)
         nodeset_ids = set([n.id for n in self.volumenodesets[id]])
 
-        for ele in self.elements.structure: 
+        for ele in self.elements.structure:
 
             node_ids = [n.id for n in ele.nodes]
-            if all([node_id in nodeset_ids for node_id in node_ids]): 
+            if all([node_id in nodeset_ids for node_id in node_ids]):
                 vol_id = "/".join(sorted([str(nid) for nid in node_ids]))
                 if vol_id not in added_vols:
                     vol_elements.append(ele)
