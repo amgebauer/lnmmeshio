@@ -28,23 +28,22 @@ from .tri6 import Tri6
 
 RegExEle = re.compile(r"^[ ]*([0-9]+)[ ]+(\S+)[ ]+(\S+)[ ]+")
 
-"""
-Creates an element from a given element shape
-
-Args:
-    elename: name of the element (e.g. SOLIDH8)
-    shape: str shape of the element (e.g. HEX8)
-    nodes: nodes of the element
-    throw_if_unknown: bool Throw an exception, if element type is not known
-
-Return:
-    Element of the specific type
-"""
-
 
 def create_element(
     ele_type: str, ele_shape: str, ele_nodes: List[Node], throw_if_unknown=False
 ):
+    """
+    Creates an element from a given element shape
+
+    Args:
+        elename: name of the element (e.g. SOLIDH8)
+        shape: str shape of the element (e.g. HEX8)
+        nodes: nodes of the element
+        throw_if_unknown: bool Throw an exception, if element type is not known
+
+    Return:
+        Element of the specific type
+    """
 
     if ele_shape == Line2.ShapeName:
         ele = Line2(ele_type, ele_nodes)
@@ -78,19 +77,17 @@ def create_element(
     return ele
 
 
-"""
-Parses the element and returns an instance of an appropriate element type
-
-Args:
-    line: linedefinition of the element
-    nodes: List of nodes
-
-Returns:
-    An instance of the properly instantianted element
-"""
-
-
 def parse(line: str, nodes: List[Node], throw_if_unknown=False):
+    """
+    Parses the element and returns an instance of an appropriate element type
+
+    Args:
+        line: linedefinition of the element
+        nodes: List of nodes
+
+    Returns:
+        An instance of the properly instantianted element
+    """
     line = line.split("//", 1)[0]
     # parse ele id, type and shape
     ele_match = RegExEle.search(line)

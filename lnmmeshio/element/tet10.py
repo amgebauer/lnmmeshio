@@ -74,6 +74,19 @@ class Tet10(ElementTet):
         ]
         return [Line3(None, [self.nodes[i] for i in nodes]) for nodes in edge_node_ids]
 
+    def get_xi(self, x):
+        """
+        Returns the local variables from given global variables
+
+        Args:
+            x: Global variable
+
+        Returns:
+            Local variables (xi)
+        """
+        coords = np.transpose(np.array([n.coords for n in self.nodes]))
+        raise NotImplementedError("This is currently not implemented for all elements")
+
     """
     Returns the value of the shape functions at the local coordinate xi
     """
