@@ -40,7 +40,7 @@ class Fiber:
         fib: Unit vector pointing in fiber direction np.array((3))
     """
 
-    def __init__(self, fib: np.array):
+    def __init__(self, fib: np.ndarray):
         self.fiber = fib
 
     """

@@ -20,9 +20,9 @@ class Node:
         coords: np.array((3)) Coordinates of the node
     """
 
-    def __init__(self, coords: np.array = np.zeros((3))):
+    def __init__(self, coords: np.ndarray = np.zeros((3))):
         self.id = None
-        self.coords: np.array = coords
+        self.coords: np.ndarray = coords
         self.fibers: Dict[str, Fiber] = {}
 
         self.pointnodesets = []

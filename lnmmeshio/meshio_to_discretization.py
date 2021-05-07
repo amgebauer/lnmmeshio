@@ -368,7 +368,7 @@ def _get_material_from_cell_data(celldata, cellgroupid, cellid):
         if name in celldata:
             return int(celldata[name][cellgroupid][cellid])
 
-    return None
+    return cellgroupid
 
 
 def _get_nodesetid_from_cell_data(celldata, cellgroupid, cellid):

@@ -197,7 +197,7 @@ class Datfile:
     """
 
     @staticmethod
-    def read(sections: Dict[str, List[str]], out: bool = False) -> "Discretization":
+    def read(sections: Dict[str, List[str]], out: bool = False) -> "Datfile":
         dat = Datfile()
 
         # read discretization

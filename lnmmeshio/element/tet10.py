@@ -29,14 +29,13 @@ class Tet10(ElementTet):
                 "You tried to created a TET10 element with {0} nodes".format(len(nodes))
             )
 
-    """
-    Get number of nodes of a TET10 element
-
-    Returns:
-        Number of nodes of a TET10 element = 4
-    """
-
     def get_num_nodes(self) -> int:
+        """
+        Get number of nodes of a TET10 element
+
+        Returns:
+            Number of nodes of a TET10 element = 10
+        """
         return 10
 
     """

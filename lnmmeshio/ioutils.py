@@ -60,7 +60,7 @@ def read_option_item(line: str, option: str, num: int = 1):
         return [match.group(i) for i in range(2, num + 2)], match.span(0)
 
 
-def read_ints(line: str, option: str, num: int) -> np.array:
+def read_ints(line: str, option: str, num: int) -> np.ndarray:
     str_items = read_option_item(line, option, num)[0]
 
     if str_items is None:
@@ -78,7 +78,7 @@ def read_int(line: str, option: str) -> int:
     return read_ints(line, option, 1)[0]
 
 
-def read_floats(line: str, option: str, num: int) -> np.array:
+def read_floats(line: str, option: str, num: int) -> np.ndarray:
     str_items = read_option_item(line, option, num)[0]
 
     if str_items is None:
@@ -217,7 +217,7 @@ def write_comment(dest, comment, newline=True):
     dest.write("{0}{1}".format(line_comment(comment), "\n" if newline else ""))
 
 
-def ens_write_floats(file_handle, arr: np.array, binary=True):
+def ens_write_floats(file_handle, arr: np.ndarray, binary=True):
     """reads array of length floats"""
     if binary:
         np.ravel(arr, "F").astype("<f").tofile(file_handle)
@@ -226,7 +226,7 @@ def ens_write_floats(file_handle, arr: np.array, binary=True):
             ens_write_float(file_handle, f, binary)
 
 
-def ens_write_ints(file_handle, arr: np.array, binary=True):
+def ens_write_ints(file_handle, arr: np.ndarray, binary=True):
     if binary:
         np.ravel(arr).astype("<i").tofile(file_handle)
     else:
