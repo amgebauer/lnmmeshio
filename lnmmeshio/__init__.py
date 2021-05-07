@@ -4,6 +4,7 @@
 
 import os
 import sys
+from typing import Union
 
 import numpy as np
 from meshio import Mesh
@@ -47,7 +48,7 @@ __TYPE_MIMICS_STL = 4
 __TYPE_OTHER = 0
 
 
-def _get_type(filename, file_format=None) -> bool:
+def _get_type(filename, file_format=None) -> int:
     if not file_format:
         # deduct file format from extension
         _, extension = os.path.splitext(filename)
@@ -74,7 +75,7 @@ def _get_type(filename, file_format=None) -> bool:
     return __TYPE_OTHER
 
 
-def read(filename, file_format=None, out=True):
+def read(filename, file_format=None, out=True) -> Datfile:
     """
     Reads an unstructured mesh with added data
 
@@ -144,7 +145,7 @@ def read_discr(filename, file_format=None, out=True):
         return dis
 
 
-def read_baci(input_stream, out=True):
+def read_baci(input_stream, out=True) -> Datfile:
     sections = ioutils.read_dat_sections(input_stream)
 
     return Datfile.read(sections, out=out)
@@ -156,7 +157,9 @@ def read_baci_discr(input_stream, out=True):
     return Discretization.read(sections, out=out)
 
 
-def write(filename: str, dat: Datfile, file_format=None, override=True, out=True):
+def write(
+    filename: str, dat: Datfile, file_format=None, override=True, out=True,
+):
     """
     Writes an dat file with head and discretization
 
@@ -250,10 +253,10 @@ def write_mesh(filename, mesh, file_format=None, override=True, **kwargs):
         raise FileExistsError("The file already exists")
 
     if ftype == __TYPE_BACI:
+        dat = Datfile()
+        dat.discretization = meshio_to_discretization.mesh2Discretization(mesh)
         write(
-            filename,
-            meshio_to_discretization.mesh2Discretization(mesh),
-            file_format=file_format,
+            filename, dat, file_format=file_format,
         )
     elif ftype == __TYPE_CASE:
         # this is ensight gold file format
