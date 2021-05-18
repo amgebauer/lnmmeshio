@@ -41,6 +41,7 @@ pages:
     - pdoc -o ./docs/ -d numpy -n lnmmeshio
     - coverage run --source=lnmmeshio -m unittest discover test_meshio
     - coverage html
+    - mkdir -p public
     - mv htmlcov public/coverage
     - mv docs public/docs
   artifacts:
