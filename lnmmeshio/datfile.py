@@ -20,13 +20,12 @@ from .progress import progress
 from .result_description import ResultDescription
 
 
-"""
-This class holds all information in the datfiles, consisting out of the discretization, conditions
-and options.
-"""
-
-
 class Datfile:
+    """
+    This class holds all information in the datfiles, consisting out of the discretization, conditions
+    and options.
+    """
+
     def __init__(self):
         self.discretization = Discretization()
 
@@ -42,14 +41,13 @@ class Datfile:
         # initialize head
         self.head: Head = Head()
 
-    """
-    Computes the ids of the elements and nodes.
-
-    Args:
-        zero_based: If true, the first node id is 0, otherwise 1
-    """
-
     def compute_ids(self, zero_based: bool):
+        """
+        Computes the ids of the elements and nodes.
+
+        Args:
+            zero_based: If true, the first node id is 0, otherwise 1
+        """
 
         self.discretization.compute_ids(zero_based)
 
@@ -58,24 +56,22 @@ class Datfile:
             f.id = id
             id += 1
 
-    """
-    Resets the computed ids
-    """
-
     def reset(self):
+        """
+        Resets the computed ids
+        """
         self.discretization.reset()
 
         for f in self.functions:
             f.reset()
 
-    """
-    Creates an dictionary of lines with section title as key
-
-    Return:
-        Dat file as dict
-    """
-
     def get_sections(self, out=True):
+        """
+        Creates an dictionary of lines with section title as key
+
+        Return:
+            Dat file as dict
+        """
         sections = OrderedDict()
 
         # write head
@@ -99,14 +95,13 @@ class Datfile:
 
         return sections
 
-    """
-    Writes the content of the datfile into dest
-
-    Args:
-        dest: Stream to write the datfile to
-    """
-
     def write(self, dest, out=True):
+        """
+        Writes the content of the datfile into dest
+
+        Args:
+            dest: Stream to write the datfile to
+        """
         sections = self.get_sections(out=out)
 
         # reorder sections
@@ -121,18 +116,17 @@ class Datfile:
             for l in lines:
                 dest.write("{0}\n".format(l))
 
-    """
-    Reorderes the sections of the datfile into a specific order
-
-    Args:
-        sections: Dictionary of sections as keys and section lines as values
-
-    Return:
-        ordered dictionary of sections as keys and section lines as values
-    """
-
     @staticmethod
     def reorder_sections(sections):
+        """
+        Reorderes the sections of the datfile into a specific order
+
+        Args:
+            sections: Dictionary of sections as keys and section lines as values
+
+        Return:
+            ordered dictionary of sections as keys and section lines as values
+        """
         ORDER_RULES = [
             "",
             "TITLE",
@@ -186,18 +180,17 @@ class Datfile:
 
         return OrderedDict((k, sections[k]) for k in myorder)
 
-    """
-    Static method that creates the discretizations file from the input lines of a .dat file
-
-    Args:
-        sections: Dictionary with header titles as keys and list of lines as value
-
-    Retuns:
-        Discretization object
-    """
-
     @staticmethod
     def read(sections: Dict[str, List[str]], out: bool = False) -> "Datfile":
+        """
+        Static method that creates the discretizations file from the input lines of a .dat file
+
+        Args:
+            sections: Dictionary with header titles as keys and list of lines as value
+
+        Retuns:
+            Discretization object
+        """
         dat = Datfile()
 
         # read discretization

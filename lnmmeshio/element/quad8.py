@@ -7,19 +7,17 @@ from .element import Element2D
 from .line3 import Line3
 
 
-"""
-Implementation of a quad8 element
-"""
-
-
 class Quad8(Element2D):
+    """
+    Implementation of a quad8 element
+    """
+
     ShapeName: str = "QUAD8"
 
-    """
-    Base constructor of a Quad8 element
-    """
-
     def __init__(self, el_type: str, nodes: List[Node]):
+        """
+        Base constructor of a Quad8 element
+        """
         super(Quad8, self).__init__(el_type, Quad8.ShapeName, nodes)
 
         if len(nodes) != self.get_num_nodes():
@@ -27,34 +25,31 @@ class Quad8(Element2D):
                 "You tried to created a QUAD8 element with {0} nodes".format(len(nodes))
             )
 
-    """
-    Get number of nodes of a QUAD8 element
-
-    Returns:
-        Number of nodes of a QUAD8 element = 8
-    """
-
     def get_num_nodes(self) -> int:
+        """
+        Get number of nodes of a QUAD8 element
+
+        Returns:
+            Number of nodes of a QUAD8 element = 8
+        """
         return 8
 
-    """
-    The face of a quad8 element is itself
-
-    Returns:
-        List of faces
-    """
-
     def get_faces(self) -> List["Quad8"]:
+        """
+        The face of a quad8 element is itself
+
+        Returns:
+            List of faces
+        """
         return [self]
 
-    """
-    Returns the list of all edges
-
-    Returns:
-        List of edges
-    """
-
     def get_edges(self) -> List[Line3]:
+        """
+        Returns the list of all edges
+
+        Returns:
+            List of edges
+        """
         return [
             Line3(None, [self.nodes[0], self.nodes[1], self.nodes[4]]),
             Line3(None, [self.nodes[1], self.nodes[2], self.nodes[5]]),
@@ -62,12 +57,11 @@ class Quad8(Element2D):
             Line3(None, [self.nodes[3], self.nodes[0], self.nodes[7]]),
         ]
 
-    """
-    Returns the value of the shape functions at the local coordinate xi
-    """
-
     @staticmethod
     def shape_fcns(xi):
+        """
+        Returns the value of the shape functions at the local coordinate xi
+        """
 
         r = xi[0]
         s = xi[1]

@@ -38,9 +38,11 @@ pages:
   dependencies:
     - test
   script:
+    - pdoc -o ./docs/ -d numpy -n lnmmeshio
     - coverage run --source=lnmmeshio -m unittest discover test_meshio
     - coverage html
-    - mv htmlcov/ public/
+    - mv htmlcov public/coverage
+    - mv docs public/docs
   artifacts:
     paths:
       - public

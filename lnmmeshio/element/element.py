@@ -18,25 +18,22 @@ from ..ioutils import (
 from ..node import Node
 
 
-"""
-Class holding the data of one element
-"""
-
-
 class Element:
-
     """
-    Creates a new element of type ele_type, shape with nodes defined in nodes
-
-    Args:
-        el_type: str of element type as used by BACI (e.g. SOHEX8)
-        shape: shape of the element as used by BACI (e.g. HEX8)
-        nodes: List of node objects
+    Class holding the data of one element
     """
 
     def __init__(
         self, el_type: str, shape: str, nodes: List[Node], options: OrderedDict = None
     ):
+        """
+        Creates a new element of type ele_type, shape with nodes defined in nodes
+
+        Args:
+            el_type: str of element type as used by BACI (e.g. SOHEX8)
+            shape: shape of the element as used by BACI (e.g. HEX8)
+            nodes: List of node objects
+        """
         self.id = None
         self.type = el_type
         self.shape = shape
@@ -45,61 +42,55 @@ class Element:
         self.fibers = {}
         self.data = {}
 
-    """
-    Get number of nodes of the element
-
-    Returns:
-        Number of nodes of the element
-    """
-
     def get_num_nodes(self) -> int:
+        """
+        Get number of nodes of the element
+
+        Returns:
+            Number of nodes of the element
+        """
         raise NotImplementedError("This method is not implemented in your element")
 
-    """
-    Sets the element id to None
-    """
-
     def reset(self):
+        """
+        Sets the element id to None
+        """
         self.id = None
 
-    """
-    Returns a list of nodes
-
-    Returns:
-        List of nodes
-    """
-
     def get_nodes(self) -> List[Node]:
+        """
+        Returns a list of nodes
+
+        Returns:
+            List of nodes
+        """
         return self.nodes
 
-    """
-    Returns all faces
-
-    Returns:
-        List of faces
-    """
-
     def get_faces(self) -> list:
+        """
+        Returns all faces
+
+        Returns:
+            List of faces
+        """
         raise RuntimeError("This element does't implement get faces")
 
-    """
-    Returns all edges
-
-    Returns:
-        List of edges
-    """
-
     def get_edges(self) -> list:
+        """
+        Returns all edges
+
+        Returns:
+            List of edges
+        """
         raise RuntimeError("This element does't implement get edges")
 
-    """
-    Returns the node ids as of each element as a numpy array of shape (num_ele, num_nod_per_ele)
-
-    Returns:
-        np.array with node ids of each element
-    """
-
     def get_node_ids(self):
+        """
+        Returns the node ids as of each element as a numpy array of shape (num_ele, num_nod_per_ele)
+
+        Returns:
+            np.array with node ids of each element
+        """
         arr: np.array = np.zeros((len(self.nodes)), dtype=int)
 
         for i, node in enumerate(self.nodes, start=0):
@@ -109,14 +100,13 @@ class Element:
 
         return arr
 
-    """
-    Returns a list of dpoints that is shared by all nodes of the element
-
-    Returns:
-        List of dpoint
-    """
-
     def get_dpoints(self):
+        """
+        Returns a list of dpoints that is shared by all nodes of the element
+
+        Returns:
+            List of dpoint
+        """
         pointnodesets = None
 
         for p in self.nodes:
@@ -127,14 +117,13 @@ class Element:
 
         return list(pointnodesets)
 
-    """
-    Returns a list of dlines that is shared by all nodes of the element
-
-    Returns:
-        List of dlines
-    """
-
     def get_dlines(self):
+        """
+        Returns a list of dlines that is shared by all nodes of the element
+
+        Returns:
+            List of dlines
+        """
         linenodesets = None
 
         for p in self.nodes:
@@ -145,14 +134,13 @@ class Element:
 
         return list(linenodesets)
 
-    """
-    Returns a list of dsurf that is shared by all nodes of the element
-
-    Returns:
-        List of dsurfs
-    """
-
     def get_dsurfs(self):
+        """
+        Returns a list of dsurf that is shared by all nodes of the element
+
+        Returns:
+            List of dsurfs
+        """
         surfacenodesets = None
 
         for p in self.nodes:
@@ -163,14 +151,13 @@ class Element:
 
         return list(surfacenodesets)
 
-    """
-    Returns a list of dvol that is shared by all nodes of the element
-
-    Returns:
-        List of dvols
-    """
-
     def get_dvols(self):
+        """
+        Returns a list of dvol that is shared by all nodes of the element
+
+        Returns:
+            List of dvols
+        """
         volumenodesets = None
 
         for p in self.nodes:
@@ -200,11 +187,10 @@ class Element:
 
         return line.getvalue()
 
-    """
-    Write the corresponding element line in the dat file
-    """
-
     def write(self, dest):
+        """
+        Write the corresponding element line in the dat file
+        """
         if self.id is None:
             raise RuntimeError("You have to compute ids before writing")
 
@@ -222,72 +208,67 @@ class Element:
 
         dest.write("\n")
 
-    """
-    Returns the number of space dimensions
-
-    Returns:
-        Number of space dimensions
-    """
-
     @staticmethod
     def get_space_dim():
+        """
+        Returns the number of space dimensions
+
+        Returns:
+            Number of space dimensions
+        """
         raise NotImplementedError(
             "This element is not correctly implemented. It needs to be derived from Element{1,2,3}D"
         )
 
-    """
-    Returns the local variables from given global variables
-
-    Args:
-        x: Global variable
-
-    Returns:
-        Local variables (xi)
-    """
-
     def get_xi(self, x):
+        """
+        Returns the local variables from given global variables
+
+        Args:
+            x: Global variable
+
+        Returns:
+            Local variables (xi)
+        """
         raise NotImplementedError("This is currently not implemented for all elements")
-
-    """
-    Checkes whether a point in reference coordinates is within the element
-
-    Args:
-        xi: Point in reference coordinates
-
-    Returns:
-        True if the point is within the element (or on the bounrary), otherwise False
-    """
 
     @staticmethod
     def is_in_ref(xi, include_boundary=True):
+        """
+        Checkes whether a point in reference coordinates is within the element
+
+        Args:
+            xi: Point in reference coordinates
+
+        Returns:
+            True if the point is within the element (or on the bounrary), otherwise False
+        """
         raise NotImplementedError("This is currently not implemented for all elements")
 
-    """
-    Check whether a point is within the element
-
-    Args:
-        x: Point in space
-        include_boundary: bool, Whether or not to include the boundary
-
-    Returns:
-        True if the point is within the element (or on the boundary), otherwise False
-    """
-
     def is_in(self, x, include_boundary=True):
+        """
+        Check whether a point is within the element
+
+        Args:
+            x: Point in space
+            include_boundary: bool, Whether or not to include the boundary
+
+        Returns:
+            True if the point is within the element (or on the boundary), otherwise False
+        """
         return self.is_in_ref(self.get_xi(x))
 
-    """
-    Projects the quantity from the nodal quantities q to the position x
-
-    Args:
-        x: Point in space
-        q: Nodal values of the quantities
-
-    Returns:
-        q_x: Quantity at x projected with the shape functions
-    """
-
     def project_quantity(self, x: np.ndarray, q: np.ndarray):
+        """
+        Projects the quantity from the nodal quantities q to the position x
+
+        Args:
+            x: Point in space
+            q: Nodal values of the quantities
+
+        Returns:
+            q_x: Quantity at x projected with the shape functions
+        """
         shapefcns = self.shape_fcns(self.get_xi(x))
 
         if q.shape[0] != self.get_num_nodes():
@@ -299,18 +280,29 @@ class Element:
 
         return np.dot(shapefcns, q)
 
-    """
-    Returns the number of nodes from the shapes
+    def integrate(self, integrand, numgp) -> np.ndarray:
+        """
+        Integrates the integrand over the element
 
-    Args:
-        shape: shape as used in baci .dat file format
-
-    Returngs:
-        int: number of nodes
-    """
+        Args:
+            integrand: integrand as a function of x
+            numgp: Number of integration points to be used
+        """
+        raise NotImplementedError(
+            "Integration is currently not implemented for all elements"
+        )
 
     @staticmethod
     def num_nodes_by_shape(shape: str):
+        """
+        Returns the number of nodes from the shapes
+
+        Args:
+            shape: shape as used in baci .dat file format
+
+        Returngs:
+            int: number of nodes
+        """
         shape_dict = {
             "TET4": 4,
             "TET10": 10,
@@ -349,43 +341,70 @@ class Element:
 
 
 class Element1D(Element):
-
-    """
-    Returns the number of space dimensions
-
-    Returns:
-        Number of space dimensions
-    """
-
     @staticmethod
     def get_space_dim():
+        """
+        Returns the number of space dimensions
+
+        Returns:
+            Number of space dimensions
+        """
         return 1
 
 
 class Element2D(Element):
-    """
-    Returns the number of space dimensions
-
-    Returns:
-        Number of space dimensions
-    """
-
     @staticmethod
     def get_space_dim():
+        """
+        Returns the number of space dimensions
+
+        Returns:
+            Number of space dimensions
+        """
         return 2
 
 
 class Element3D(Element):
-    """
-    Returns the number of space dimensions
-
-    Returns:
-        Number of space dimensions
-    """
-
     @staticmethod
     def get_space_dim():
+        """
+        Returns the number of space dimensions
+
+        Returns:
+            Number of space dimensions
+        """
         return 3
+
+
+class ElementTri(Element2D):
+    @staticmethod
+    def int_points(num_points: int) -> np.ndarray:
+        """
+        Returns the position of the integration points for a given number of integration points
+        """
+        if num_points == 1:
+            return np.array([[1.0 / 3.0, 1.0 / 3.0]])
+        if num_points == 3:
+            return np.array(
+                [[1.0 / 6.0, 1.0 / 6.0], [2.0 / 3.0, 1.0 / 6.0], [1.0 / 6.0, 2.0 / 3.0]]
+            )
+        raise RuntimeError(
+            "The number of integration points provided ({0}) is not supported for TRI elements".format(
+                num_points
+            )
+        )
+
+    @staticmethod
+    def int_weight(num_points: int) -> np.ndarray:
+        if num_points == 1:
+            return np.array([0.5])
+        elif num_points == 3:
+            return np.array([1.0 / 6.0, 1.0 / 6.0, 1.0 / 6.0])
+        raise RuntimeError(
+            "The number of integration points provided ({0}) is not supported for TRI elements".format(
+                num_points
+            )
+        )
 
 
 class ElementTet(Element3D):
