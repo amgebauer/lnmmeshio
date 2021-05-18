@@ -3,13 +3,12 @@ from enum import Enum
 
 
 class Condition:
+    """
+    This class is an abstract definition of an condition.
+    """
+
     def get_line(self):
         raise NotImplementedError("The condition needs to implement get_line!")
-
-
-"""
-This class is an abstract definition of an condition.
-"""
 
 
 class ConditionsType:

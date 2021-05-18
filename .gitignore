@@ -9,3 +9,4 @@ htmlcov
 .tox/*
 .pytest_cache
 junit.xml
+docs/
