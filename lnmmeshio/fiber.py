@@ -12,12 +12,11 @@ from .ioutils import (
 )
 
 
-"""
-Class that holds all information of fibers
-"""
-
-
 class Fiber:
+    """
+    Class that holds all information of fibers
+    """
+
     # defintion of different fibers (add if more are necessary)
     TypeFiber1: str = "fiber1"
     TypeFiber2: str = "fiber2"
@@ -33,24 +32,22 @@ class Fiber:
     TypeRad: str = "rad"
     TypeAxi: str = "axi"
 
-    """
-    Initialize fiber vector in direction of fib
-
-    Args:
-        fib: Unit vector pointing in fiber direction np.array((3))
-    """
-
     def __init__(self, fib: np.ndarray):
+        """
+        Initialize fiber vector in direction of fib
+
+        Args:
+            fib: Unit vector pointing in fiber direction np.array((3))
+        """
         self.fiber = fib
 
-    """
-    Gets the corresponding line in the dat file
-
-    Args:
-        inp_type: type of fiber (defined as static variable)
-    """
-
     def get_line(self, inp_type):
+        """
+        Gets the corresponding line in the dat file
+
+        Args:
+            inp_type: type of fiber (defined as static variable)
+        """
         ftype = None
 
         if inp_type == Fiber.TypeFiber1:
@@ -84,29 +81,27 @@ class Fiber:
 
         return line_option_list({ftype: self.fiber})
 
-    """
-    Writes the corresponding section in the dat file into the stream type variable dest
-
-    Args:
-        dest: stream variable where to write the fiber
-        inp_type: type of fiber (defined as static variable)
-    """
-
     def write(self, dest, inp_type):
+        """
+        Writes the corresponding section in the dat file into the stream type variable dest
+
+        Args:
+            dest: stream variable where to write the fiber
+            inp_type: type of fiber (defined as static variable)
+        """
         dest.write(self.get_line(inp_type))
-
-    """
-    Returns the corresponding fiber type enum from the definition in the dat file
-
-    Args:
-        fstr: Fiber name as defined in the dat file
-
-    Returns:
-        Fiber enum as defined on top of the class
-    """
 
     @staticmethod
     def get_fiber_type(fstr: str):
+        """
+        Returns the corresponding fiber type enum from the definition in the dat file
+
+        Args:
+            fstr: Fiber name as defined in the dat file
+
+        Returns:
+            Fiber enum as defined on top of the class
+        """
         if fstr == "FIBER1":
             return Fiber.TypeFiber1
         elif fstr == "FIBER2":
@@ -136,18 +131,17 @@ class Fiber:
         else:
             return None
 
-    """
-    Parses the fibers from the line and returns a dict of fiber objects
-
-    Args:
-        line: String of the line
-
-    Returns:
-        dict with fiber type as key and fiber object as value
-    """
-
     @staticmethod
     def parse_fibers(line: str) -> dict:
+        """
+        Parses the fibers from the line and returns a dict of fiber objects
+
+        Args:
+            line: String of the line
+
+        Returns:
+            dict with fiber type as key and fiber object as value
+        """
         fibs: dict = {}
         if "FIBER1" in line:
             fibs[Fiber.TypeFiber1] = Fiber(

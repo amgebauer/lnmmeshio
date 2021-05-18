@@ -16,119 +16,110 @@ from .element import Element
 from .parse_element import parse as parse_ele
 
 
-"""
-Class holding all elements in different categories. Current implemented categories are
-
-ElementContainer.structure
-ElementContainer.fluid
-ElementContainer.ale
-ElementContainer.transport
-ElementContainer.thermo
-"""
-
-
 class ElementContainer:
+    """
+    Class holding all elements in different categories. Current implemented categories are
+
+    ElementContainer.structure
+    ElementContainer.fluid
+    ElementContainer.ale
+    ElementContainer.transport
+    ElementContainer.thermo
+    """
+
     TypeStructure: str = "structure"
     TypeFluid: str = "fluid"
     TypeALE: str = "ale"
     TypeTransport: str = "transport"
     TypeThermo: str = "thermo"
 
-    """
-    Initialize element contained
-    """
-
     def __init__(self):
+        """
+        Initialize element contained
+        """
         self.structure: List[Element] = None
         self.fluid: List[Element] = None
         self.ale: List[Element] = None
         self.transport: List[Element] = None
         self.thermo: List[Element] = None
 
-    """
-    Returns the number of structural elements in the discretization
-
-    Returns:
-        int: Number of structural parameters in the discretization
-    """
-
     def get_num_structure(self) -> int:
+        """
+        Returns the number of structural elements in the discretization
+
+        Returns:
+            int: Number of structural parameters in the discretization
+        """
         if self.structure is None:
             return 0
 
         return len(self.structure)
 
-    """
-    Returns the number of fluid elements in the discretization
-
-    Returns:
-        int: Number of fluid parameters in the discretization
-    """
-
     def get_num_fluid(self) -> int:
+        """
+        Returns the number of fluid elements in the discretization
+
+        Returns:
+            int: Number of fluid parameters in the discretization
+        """
         if self.fluid is None:
             return 0
 
         return len(self.fluid)
 
-    """
-    Returns the number of ale elements in the discretization
-
-    Returns:
-        int: Number of ale parameters in the discretization
-    """
-
     def get_num_ale(self) -> int:
+        """
+        Returns the number of ale elements in the discretization
+
+        Returns:
+            int: Number of ale parameters in the discretization
+        """
         if self.ale is None:
             return 0
 
         return len(self.ale)
 
-    """
-    Returns the number of transport elements in the discretization
-
-    Returns:
-        int: Number of transport parameters in the discretization
-    """
-
     def get_num_transport(self) -> int:
+        """
+        Returns the number of transport elements in the discretization
+
+        Returns:
+            int: Number of transport parameters in the discretization
+        """
         if self.transport is None:
             return 0
 
         return len(self.transport)
 
-    """
-    Returns the number of thermo elements in the discretization
-
-    Returns:
-        int: Number of thermo parameters in the discretization
-    """
-
     def get_num_thermo(self) -> int:
+        """
+        Returns the number of thermo elements in the discretization
+
+        Returns:
+            int: Number of thermo parameters in the discretization
+        """
         if self.thermo is None:
             return 0
 
         return len(self.thermo)
 
-    """
-    Write the corresponding sections into the stream like variable dest
-
-    Args:
-        dest: Stream like variable, where to write the corresponding sections
-    """
-
     def write(self, dest):
+        """
+        Write the corresponding sections into the stream like variable dest
+
+        Args:
+            dest: Stream like variable, where to write the corresponding sections
+        """
         ElementContainer.__write_section(dest, "STRUCTURE ELEMENTS", self.structure)
         ElementContainer.__write_section(dest, "FLUID ELEMENTS", self.fluid)
         ElementContainer.__write_section(dest, "ALE ELEMENTS", self.ale)
         ElementContainer.__write_section(dest, "TRANSPORT ELEMENTS", self.transport)
         ElementContainer.__write_section(dest, "THERMO ELEMENTS", self.thermo)
 
-    """
-    Returns an ordereddict of sections with the corresponding lines
-    """
-
     def get_sections(self, out=True):
+        """
+        Returns an ordereddict of sections with the corresponding lines
+        """
         d = OrderedDict()
         for key, elements in self.items():
             d[
@@ -137,14 +128,13 @@ class ElementContainer:
 
         return d
 
-    """
-    Returns a list of List[Elements] for the different element types
-
-    Returns:
-        List[List[Element]]
-    """
-
     def values(self):
+        """
+        Returns a list of List[Elements] for the different element types
+
+        Returns:
+            List[List[Element]]
+        """
         ele_list = []
 
         if self.structure is not None:
@@ -160,24 +150,22 @@ class ElementContainer:
 
         return ele_list
 
-    """
-    Returns a list of tuples with key and values for each element type
-
-    Returns:
-        List[Tuple[str, List[Element]]]
-    """
-
     def items(self):
+        """
+        Returns a list of tuples with key and values for each element type
+
+        Returns:
+            List[Tuple[str, List[Element]]]
+        """
         return zip(self.keys(), self.values())
 
-    """
-    Returns a list of keys of the elemet types
-
-    Returns:
-        List[str]
-    """
-
     def keys(self):
+        """
+        Returns a list of keys of the elemet types
+
+        Returns:
+            List[str]
+        """
         ele_keys = []
 
         if self.structure is not None:
@@ -193,17 +181,16 @@ class ElementContainer:
 
         return ele_keys
 
-    """
-    Returns the list of elements belonging to a type of discretization
-
-    Args:
-        key: str Type of field
-
-    Returns:
-        List[Element]
-    """
-
     def __getitem__(self, key):
+        """
+        Returns the list of elements belonging to a type of discretization
+
+        Args:
+            key: str Type of field
+
+        Returns:
+            List[Element]
+        """
         if key == self.TypeStructure and self.structure is not None:
             return self.structure
         elif key == self.TypeFluid and self.fluid is not None:
@@ -217,17 +204,16 @@ class ElementContainer:
 
         raise KeyError("Key not found: {0}".format(key))
 
-    """
-    Returns the a boolean, whether the field type is available
-
-    Args:
-        key: str Type of field
-
-    Returns:
-        bool
-    """
-
     def __contains__(self, key):
+        """
+        Returns the a boolean, whether the field type is available
+
+        Args:
+            key: str Type of field
+
+        Returns:
+            bool
+        """
         if key == self.TypeStructure and self.structure is not None:
             return True
         elif key == self.TypeFluid and self.fluid is not None:
@@ -241,15 +227,14 @@ class ElementContainer:
 
         return False
 
-    """
-    Returns the list of elements belonging to a type of discretization
-
-    Args:
-        key: str Type of field
-        value: List[Element] List of elements
-    """
-
     def __setitem__(self, key, value):
+        """
+        Returns the list of elements belonging to a type of discretization
+
+        Args:
+            key: str Type of field
+            value: List[Element] List of elements
+        """
         if key == self.TypeStructure:
             self.structure = value
         elif key == self.TypeFluid:
@@ -263,32 +248,30 @@ class ElementContainer:
         else:
             raise KeyError("Key not found: {0}".format(key))
 
-    """
-    Writes the element section with section title and elements. If elements is None,
-    the section is not written at all
-
-    Args:
-        dest: stream like variable to write
-        section_name: string of the section heart
-        elements: List of elements
-    """
-
     @staticmethod
     def __write_section(dest, section_name: str, elements: List[Element]):
+        """
+        Writes the element section with section title and elements. If elements is None,
+        the section is not written at all
+
+        Args:
+            dest: stream like variable to write
+            section_name: string of the section heart
+            elements: List of elements
+        """
         if elements is not None:
             write_title(dest, section_name)
             for line in ElementContainer.__get_section_lines(elements):
                 dest.write("{0}\n".format(line))
 
-    """
-    Writes the elements into an list of lines
-
-    Args:
-        elements: List of elements
-    """
-
     @staticmethod
     def __get_section_lines(elements: List[Element], out=True):
+        """
+        Writes the elements into an list of lines
+
+        Args:
+            elements: List of elements
+        """
         lines = []
         if elements is not None:
             for ele in progress(elements, out=out, label="Write Element"):
@@ -335,19 +318,18 @@ class ElementContainer:
 
         return elec
 
-    """
-    Static method that reads the list of elements
-
-    Args:
-        nodes: List of nodes (order is important: first node in list must be the one with id 1)
-        lines: List of string that represent the lines of the corresponding element section
-
-    Returns:
-        List of elements
-    """
-
     @staticmethod
     def __read_elements(nodes: List[Node], lines: List[str], out=False, fieldtype=None):
+        """
+        Static method that reads the list of elements
+
+        Args:
+            nodes: List of nodes (order is important: first node in list must be the one with id 1)
+            lines: List of string that represent the lines of the corresponding element section
+
+        Returns:
+            List of elements
+        """
         eles = []
 
         if fieldtype is None:

@@ -8,19 +8,17 @@ from .line3 import Line3
 from .quad9 import Quad9
 
 
-"""
-Implementation of a HEX27 element
-"""
-
-
 class Hex27(ElementHex):
+    """
+    Implementation of a HEX27 element
+    """
+
     ShapeName: str = "HEX27"
 
-    """
-    Base constructor of a Hex27 element
-    """
-
     def __init__(self, el_type: str, nodes: List[Node]):
+        """
+        Base constructor of a Hex27 element
+        """
         super(Hex27, self).__init__(el_type, Hex27.ShapeName, nodes)
 
         if len(nodes) != self.get_num_nodes():
@@ -28,24 +26,22 @@ class Hex27(ElementHex):
                 "You tried to created a HEX27 element with {0} nodes".format(len(nodes))
             )
 
-    """
-    Get number of nodes of a HEX27 element
-
-    Returns:
-        Number of nodes of a Hex27 element = 27
-    """
-
     def get_num_nodes(self) -> int:
+        """
+        Get number of nodes of a HEX27 element
+
+        Returns:
+            Number of nodes of a Hex27 element = 27
+        """
         return 27
 
-    """
-    Returns a list of faces of the Hex27 element
-
-    Returns:
-        List of faces
-    """
-
     def get_faces(self) -> List[Quad9]:
+        """
+        Returns a list of faces of the Hex27 element
+
+        Returns:
+            List of faces
+        """
         face_node_ids = [
             [0, 1, 2, 3, 8, 9, 10, 11, 20],
             [0, 1, 5, 4, 8, 13, 16, 12, 21],
@@ -57,14 +53,13 @@ class Hex27(ElementHex):
 
         return [Quad9(None, [self.nodes[i] for i in nodes]) for nodes in face_node_ids]
 
-    """
-    Returns the list of all edges
-
-    Returns:
-        List of edges
-    """
-
     def get_edges(self) -> List[Line3]:
+        """
+        Returns the list of all edges
+
+        Returns:
+            List of edges
+        """
         edge_node_ids = [
             [0, 1, 8],
             [1, 2, 9],
@@ -81,13 +76,11 @@ class Hex27(ElementHex):
         ]
         return [Line3(None, [self.nodes[i] for i in nodes]) for nodes in edge_node_ids]
 
-    """
-    Returns the value of the shape functions at the local coordinate xi
-    """
-
     @staticmethod
     def shape_fcns(xi):
-
+        """
+        Returns the value of the shape functions at the local coordinate xi
+        """
         return np.array(
             [
                 Line3.shape_fcns(xi[0])[0]

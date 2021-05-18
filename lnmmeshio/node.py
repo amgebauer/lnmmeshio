@@ -6,21 +6,18 @@ import numpy as np
 from .fiber import Fiber
 
 
-"""
-Class that holds all information of nodes like coords, fibers, nodesets (and additional data)
-"""
-
-
 class Node:
-
     """
-    Initialize node at the coordinades coords
-
-    Args:
-        coords: np.array((3)) Coordinates of the node
+    Class that holds all information of nodes like coords, fibers, nodesets (and additional data)
     """
 
     def __init__(self, coords: np.ndarray = np.zeros((3))):
+        """
+        Initialize node at the coordinades coords
+
+        Args:
+            coords: np.array((3)) Coordinates of the node
+        """
         self.id = None
         self.coords: np.ndarray = coords
         self.fibers: Dict[str, Fiber] = {}
@@ -31,18 +28,16 @@ class Node:
         self.volumenodesets = []
         self.data = {}
 
-    """
-    Sets the id to None
-    """
-
     def reset(self):
+        """
+        Sets the id to None
+        """
         self.id = None
 
-    """
-    Returns the line definition in the dat file
-    """
-
     def get_line(self):
+        """
+        Returns the line definition in the dat file
+        """
         dest = io.StringIO()
         if len(self.fibers) > 0:
             dest.write("FNODE")
@@ -62,14 +57,13 @@ class Node:
 
         return dest.getvalue()
 
-    """
-    Writes the corresponding line in to the stream variable
-
-    Args:
-        dest: stream variable where to write the line
-    """
-
     def write(self, dest):
+        """
+        Writes the corresponding line in to the stream variable
+
+        Args:
+            dest: stream variable where to write the line
+        """
         if len(self.fibers) > 0:
             dest.write("FNODE")
         else:
