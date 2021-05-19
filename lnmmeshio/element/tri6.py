@@ -57,6 +57,29 @@ class Tri6(ElementTri):
             Line3(None, [self.nodes[2], self.nodes[0], self.nodes[5]]),
         ]
 
+    def integrate_xi(self, integrand, numgp) -> np.ndarray:
+        """
+        Integrates the integrand over the element
+
+        Args:
+            integrand: integrand as a function of xi
+            numgp: Number of integration points to be used
+        """
+        result = np.array(0.0)
+
+        intpoints: np.ndarray = ElementTri.int_points(numgp)
+        intweights: np.ndarray = ElementTri.int_weight(numgp)
+
+        coords = np.array([n.coords for n in self.nodes])
+
+        for xi, w in zip(intpoints, intweights):
+            J = np.matmul(Tri6.shape_fcns_derivs(xi), coords)
+            G = np.matmul(J, J.T)
+            detA = math.sqrt(np.linalg.det(G))
+            result += w * detA * integrand(xi)
+
+        return result
+
     def integrate(self, integrand, numgp) -> np.ndarray:
         """
         Integrates the integrand over the element

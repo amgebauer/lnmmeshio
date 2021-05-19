@@ -57,6 +57,31 @@ class Tri3(ElementTri):
             Line2(None, [self.nodes[2], self.nodes[0]]),
         ]
 
+    def integrate_xi(self, integrand, numgp) -> np.ndarray:
+        """
+        Integrates the integrand over the element
+
+        Args:
+            integrand: integrand as a function of xi
+            numgp: Number of integration points to be used
+        """
+        result = np.array(0.0 * integrand(np.zeros((3))))
+
+        intpoints: np.ndarray = ElementTri.int_points(numgp)
+        intweights: np.ndarray = ElementTri.int_weight(numgp)
+
+        coords = np.array([n.coords for n in self.nodes])
+
+        for xi, w in zip(intpoints, intweights):
+            J = np.matmul(Tri3.shape_fcns_derivs(xi), coords)
+
+            # covariant metric tensor
+            G = np.matmul(J, J.T)
+            detA = math.sqrt(np.linalg.det(G))
+            result += w * detA * integrand(xi)
+
+        return result
+
     def integrate(self, integrand, numgp) -> np.ndarray:
         """
         Integrates the integrand over the element
@@ -83,7 +108,7 @@ class Tri3(ElementTri):
 
         return result
 
-    def get_normal(self):
+    def get_normal(self, xi):
         u = self.nodes[1].coords - self.nodes[0].coords
         v = self.nodes[2].coords - self.nodes[0].coords
         return np.cross(u, v)
