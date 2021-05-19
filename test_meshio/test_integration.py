@@ -147,12 +147,12 @@ class TestFibers(unittest.TestCase):
         tri6 = lnmmeshio.Tri6(
             "T6",
             [
-                lnmmeshio.Node(np.array([0.0, 0.0, 0.0])),
-                lnmmeshio.Node(np.array([1.0, 0.0, 0.0])),
-                lnmmeshio.Node(np.array([2.0, 3.0, 0.0])),
+                lnmmeshio.Node(np.array([-1.0, -2.0, 0.0])),
+                lnmmeshio.Node(np.array([2.0, -2.0, 0.0])),
+                lnmmeshio.Node(np.array([-1.0, 2.0, 0.0])),
+                lnmmeshio.Node(np.array([0.5, -2.0, 0.0])),
                 lnmmeshio.Node(np.array([0.5, 0.0, 0.0])),
-                lnmmeshio.Node(np.array([1.5, 1.5, 0.0])),
-                lnmmeshio.Node(np.array([1.0, 1.5, 0.0])),
+                lnmmeshio.Node(np.array([-1.0, 0.0, 0.0])),
             ],
         )
 

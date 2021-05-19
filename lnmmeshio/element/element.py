@@ -269,7 +269,21 @@ class Element:
         Returns:
             q_x: Quantity at x projected with the shape functions
         """
-        shapefcns = self.shape_fcns(self.get_xi(x))
+
+        return self.project_quantity_xi(self.get_xi(x), q)
+
+    def project_quantity_xi(self, xi: np.ndarray, q: np.ndarray):
+        """
+        Projects the quantity from the nodal quantities q to the local position in reference coordinates xi
+
+        Args:
+            xi: Point in the element in reference coordinates
+            q: Nodal values of the quantities
+
+        Returns:
+            q_x: Quantity at xi projected with the shape functions
+        """
+        shapefcns = self.shape_fcns(xi)
 
         if q.shape[0] != self.get_num_nodes():
             raise ValueError(
