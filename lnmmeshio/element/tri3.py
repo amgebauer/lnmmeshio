@@ -111,7 +111,8 @@ class Tri3(ElementTri):
     def get_normal(self, xi):
         u = self.nodes[1].coords - self.nodes[0].coords
         v = self.nodes[2].coords - self.nodes[0].coords
-        return np.cross(u, v)
+        n = np.cross(u, v)
+        return n / np.linalg.norm(n)
 
     @staticmethod
     def shape_fcns(xi):
