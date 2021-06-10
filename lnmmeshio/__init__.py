@@ -22,6 +22,7 @@ from .element.element import (
     Element3D,
     ElementHex,
     ElementTet,
+    ElementTri,
 )
 from .element.element_container import ElementContainer
 from .element.hex8 import Hex8
