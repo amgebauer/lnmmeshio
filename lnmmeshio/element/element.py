@@ -51,6 +51,14 @@ class Element:
         """
         raise NotImplementedError("This method is not implemented in your element")
 
+    def get_node_coords(self) -> np.ndarray:
+        arr = np.zeros((self.get_num_nodes(), 3))
+
+        for i, node in enumerate(self.nodes):
+            arr[i, :] = node.coords
+
+        return arr
+
     def reset(self):
         """
         Sets the element id to None

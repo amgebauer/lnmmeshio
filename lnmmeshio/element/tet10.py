@@ -86,12 +86,11 @@ class Tet10(ElementTet):
         coords = np.transpose(np.array([n.coords for n in self.nodes]))
         raise NotImplementedError("This is currently not implemented for all elements")
 
-    """
-    Returns the value of the shape functions at the local coordinate xi
-    """
-
     @staticmethod
     def shape_fcns(xi):
+        """
+        Returns the value of the shape functions at the local coordinate xi
+        """
         r = xi[0]
         s = xi[1]
         t = xi[2]
@@ -108,6 +107,59 @@ class Tet10(ElementTet):
                 4.0 * t * u,
                 4.0 * r * t,
                 4.0 * s * t,
+            ]
+        )
+
+    @staticmethod
+    def shape_fcns_derivs(xi):
+        """
+        Returns the value of the derivatives of the shape functions with respect to the local coordinates at the local coordinate xi
+
+        +-                                  -+
+        |  dN_1 / dxi_1   dN_2 / dxi_1, ...  |
+        |  dN_1 / dxi_2   dN_2 / dxi_2, ...  |
+        |  dN_1 / dxi_3   dN_2 / dxi_3, ...  |
+        +-                                  -+
+        """
+        u = 1 - xi[0] - xi[1] - xi[2]
+        return np.array(
+            [
+                [
+                    -4 * u + 1,
+                    4 * xi[0] - 1,
+                    0,
+                    0,
+                    4 * (u - xi[0]),
+                    4 * xi[1],
+                    -4 * xi[1],
+                    -4 * xi[2],
+                    4 * xi[2],
+                    0,
+                ],
+                [
+                    -4 * u + 1,
+                    0,
+                    4 * xi[1] - 1,
+                    0,
+                    -4 * xi[0],
+                    4 * xi[0],
+                    4 * (u - xi[1]),
+                    -4 * xi[2],
+                    0,
+                    4 * xi[2],
+                ],
+                [
+                    -4 * u + 1,
+                    0,
+                    0,
+                    4 * xi[2] - 1,
+                    -4 * xi[0],
+                    0,
+                    -4 * xi[1],
+                    4 * (u - xi[2]),
+                    4 * xi[0],
+                    4 * xi[1],
+                ],
             ]
         )
 
