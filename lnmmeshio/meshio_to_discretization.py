@@ -29,6 +29,7 @@ from .progress import progress
 cell_nodes = {
     "line": 2,
     "triangle": 3,
+    "triangle6": 6,
     "tetra": 4,
     "tetra10": 10,
     "pyramid": 5,
@@ -44,6 +45,7 @@ cell_nodes = {
 cell_disc_eles = {
     "line": "UNKNOWN",
     "triangle": "UNKNOWN",
+    "triangle6": "UNKNOWN",
     "tetra": "SOLIDT4",
     "tetra10": "SOLIDT10",
     "pyramid": "PYRAMID5",
@@ -58,6 +60,7 @@ cell_disc_eles = {
 cell_disc_shape = {
     "line": "LINE2",
     "triangle": "TRI3",
+    "triangle6": "TRI6",
     "tetra": "TET4",
     "tetra10": "TET10",
     "pyramid": "PYRAMID5",
@@ -96,6 +99,7 @@ cell_to_dim = {
 ele_node_order_vtk2baci = {
     "LINE2": list(range(0, 2)),
     "TRI3": list(range(0, 3)),
+    "TRI6": list(range(0, 6)),
     "TET4": list(range(0, 4)),
     "TET10": list(range(0, 10)),
     "PYRAMID5": list(range(0, 5)),
