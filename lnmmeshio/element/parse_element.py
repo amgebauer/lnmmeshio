@@ -25,6 +25,7 @@ from .tet4 import Tet4
 from .tet10 import Tet10
 from .tri3 import Tri3
 from .tri6 import Tri6
+from .vertex import Vertex
 
 RegExEle = re.compile(r"^[ ]*([0-9]+)[ ]+(\S+)[ ]+(\S+)[ ]+")
 
@@ -45,7 +46,9 @@ def create_element(
         Element of the specific type
     """
 
-    if ele_shape == Line2.ShapeName:
+    if ele_shape == Vertex.ShapeName:
+        ele = Vertex(ele_type, ele_nodes)
+    elif ele_shape == Line2.ShapeName:
         ele = Line2(ele_type, ele_nodes)
     elif ele_shape == Line3.ShapeName:
         ele = Line3(ele_type, ele_nodes)
