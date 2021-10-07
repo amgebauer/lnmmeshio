@@ -27,6 +27,7 @@ from .nodeset import (
 from .progress import progress
 
 cell_nodes = {
+    "vertex": 1,
     "line": 2,
     "triangle": 3,
     "triangle6": 6,
@@ -43,6 +44,7 @@ cell_nodes = {
 }
 
 cell_disc_eles = {
+    "vertex": "UNKNOWN",
     "line": "UNKNOWN",
     "triangle": "UNKNOWN",
     "triangle6": "UNKNOWN",
@@ -58,6 +60,7 @@ cell_disc_eles = {
 }
 
 cell_disc_shape = {
+    "vertex": "VERTEX1",
     "line": "LINE2",
     "triangle": "TRI3",
     "triangle6": "TRI6",
@@ -97,6 +100,7 @@ cell_to_dim = {
 # meshio used vtk node ordering
 # with this array, we reorder the nodes
 ele_node_order_vtk2baci = {
+    "VERTEX1": list(range(0, 1)),
     "LINE2": list(range(0, 2)),
     "TRI3": list(range(0, 3)),
     "TRI6": list(range(0, 6)),
@@ -320,21 +324,22 @@ def discretization2mesh(dis: Discretization) -> meshio.Mesh:
                 axis=0,
             )
             # store material id
-            for variable_name in _cell_data_id_names:
-                if variable_name not in cell_data:
-                    cell_data[variable_name] = []
+            if "MAT" in ele.options:
+                for variable_name in _cell_data_id_names:
+                    if variable_name not in cell_data:
+                        cell_data[variable_name] = []
 
-                if newgroup:
-                    cell_data[variable_name].append(np.array([], dtype=int))
+                    if newgroup:
+                        cell_data[variable_name].append(np.array([], dtype=int))
 
-                cell_data[variable_name][-1] = np.append(
-                    cell_data[variable_name][-1],
-                    int(
-                        ele.options["MAT"][0]
-                        if _isiter(ele.options["MAT"])
-                        else ele.options["MAT"]
-                    ),
-                )
+                    cell_data[variable_name][-1] = np.append(
+                        cell_data[variable_name][-1],
+                        int(
+                            ele.options["MAT"][0]
+                            if _isiter(ele.options["MAT"])
+                            else ele.options["MAT"]
+                        ),
+                    )
 
             for variable_name, value in ele.data.items():
                 value_reshaped = np.array(value).reshape((-1))

@@ -326,6 +326,7 @@ class Element:
             int: number of nodes
         """
         shape_dict = {
+            "VERTEX1": 1,
             "TET4": 4,
             "TET10": 10,
             "PYRAMID5": 5,
@@ -360,6 +361,18 @@ class Element:
         Returns the position of the integration points for a given number of integration points
         """
         raise NotImplementedError("This element has not implemented integration points")
+
+
+class Element0D(Element):
+    @staticmethod
+    def get_space_dim():
+        """
+        Returns the number of space dimensions
+
+        Returns:
+            Number of space dimensions
+        """
+        return 0
 
 
 class Element1D(Element):

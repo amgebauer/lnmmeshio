@@ -191,6 +191,8 @@ def _write_case(fstream, geofile, ele_vars_props, nodal_vars_props):
     fstream.write("VARIABLE\n\n")
     # Todo variables
     for varname, props in ele_vars_props.items():
+        if props["dim"] not in dim_to_type:
+            continue
         fstream.write(
             "{0} per {1}:\t{2}\t{3}\t{4}\t{5}\n".format(
                 dim_to_type[props["dim"]],
@@ -203,6 +205,8 @@ def _write_case(fstream, geofile, ele_vars_props, nodal_vars_props):
         )
 
     for varname, props in nodal_vars_props.items():
+        if props["dim"] not in dim_to_type:
+            continue
         fstream.write(
             "{0} per {1}:\t{2}\t{3}\t{4}\t{5}\n".format(
                 dim_to_type[props["dim"]],

@@ -3,7 +3,6 @@ import unittest
 
 import numpy as np
 import sympy as sp
-
 from lnmmeshio import (
     Element,
     Element1D,
@@ -21,6 +20,7 @@ from lnmmeshio import (
     Tet10,
     Tri3,
     Tri6,
+    Vertex,
 )
 from lnmmeshio.element.parse_element import parse as parse_ele
 from lnmmeshio.node import Node
@@ -626,3 +626,6 @@ class TestEles(unittest.TestCase):
 
         self.__test_ele("LINE3", Line3, 3, [], None, EDGES, Line3)
         self._test_ele_shpfcns(Line3, [-1.0, 1.0, 0.0])
+
+    def test_vertex1(self):
+        self.__test_ele("VERTEX1", Vertex, 1, [], None, [], None)

@@ -37,6 +37,7 @@ from .element.tet4 import Tet4
 from .element.tet10 import Tet10
 from .element.tri3 import Tri3
 from .element.tri6 import Tri6
+from .element.vertex import Vertex
 from .fiber import Fiber
 from .node import Node
 from .nodeset import LineNodeset, PointNodeset, SurfaceNodeset, VolumeNodeset
