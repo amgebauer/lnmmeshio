@@ -344,8 +344,12 @@ class ElementContainer:
 
             eles.append(ele)
 
-            # safety check for integrity of the dat file
-            if int(ele.id) != len(eles):
+            # safety check for integrity of the dat file:
+            # ids must increase continuously by +1 from first id
+            if len(eles) == 1:
+                first_id = eles[0].id
+                id_offset = first_id - 1
+            if int(ele.id) - id_offset != len(eles):
                 raise RuntimeError(
                     "Element ids in dat file have a gap at {0}!={1}!".format(
                         ele.id, len(eles)
