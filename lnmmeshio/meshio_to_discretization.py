@@ -240,6 +240,16 @@ def mesh2Discretization(mesh: meshio.Mesh) -> Discretization:
                 for key, data in mesh.cell_data.items():
                     ele.data[key] = data[cellgroupid][cellid]
 
+                # # create surface-nodesets
+                if maxdim == 2:
+                    nsid: int = int(
+                        _get_nodesetid_from_cell_data(
+                            mesh.cell_data, cellgroupid, cellid
+                        )
+                    )
+                    for node in nodes:
+                        surfnsbuilder.add(node, nsid)
+
             else:
                 # this is a lower-dimensional element
                 # treat as surface-, line- or point-nodeset definition
