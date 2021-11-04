@@ -177,7 +177,7 @@ class VolumeNodeset(Nodeset):
 
     @staticmethod
     def get_typename_long():
-        return "VOLUME"
+        return "VOL"
 
     @staticmethod
     def get_typename_short():
