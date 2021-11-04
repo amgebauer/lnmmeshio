@@ -513,3 +513,32 @@ class ElementHex(Element3D):
             return False
 
         return True
+
+    @staticmethod
+    def int_points(num_points):
+        """
+        Returns the position of the integration points for a given number of integration points
+        """
+        if num_points == 8:
+            xi = 1.0 / math.sqrt(3.0)
+
+            return (
+                np.array(
+                    [
+                        [-1, -1, -1],
+                        [1, -1, -1],
+                        [1, 1, -1],
+                        [-1, 1, -1],
+                        [-1, -1, 1],
+                        [1, -1, 1],
+                        [1, 1, 1],
+                        [-1, 1, 1],
+                    ]
+                )
+                * xi
+            )
+        raise RuntimeError(
+            "The number of integration points provided ({0}) is not supported for HEX elements".format(
+                num_points
+            )
+        )
