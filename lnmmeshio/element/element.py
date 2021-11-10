@@ -430,7 +430,7 @@ class ElementTri(Element2D):
         )
 
     @staticmethod
-    def int_weight(num_points: int) -> np.ndarray:
+    def int_weights(num_points: int) -> np.ndarray:
         if num_points == 1:
             return np.array([0.5])
         elif num_points == 3:
@@ -470,10 +470,24 @@ class ElementTet(Element3D):
         return True
 
     @staticmethod
+    def int_weights(num_points):
+        """
+        Returns the integration weights for the integration points
+        """
+        if num_points == 1:
+            return np.array([1.0 / 6.0])
+        elif num_points == 4:
+            return np.array(
+                [1.0 / 6.0 / 4.0, 1.0 / 6.0 / 4.0, 1.0 / 6.0 / 4.0, 1.0 / 6.0 / 4.0]
+            )
+
+    @staticmethod
     def int_points(num_points):
         """
         Returns the position of the integration points for a given number of integration points
         """
+        if num_points == 1:
+            return np.array([0.25, 0.25, 0.25])
         if num_points == 4:
             palpha = (5.0 + 3.0 * math.sqrt(5.0)) / 20.0
             pbeta = (5.0 - math.sqrt(5.0)) / 20.0
