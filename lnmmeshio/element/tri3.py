@@ -68,7 +68,7 @@ class Tri3(ElementTri):
         result = np.array(0.0 * integrand(np.zeros((3))))
 
         intpoints: np.ndarray = ElementTri.int_points(numgp)
-        intweights: np.ndarray = ElementTri.int_weight(numgp)
+        intweights: np.ndarray = ElementTri.int_weights(numgp)
 
         coords = np.array([n.coords for n in self.nodes])
 
