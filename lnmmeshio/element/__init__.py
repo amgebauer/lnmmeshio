@@ -1,7 +1,15 @@
 from typing import List
 
 from .. import node
-from .element import Element, Element1D, Element2D, Element3D, ElementHex, ElementTet
+from .element import (
+    Element,
+    Element1D,
+    Element2D,
+    Element3D,
+    ElementHex,
+    ElementTet,
+    ElementTri,
+)
 from .parse_element import create_element
 
 
