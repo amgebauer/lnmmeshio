@@ -14,7 +14,11 @@ test:
     reports:
       junit: junit.xml
   rules:
-    - when: always
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: on_success
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      when: on_success
+    - when: never
 
 version_check:
   stage: test
@@ -25,7 +29,7 @@ version_check:
     - echo Try to install this version via pip
     - if pip install lnmmeshio==$VERSION --index-url=https://pypi.python.org/simple/ --extra-index-url=https://lnm-heartgroup.pages.gitlab.lrz.de/packages/; then echo Version does already exist; exit 1; else echo Version is unique; fi
   rules:
-    - if: $CI_MERGE_REQUEST_ID
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       when: on_success
     - when: never
 
