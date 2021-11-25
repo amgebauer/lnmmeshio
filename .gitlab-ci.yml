@@ -4,7 +4,7 @@ before_script:
   - python3.8 -m venv venv
   - . venv/bin/activate
 
-test:
+.test: &test
   stage: test
   script:
     - pip install -r requirements-dev.txt --index-url=https://pypi.python.org/simple/ --extra-index-url=https://lnm-heartgroup.pages.gitlab.lrz.de/packages/
@@ -13,12 +13,27 @@ test:
   artifacts:
     reports:
       junit: junit.xml
+
+test_master:
+  <<: *test
+  script:
+    - pip install -r requirements-dev.txt --index-url=https://pypi.python.org/simple/ --extra-index-url=https://lnm-heartgroup.pages.gitlab.lrz.de/packages/
+    - tox
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      when: on_success
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
       when: on_success
     - when: never
+
+test_mr:
+  <<: *test
+  script:
+    - pip install -r requirements-dev.txt --index-url=https://pypi.python.org/simple/ --extra-index-url=https://lnm-heartgroup.pages.gitlab.lrz.de/packages/
+    - tox -e py37
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: on_success
+    - when: never
+
 
 version_check:
   stage: test
@@ -36,7 +51,7 @@ version_check:
 pages:
   stage: deploy
   dependencies:
-    - test
+    - test_mr
   script:
     - pip install -r requirements-dev.txt --index-url=https://pypi.python.org/simple/ --extra-index-url=https://lnm-heartgroup.pages.gitlab.lrz.de/packages/
     - pdoc -o ./docs/ -d numpy -n lnmmeshio
