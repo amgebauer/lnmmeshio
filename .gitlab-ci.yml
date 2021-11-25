@@ -3,12 +3,12 @@ image: python:3.7
 before_script:
   - python3.8 -m venv venv
   - . venv/bin/activate
-  - pip install -r requirements-dev.txt --index-url=https://pypi.python.org/simple/ --extra-index-url=https://lnm-heartgroup.pages.gitlab.lrz.de/packages/
 
 test:
   stage: test
   script:
-  - tox
+    - pip install -r requirements-dev.txt --index-url=https://pypi.python.org/simple/ --extra-index-url=https://lnm-heartgroup.pages.gitlab.lrz.de/packages/
+    - tox
   coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
   artifacts:
     reports:
@@ -34,6 +34,7 @@ pages:
   dependencies:
     - test
   script:
+    - pip install -r requirements-dev.txt --index-url=https://pypi.python.org/simple/ --extra-index-url=https://lnm-heartgroup.pages.gitlab.lrz.de/packages/
     - pdoc -o ./docs/ -d numpy -n lnmmeshio
     - coverage run --source=lnmmeshio -m unittest discover test_meshio
     - coverage html
