@@ -6,34 +6,40 @@ before_script:
 
 .test: &test
   stage: test
+  variables:
+    PYTHON_VERSION: ""
   script:
-    - pip install -r requirements-dev.txt --index-url=https://pypi.python.org/simple/ --extra-index-url=https://lnm-heartgroup.pages.gitlab.lrz.de/packages/
-    - tox
+  - pip install tox
+  - rm -rf .tox/
+  - rm -rf junit.xml
+  - tox -e $PYTHON_VERSION
   coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
+  rules:
+    - when: always
   artifacts:
     reports:
       junit: junit.xml
 
-test_master:
+test_python_3.7:
   <<: *test
-  script:
-    - pip install -r requirements-dev.txt --index-url=https://pypi.python.org/simple/ --extra-index-url=https://lnm-heartgroup.pages.gitlab.lrz.de/packages/
-    - tox
+  variables:
+    PYTHON_VERSION: "py37"
   rules:
-    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
-      when: on_success
-    - when: never
+    - when: always
 
-test_mr:
+test_python_3.8:
   <<: *test
-  script:
-    - pip install -r requirements-dev.txt --index-url=https://pypi.python.org/simple/ --extra-index-url=https://lnm-heartgroup.pages.gitlab.lrz.de/packages/
-    - tox -e py37
+  variables:
+    PYTHON_VERSION: "py38"
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      when: on_success
-    - when: never
+    - when: always
 
+test_python_3.9:
+  <<: *test
+  variables:
+    PYTHON_VERSION: "py39"
+  rules:
+    - when: always
 
 version_check:
   stage: test
@@ -42,38 +48,34 @@ version_check:
     - VERSION=$(cat VERSION)
     - echo Version is $VERSION
     - echo Try to install this version via pip
-    - if pip install lnmmeshio==$VERSION --index-url=https://pypi.python.org/simple/ --extra-index-url=https://lnm-heartgroup.pages.gitlab.lrz.de/packages/; then echo Version does already exist; exit 1; else echo Version is unique; fi
+    - if pip install $PACKAGE_NAME==$VERSION --index-url=https://pypi.python.org/simple/ --extra-index-url=https://lnm-heartgroup.pages.gitlab.lrz.de/packages/; then echo Version does already exist; exit 1; else echo Version is unique; fi
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: '$CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "merge_request_event"'
       when: on_success
     - when: never
 
+
 pages:
   stage: deploy
-  dependencies:
-    - test_mr
   script:
     - pip install -r requirements-dev.txt --index-url=https://pypi.python.org/simple/ --extra-index-url=https://lnm-heartgroup.pages.gitlab.lrz.de/packages/
-    - pdoc -o ./docs/ -d numpy -n lnmmeshio
-    - coverage run --source=lnmmeshio -m unittest discover test_meshio
+    - coverage run --source=$PACKAGE_NAME -m unittest discover test_$PACKAGE_NAME
     - coverage html
-    - mkdir -p public
-    - mv htmlcov public/coverage
-    - mv docs public/docs
+    - mv htmlcov/ public/
   artifacts:
     paths:
       - public
     expire_in: 30 days
   rules:
-    - if: '$CI_COMMIT_BRANCH == "master"'
+    - if: '$CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE != "schedule" && $CI_PIPELINE_SOURCE != "web"'
       when: on_success
     - when: never
 
 trigger_pypi:
   stage: deploy
   script:
-  - "curl --request POST --form token=$TRIGGER_PYPI_TOKEN --form ref=master https://gitlab.lrz.de/api/v4/projects/50609/trigger/pipeline"
+    - "curl --request POST --form token=$TRIGGER_PYPI_TOKEN --form ref=master https://gitlab.lrz.de/api/v4/projects/50609/trigger/pipeline"
   rules:
-    - if: '$CI_COMMIT_BRANCH == "master"'
+    - if: '$CI_COMMIT_BRANCH == "master" && ($CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "merge_request_event")'
       when: on_success
     - when: never
