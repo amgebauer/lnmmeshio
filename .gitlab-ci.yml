@@ -32,18 +32,14 @@ test_python_3.8:
   variables:
     PYTHON_VERSION: "py38"
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "web"'
-      when: always
-    - when: never
+    - when: always
 
 test_python_3.9:
   <<: *test
   variables:
     PYTHON_VERSION: "py39"
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "web"'
-      when: always
-    - when: never
+    - when: always
 
 version_check:
   stage: test
