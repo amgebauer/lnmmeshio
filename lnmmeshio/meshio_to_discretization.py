@@ -241,7 +241,7 @@ def mesh2Discretization(mesh: meshio.Mesh) -> Discretization:
                     ele.data[key] = data[cellgroupid][cellid]
 
                 # # create surface-nodesets
-                if maxdim == 2:
+                if maxdim == 2 and len(mesh.cell_data) > 0:
                     nsid: int = int(
                         _get_nodesetid_from_cell_data(
                             mesh.cell_data, cellgroupid, cellid
