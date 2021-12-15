@@ -14,6 +14,7 @@ shape_to_eletype: Dict[str, str] = {
     "HEX8": "hexa8",
     "HEX20": "hexa20",
     "HEX27": "hexa27",
+    "QUAD4": "quad4",
     "TRI3": "tria3",
     "LINE2": "bar2",
 }
