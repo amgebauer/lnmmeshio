@@ -1,10 +1,9 @@
 import os
-from typing import Dict
+from typing import IO, Any, Dict, List, Tuple
 
 import numpy as np
 
 from . import ioutils as io
-from .datfile import Datfile
 from .discretization import Discretization
 from .progress import progress
 
@@ -20,7 +19,7 @@ shape_to_eletype: Dict[str, str] = {
 }
 
 
-def get_unique_filename(filename):
+def get_unique_filename(filename: str) -> str:
     splitted = os.path.splitext(filename)
 
     # write geometry file
@@ -33,8 +32,14 @@ def get_unique_filename(filename):
     return fname
 
 
-def write_case(filename, dat: Datfile, binary=True, override=False, out=True):
-    dat.compute_ids(False)
+def write_case(
+    filename,
+    dis: Discretization,
+    binary: bool = True,
+    override: bool = False,
+    out: bool = True,
+) -> None:
+    dis.compute_ids(False)
     filedir = os.path.dirname(filename)
 
     basename = os.path.splitext(os.path.basename(filedir))[0]
@@ -48,13 +53,13 @@ def write_case(filename, dat: Datfile, binary=True, override=False, out=True):
         )
 
     with open(geofile, "w{0}".format("b" if binary else "")) as f:
-        write_geometry(f, dat.discretization, binary=binary, out=out)
+        write_geometry(f, dis, binary=binary, out=out)
 
     # A variable is supposed to be transient if len(shape) == 3 (time component is first index)
     # write element variables
     ele_count = {}
     # get number of elements for each type
-    for eles in dat.discretization.elements.values():
+    for eles in dis.elements.values():
         for ele in eles:
             if ele.shape not in shape_to_eletype:
                 raise NotImplementedError(
@@ -70,9 +75,7 @@ def write_case(filename, dat: Datfile, binary=True, override=False, out=True):
     # build element variables
     ele_vars = {}
     ele_cur_count = {}
-    for eles in progress(
-        dat.discretization.elements.values(), out=out, label="Prepare element data"
-    ):
+    for eles in progress(dis.elements.values(), out=out, label="Prepare element data"):
         for ele in eles:
             if ele.shape not in shape_to_eletype:
                 raise NotImplementedError(
@@ -119,15 +122,11 @@ def write_case(filename, dat: Datfile, binary=True, override=False, out=True):
             (
                 ele_vars_props[varname]["timesteps"],
                 ele_vars_props[varname]["dim"],
-            ) = write_element_variable(
-                f, dat.discretization, varname, data, binary=binary
-            )
+            ) = write_element_variable(f, dis, varname, data, binary=binary)
 
     # write nodal variables
     nodal_vars = {}
-    for i, node in progress(
-        enumerate(dat.discretization.nodes), out=out, label="Prepare nodal data"
-    ):
+    for i, node in progress(enumerate(dis.nodes), out=out, label="Prepare nodal data"):
         for varname, data in node.data.items():
             # ensure that data is a np array
             data = np.array(data)
@@ -135,7 +134,7 @@ def write_case(filename, dat: Datfile, binary=True, override=False, out=True):
                 data = data.reshape((1))
             if varname not in nodal_vars:
                 nodal_vars[varname] = np.zeros(
-                    tuple([len(dat.discretization.nodes)] + list(data.shape)),
+                    tuple([len(dis.nodes)] + list(data.shape)),
                     dtype=data.dtype,
                 )
 
@@ -159,7 +158,7 @@ def write_case(filename, dat: Datfile, binary=True, override=False, out=True):
             (
                 nodal_vars_props[varname]["timesteps"],
                 nodal_vars_props[varname]["dim"],
-            ) = write_node_variable(f, dat.discretization, varname, data, binary=binary)
+            ) = write_node_variable(f, dis, varname, data, binary=binary)
 
     # write case file
     if override:
@@ -170,7 +169,12 @@ def write_case(filename, dat: Datfile, binary=True, override=False, out=True):
         _write_case(f, os.path.basename(geofile), ele_vars_props, nodal_vars_props)
 
 
-def _write_case(fstream, geofile, ele_vars_props, nodal_vars_props):
+def _write_case(
+    fstream: IO,
+    geofile: str,
+    ele_vars_props: Dict[str, Dict[str, Any]],
+    nodal_vars_props: Dict[str, Dict[str, Any]],
+) -> None:
 
     sets = {1: 1}
     dim_to_type = {1: "scalar", 3: "vector", 6: "tensor symm"}
@@ -249,7 +253,9 @@ def get_timeset_entry(id, count):
     return entry
 
 
-def write_geometry(fstream, dis: Discretization, binary=True, out=True):
+def write_geometry(
+    fstream: IO, dis: Discretization, binary: bool = True, out: bool = True
+) -> None:
     if binary:
         io.ens_write_string(fstream, "C Binary", binary=True)
 
@@ -293,8 +299,12 @@ def write_geometry(fstream, dis: Discretization, binary=True, out=True):
 
 
 def write_element_variable(
-    fstream, dis: Discretization, varname: str, data: Dict[str, np.array], binary=True
-):
+    fstream: IO,
+    dis: Discretization,
+    varname: str,
+    data: Dict[str, np.ndarray],
+    binary: bool = True,
+) -> Tuple[int, int]:
     if binary:
         io.ens_write_string(fstream, "C Binary", binary=True)
 
@@ -335,6 +345,11 @@ def write_element_variable(
                 )
             )
 
+    if ts is None:
+        raise RuntimeError("Timestep is None")
+    if dim is None:
+        raise RuntimeError("dim is None")
+
     for t in range(ts):
         io.ens_write_string(fstream, "BEGIN TIME STEP", binary=binary)
         io.ens_write_string(fstream, "description", binary=binary)
@@ -351,8 +366,12 @@ def write_element_variable(
 
 
 def write_node_variable(
-    fstream, dis: Discretization, varname: str, data: np.array, binary=True
-):
+    fstream: IO,
+    dis: Discretization,
+    varname: str,
+    data: np.ndarray,
+    binary: bool = True,
+) -> Tuple[int, int]:
     if binary:
         io.ens_write_string(fstream, "C Binary", binary=True)
 

@@ -3,9 +3,8 @@ import os
 import shutil
 import unittest
 
-import numpy as np
-
 import lnmmeshio
+import numpy as np
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 
@@ -75,10 +74,14 @@ class TestMimicsStlIO(unittest.TestCase):
         mesh = lnmmeshio.Mesh(points, cells, cell_data=cell_data)
 
         lnmmeshio.write_mesh(
-            os.path.join(script_dir, "tmp", "dummy.mesh"), mesh, file_format="gmsh",
+            os.path.join(script_dir, "tmp", "dummy.mesh"),
+            mesh,
+            file_format="gmsh",
         )
         lnmmeshio.write_mesh(
-            os.path.join(script_dir, "tmp", "dummy.stl"), mesh, file_format="mimicsstl",
+            os.path.join(script_dir, "tmp", "dummy.stl"),
+            mesh,
+            file_format="mimicsstl",
         )
 
         # self.assertTrue(

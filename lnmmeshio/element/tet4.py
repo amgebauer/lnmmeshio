@@ -2,7 +2,6 @@ from typing import List
 
 import numpy as np
 
-from .. import utils
 from ..node import Node
 from .element import ElementTet
 from .line2 import Line2
@@ -98,7 +97,23 @@ class Tet4(ElementTet):
         |  dN_1 / dxi_3   dN_2 / dxi_3, ...  |
         +-                                  -+
         """
-        return np.array([[-1, 1, 0, 0,], [-1, 0, 1, 0], [-1, 0, 0, 1,],])
+        return np.array(
+            [
+                [
+                    -1,
+                    1,
+                    0,
+                    0,
+                ],
+                [-1, 0, 1, 0],
+                [
+                    -1,
+                    0,
+                    0,
+                    1,
+                ],
+            ]
+        )
 
     @staticmethod
     def nodal_reference_coordinates():

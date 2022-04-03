@@ -1,23 +1,12 @@
 from collections import OrderedDict
-from typing import Dict, List
+from typing import IO, TYPE_CHECKING, Dict, List, Set
 
 import numpy as np
 
+from .element.element import Element1D, Element2D, Element3D
 from .element.element_container import ElementContainer
 from .fiber import Fiber
-from .ioutils import (
-    line_comment,
-    line_option,
-    line_option_list,
-    line_title,
-    read_next_key,
-    read_next_option,
-    read_next_value,
-    read_option_item,
-    write_option,
-    write_option_list,
-    write_title,
-)
+from .ioutils import line_option, read_option_item, read_option_items, write_title
 from .node import Node
 from .nodeset import LineNodeset, PointNodeset, SurfaceNodeset, VolumeNodeset
 from .progress import progress
@@ -42,7 +31,7 @@ class Discretization:
         self.surfacenodesets: List[SurfaceNodeset] = []
         self.volumenodesets: List[VolumeNodeset] = []
 
-    def compute_ids(self, zero_based: bool):
+    def compute_ids(self, zero_based: bool) -> None:
         """
         Computes the ids of the elements and nodes.
 
@@ -81,7 +70,7 @@ class Discretization:
             ns.id = id
             id += 1
 
-    def reset(self):
+    def reset(self) -> None:
         """
         Resets the computed ids
         """
@@ -101,11 +90,11 @@ class Discretization:
         for ns in self.volumenodesets:
             ns.reset()
 
-    def get_node_coords(self):
+    def get_node_coords(self) -> np.ndarray:
         """
         Returns an np.array((num_node, 3)) with the coordinates of each node
         """
-        arr: np.array = np.zeros((len(self.nodes), 3))
+        arr: np.ndarray = np.zeros((len(self.nodes), 3))
 
         i: int = 0
         for node in self.nodes:
@@ -114,15 +103,15 @@ class Discretization:
 
         return arr
 
-    def get_dsurf_elements(self, id):
+    def get_dsurf_elements(self, id: int) -> List[Element2D]:
         """
         Returns a list of surface elements that belong to a dsurf
         """
-        face_elements = []
-        added_faces = set()
+        face_elements: List[Element2D] = []
+        added_faces: Set[str] = set()
 
         self.compute_ids(True)
-        nodeset_ids = set([n.id for n in self.surfacenodesets[id]])
+        nodeset_ids: Set[int] = set([n.id for n in self.surfacenodesets[id]])
 
         for ele in self.elements.structure:
 
@@ -136,17 +125,20 @@ class Discretization:
 
         return face_elements
 
-    def get_dvol_elements(self, id):
+    def get_dvol_elements(self, id: int) -> List[Element3D]:
         """
         Returns a list of volume elements that belong to a dvol
         """
-        vol_elements = []
-        added_vols = set()
+        vol_elements: List[Element3D] = []
+        added_vols: Set[str] = set()
 
         self.compute_ids(True)
-        nodeset_ids = set([n.id for n in self.volumenodesets[id]])
+        nodeset_ids: Set[int] = set([n.id for n in self.volumenodesets[id]])
 
         for ele in self.elements.structure:
+
+            if not isinstance(ele, Element3D):
+                continue
 
             node_ids = [n.id for n in ele.nodes]
             if all([node_id in nodeset_ids for node_id in node_ids]):
@@ -156,7 +148,7 @@ class Discretization:
                     added_vols.add(vol_id)
         return vol_elements
 
-    def get_sections(self, out=True):
+    def get_sections(self, out=True) -> Dict[str, List[str]]:
         self.compute_ids(zero_based=False)
 
         sections = OrderedDict()
@@ -226,7 +218,7 @@ class Discretization:
 
         return sections
 
-    def write(self, dest, out=True):
+    def write(self, dest: IO, out: bool = True) -> None:
         """
         Writes the discretization related sections into the stream variable dest
 
@@ -240,7 +232,7 @@ class Discretization:
             for l in lines:
                 dest.write("{0}\n".format(l))
 
-    def finalize(self):
+    def finalize(self) -> None:
         """
         Finalizes the discretization by creating internal references
         """
@@ -297,7 +289,7 @@ class Discretization:
                 # this is not a node, probably a comment
                 continue
 
-            coords_str, _ = read_option_item(line, "COORD", num=3)
+            coords_str, _ = read_option_items(line, "COORD", num=3)
 
             coords = np.array([float(i) for i in coords_str])
 
@@ -348,7 +340,7 @@ class Discretization:
         disc.finalize()
         return disc
 
-    def __str__(self):
+    def __str__(self) -> str:
         s = ""
         s += "Discretization with ...\n"
         s += "{0:>10} nodes\n".format(len(self.nodes))

@@ -1,42 +1,45 @@
+from typing import IO, Iterator, List, Optional, Set
+
 from .ioutils import read_option_item, write_title
+from .node import Node
 from .progress import progress
 
 
 class Nodeset:
-    def __init__(self, id, name=None):
-        self.id = id
-        self.nodes = set()
-        self.name = name
+    def __init__(self, id: int, name: Optional[str] = None):
+        self.id: Optional[int] = id
+        self.nodes: Set[Node] = set()
+        self.name: Optional[str] = name
 
     @staticmethod
-    def get_typename_long():
+    def get_typename_long() -> str:
         raise NotImplementedError("Need to implement get_typename_long()")
 
     @staticmethod
-    def get_typename_short():
+    def get_typename_short() -> str:
         raise NotImplementedError("Need to implement get_typename_short()")
 
-    def reset(self):
+    def reset(self) -> None:
         self.id = None
 
-    def add_node(self, node):
+    def add_node(self, node: Node) -> None:
         if node not in self.nodes:
             self.nodes.add(node)
 
-    def add_nodes(self, nodes):
+    def add_nodes(self, nodes: List[Node]) -> None:
         for n in nodes:
             self.nodes.add(n)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.nodes)
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator:
         return iter(self.nodes)
 
-    def __getitem__(self, x):
+    def __getitem__(self, x: int) -> Node:
         return list(self.nodes)[x]
 
-    def get_lines(self):
+    def get_lines(self) -> List[str]:
         lines = []
         for n in self:
             lines.append(
@@ -47,12 +50,12 @@ class Nodeset:
 
         return lines
 
-    def write(self, dest):
+    def write(self, dest: IO) -> None:
         for l in self.get_lines():
             dest.write("{0}\n".format(l))
 
-    @staticmethod
-    def base_read(lines, nodes, nodeset_cls, out=False):
+    @classmethod
+    def read(cls, lines: List[str], nodes, out: bool = False) -> List["Nodeset"]:
         id2pos = {}
         nodesets = []
 
@@ -69,31 +72,26 @@ class Nodeset:
             except ValueError:
                 print("Could not read {0} as int".format(nodeid_str))
                 continue
-            dpoint, _ = read_option_item(
-                line, "D{0}".format(nodeset_cls.get_typename_long())
+            dpoint = int(
+                read_option_item(line, "D{0}".format(cls.get_typename_long()))[0]
             )
-            if dpoint is None:
-                raise RuntimeError(
-                    "Couldn't find D{0} option for {0} {1}. Line is \n\n{2}".format(
-                        nodeset_cls.get_typename_long(), nodeid, line
-                    )
-                )
 
             if dpoint not in id2pos:
                 id2pos[dpoint] = next_number
                 next_number += 1
-                if int(dpoint) != next_number:
-                    pass
-                    # raise RuntimeError(
-                    #    "The nodeset numbering will not be preserved during read! Expecting {0}, got {1}".format(
-                    #        next_number, dpoint
-                    #    )
-                    # )
-                nodesets.append(nodeset_cls(dpoint))
+                nodesets.append(cls(dpoint))
 
             nodesets[id2pos[dpoint]].add_node(nodes[nodeid - 1])
 
         return nodesets
+
+    @staticmethod
+    def get_section() -> str:
+        raise RuntimeError("This function should not be called")
+
+    @classmethod
+    def write_header(cls, dest: IO) -> None:
+        write_title(dest, cls.get_section())
 
 
 class PointNodeset(Nodeset):
@@ -101,24 +99,20 @@ class PointNodeset(Nodeset):
         super(PointNodeset, self).__init__(id, name=name)
 
     @staticmethod
-    def get_typename_long():
+    def get_typename_long() -> str:
         return "NODE"
 
     @staticmethod
-    def get_typename_short():
+    def get_typename_short() -> str:
         return "NODE"
 
     @staticmethod
-    def get_section():
+    def get_section() -> str:
         return "DNODE-NODE TOPOLOGY"
 
     @staticmethod
-    def write_header(dest):
+    def write_header(dest: IO) -> None:
         write_title(dest, PointNodeset.get_section())
-
-    @staticmethod
-    def read(lines, nodes, out=False):
-        return Nodeset.base_read(lines, nodes, PointNodeset, out=out)
 
 
 class LineNodeset(Nodeset):
@@ -141,10 +135,6 @@ class LineNodeset(Nodeset):
     def write_header(dest):
         write_title(dest, LineNodeset.get_section())
 
-    @staticmethod
-    def read(lines, nodes, out=False):
-        return Nodeset.base_read(lines, nodes, LineNodeset, out=out)
-
 
 class SurfaceNodeset(Nodeset):
     def __init__(self, id, name=None):
@@ -166,10 +156,6 @@ class SurfaceNodeset(Nodeset):
     def write_header(dest):
         write_title(dest, SurfaceNodeset.get_section())
 
-    @staticmethod
-    def read(lines, nodes, out=False):
-        return Nodeset.base_read(lines, nodes, SurfaceNodeset, out=out)
-
 
 class VolumeNodeset(Nodeset):
     def __init__(self, id, name=None):
@@ -190,10 +176,6 @@ class VolumeNodeset(Nodeset):
     @staticmethod
     def write_header(dest):
         write_title(dest, VolumeNodeset.get_section())
-
-    @staticmethod
-    def read(lines, nodes, out=False):
-        return Nodeset.base_read(lines, nodes, VolumeNodeset, out=out)
 
 
 class NodesetBuilder:

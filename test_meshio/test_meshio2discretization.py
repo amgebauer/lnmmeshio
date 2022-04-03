@@ -1,9 +1,8 @@
 import os
 import unittest
 
-import numpy as np
-
 import lnmmeshio
+import numpy as np
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 
@@ -29,11 +28,11 @@ class TestMeshio2Discretization(unittest.TestCase):
     def test_vice_versa(self):
         dis: lnmmeshio.Discretization = lnmmeshio.read(
             os.path.join(script_dir, "data", "dummy2.dat")
-        ).discretization
+        )
 
         mesh = lnmmeshio.meshio_to_discretization.discretization2mesh(dis)
-        dis2: lnmmeshio.Discretization = lnmmeshio.meshio_to_discretization.mesh2Discretization(
-            mesh
+        dis2: lnmmeshio.Discretization = (
+            lnmmeshio.meshio_to_discretization.mesh2Discretization(mesh)
         )
 
         dis.compute_ids(zero_based=True)

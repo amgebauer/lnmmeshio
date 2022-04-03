@@ -4,6 +4,8 @@
 # This is the interface between the meshio package and our Discretization description
 # May not work perfectly
 #
+from typing import Any, Dict, List, Optional
+
 import meshio
 import numpy as np
 
@@ -324,7 +326,10 @@ def discretization2mesh(dis: Discretization) -> meshio.Mesh:
 
             if len(cells) == 0 or cells[-1]["type"] != celltype:
                 cells.append(
-                    {"type": celltype, "arr": np.zeros((0, len(ele.nodes)), dtype=int),}
+                    {
+                        "type": celltype,
+                        "arr": np.zeros((0, len(ele.nodes)), dtype=int),
+                    }
                 )
                 newgroup = True
 
@@ -382,7 +387,9 @@ def discretization2mesh(dis: Discretization) -> meshio.Mesh:
     return mesh
 
 
-def _get_material_from_cell_data(celldata, cellgroupid, cellid):
+def _get_material_from_cell_data(
+    celldata: Dict[str, List[List[Any]]], cellgroupid: int, cellid: int
+) -> int:
     for name in _cell_data_id_names:
         if name in celldata:
             return int(celldata[name][cellgroupid][cellid])
@@ -390,7 +397,9 @@ def _get_material_from_cell_data(celldata, cellgroupid, cellid):
     return cellgroupid
 
 
-def _get_nodesetid_from_cell_data(celldata, cellgroupid, cellid):
+def _get_nodesetid_from_cell_data(
+    celldata: Dict[str, List[List[Any]]], cellgroupid: int, cellid: int
+) -> Optional[int]:
     for name in _cell_data_id_names:
         if name in celldata:
             return int(celldata[name][cellgroupid][cellid])
@@ -398,7 +407,7 @@ def _get_nodesetid_from_cell_data(celldata, cellgroupid, cellid):
     return None
 
 
-def _isiter(list):
+def _isiter(list: Any) -> bool:
     try:
         iter(list)
     except TypeError:

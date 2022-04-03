@@ -2,9 +2,8 @@ import io
 import os
 import unittest
 
-import numpy as np
-
 import lnmmeshio
+import numpy as np
 from lnmmeshio import ioutils
 from lnmmeshio.nodeset import LineNodeset, PointNodeset, SurfaceNodeset, VolumeNodeset
 
@@ -62,9 +61,7 @@ class TestDiscretizationIO(unittest.TestCase):
 
     def test_read_new(self):
         # read discretization
-        disc = lnmmeshio.read(
-            os.path.join(script_dir, "data", "dummy.dat"), out=True
-        ).discretization
+        disc = lnmmeshio.read(os.path.join(script_dir, "data", "dummy.dat"), out=True)
 
         disc.compute_ids(zero_based=False)
 
@@ -124,7 +121,7 @@ class TestDiscretizationIO(unittest.TestCase):
         dummy_file.seek(0)
 
         # read dummy file
-        d_new = lnmmeshio.read_baci(dummy_file).discretization
+        d_new = lnmmeshio.read_baci_discr(dummy_file)
         d_new.compute_ids(zero_based=True)
 
         self.assertEqual(len(d_new.nodes), 4)
@@ -174,11 +171,9 @@ class TestDiscretizationIO(unittest.TestCase):
         self.assertEqual(d_new.elements.structure[0].type, "SOLIDT4SCATRA")
         self.assertEqual(d_new.elements.structure[0].shape, "TET4")
         self.assertListEqual(d_new.elements.structure[0].nodes, d_new.nodes)
-        self.assertListEqual(d_new.elements.structure[0].options["MAT"], ["1"])
-        self.assertListEqual(
-            d_new.elements.structure[0].options["KINEM"], ["nonlinear"]
-        )
-        self.assertListEqual(d_new.elements.structure[0].options["TYPE"], ["Std"])
+        self.assertEqual(d_new.elements.structure[0].options["MAT"], "1")
+        self.assertEqual(d_new.elements.structure[0].options["KINEM"], "nonlinear")
+        self.assertEqual(d_new.elements.structure[0].options["TYPE"], "Std")
 
     def test_io_utils_text_fill(self):
         # test text_fill
@@ -324,15 +319,17 @@ class TestDiscretizationIO(unittest.TestCase):
         line = dummy_file.getvalue()
         self.assertEqual(lnmmeshio.ioutils.read_option_item(line, "KEY1")[0], "VAL1")
         self.assertListEqual(
-            lnmmeshio.ioutils.read_option_item(line, "KEY2", num=2)[0],
+            lnmmeshio.ioutils.read_option_items(line, "KEY2", num=2)[0],
             ["VAL2.1", "VAL2.2"],
         )
         self.assertEqual(lnmmeshio.ioutils.read_option_item(line, "KEY3")[0], "3")
         self.assertListEqual(
-            lnmmeshio.ioutils.read_option_item(line, "KEY4", num=2)[0], ["4.1", "4.2"]
+            lnmmeshio.ioutils.read_option_items(line, "KEY4", num=2)[0], ["4.1", "4.2"]
         )
 
-        self.assertEqual(lnmmeshio.ioutils.read_option_item(line, "KEY5"), (None, None))
+        self.assertRaises(
+            RuntimeError, lambda: lnmmeshio.ioutils.read_option_item(line, "KEY5")
+        )
 
     def test_io_utils_read_next_option(self):
         # build file
@@ -349,21 +346,21 @@ class TestDiscretizationIO(unittest.TestCase):
 
         line = dummy_file.getvalue()
 
-        line, key, value = lnmmeshio.ioutils.read_next_option(line)
-        self.assertEqual(key, "KEY1")
-        self.assertListEqual(value, ["VAL1"])
+        for i, (key, values) in enumerate(
+            lnmmeshio.ioutils.read_key_values(
+                line, lambda key: 2 if key == "KEY2" or key == "KEY4" else 1
+            )
+        ):
+            self.assertEqual(key, f"KEY{i+1}")
 
-        line, key, value = lnmmeshio.ioutils.read_next_option(line, num=2)
-        self.assertEqual(key, "KEY2")
-        self.assertListEqual(value, ["VAL2.1", "VAL2.2"])
-
-        line, key, value = lnmmeshio.ioutils.read_next_option(line)
-        self.assertEqual(key, "KEY3")
-        self.assertListEqual(value, ["3"])
-
-        line, key, value = lnmmeshio.ioutils.read_next_option(line, num=2)
-        self.assertEqual(key, "KEY4")
-        self.assertListEqual(value, ["4.1", "4.2"])
+            if i == 0:
+                self.assertEqual(values, ["VAL1"])
+            elif i == 1:
+                self.assertListEqual(values, ["VAL2.1", "VAL2.2"])
+            elif i == 2:
+                self.assertListEqual(values, ["3"])
+            elif i == 3:
+                self.assertListEqual(values, ["4.1", "4.2"])
 
     def test_dummy_read(self):
         dummy_file = io.StringIO()

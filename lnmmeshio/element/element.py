@@ -1,15 +1,13 @@
 import io
 import math
 from collections import OrderedDict
-from typing import List
+from typing import Dict, List, Optional, Union
 
 import numpy as np
 
+from ..fiber import Fiber
 from ..ioutils import (
     line_option_list,
-    read_next_key,
-    read_next_option,
-    read_next_value,
     read_option_item,
     write_option,
     write_option_list,
@@ -24,7 +22,11 @@ class Element:
     """
 
     def __init__(
-        self, el_type: str, shape: str, nodes: List[Node], options: OrderedDict = None
+        self,
+        el_type: Optional[str],
+        shape: str,
+        nodes: List[Node],
+        options: Optional[OrderedDict] = None,
     ):
         """
         Creates a new element of type ele_type, shape with nodes defined in nodes
@@ -34,13 +36,13 @@ class Element:
             shape: shape of the element as used by BACI (e.g. HEX8)
             nodes: List of node objects
         """
-        self.id = None
+        self.id: Optional[int] = None
         self.type = el_type
         self.shape = shape
         self.nodes = nodes
         self.options = options if options is not None else OrderedDict()
-        self.fibers = {}
-        self.data = {}
+        self.fibers: Dict[str, Fiber] = {}
+        self.data: Dict[str, Union[np.ndarray, int, float]] = {}
 
     def get_num_nodes(self) -> int:
         """
@@ -99,7 +101,7 @@ class Element:
         Returns:
             np.array with node ids of each element
         """
-        arr: np.array = np.zeros((len(self.nodes)), dtype=int)
+        arr: np.ndarray = np.zeros((len(self.nodes)), dtype=int)
 
         for i, node in enumerate(self.nodes, start=0):
             if node.id is None:
