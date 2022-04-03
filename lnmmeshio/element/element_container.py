@@ -1,15 +1,7 @@
 from collections import OrderedDict
-from typing import Dict, List
+from typing import Dict, List, Optional
 
-from ..ioutils import (
-    read_next_key,
-    read_next_option,
-    read_next_value,
-    read_option_item,
-    write_option,
-    write_option_list,
-    write_title,
-)
+from ..ioutils import write_title
 from ..node import Node
 from ..progress import progress
 from .element import Element
@@ -37,11 +29,11 @@ class ElementContainer:
         """
         Initialize element contained
         """
-        self.structure: List[Element] = None
-        self.fluid: List[Element] = None
-        self.ale: List[Element] = None
-        self.transport: List[Element] = None
-        self.thermo: List[Element] = None
+        self.structure: Optional[List[Element]] = None
+        self.fluid: Optional[List[Element]] = None
+        self.ale: Optional[List[Element]] = None
+        self.transport: Optional[List[Element]] = None
+        self.thermo: Optional[List[Element]] = None
 
     def get_num_structure(self) -> int:
         """
@@ -110,11 +102,20 @@ class ElementContainer:
         Args:
             dest: Stream like variable, where to write the corresponding sections
         """
-        ElementContainer.__write_section(dest, "STRUCTURE ELEMENTS", self.structure)
-        ElementContainer.__write_section(dest, "FLUID ELEMENTS", self.fluid)
-        ElementContainer.__write_section(dest, "ALE ELEMENTS", self.ale)
-        ElementContainer.__write_section(dest, "TRANSPORT ELEMENTS", self.transport)
-        ElementContainer.__write_section(dest, "THERMO ELEMENTS", self.thermo)
+        if self.structure is not None:
+            ElementContainer.__write_section(dest, "STRUCTURE ELEMENTS", self.structure)
+
+        if self.fluid is not None:
+            ElementContainer.__write_section(dest, "FLUID ELEMENTS", self.fluid)
+
+        if self.ale is not None:
+            ElementContainer.__write_section(dest, "ALE ELEMENTS", self.ale)
+
+        if self.transport is not None:
+            ElementContainer.__write_section(dest, "TRANSPORT ELEMENTS", self.transport)
+
+        if self.thermo is not None:
+            ElementContainer.__write_section(dest, "THERMO ELEMENTS", self.thermo)
 
     def get_sections(self, out=True):
         """
@@ -330,7 +331,7 @@ class ElementContainer:
         Returns:
             List of elements
         """
-        eles = []
+        eles: List[Element] = []
 
         if fieldtype is None:
             fieldtype = "Elements"
@@ -344,10 +345,15 @@ class ElementContainer:
 
             eles.append(ele)
 
+            if ele.id is None:
+                raise RuntimeError("Id of the element is None")
+
             # safety check for integrity of the dat file:
             # ids must increase continuously by +1 from first id
+            first_id: int = 0
+            id_offset: int = 0
             if len(eles) == 1:
-                first_id = eles[0].id
+                first_id = eles[0].id if eles[0].id is not None else 1
                 id_offset = first_id - 1
             if int(ele.id) - id_offset != len(eles):
                 raise RuntimeError(

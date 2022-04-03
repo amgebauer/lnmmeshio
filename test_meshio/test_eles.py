@@ -177,7 +177,7 @@ class TestEles(unittest.TestCase):
             self.__get_nodes(nnodes),
         )
 
-        self.assertEqual(int(ele.options["MAT"][0]), 11)
+        self.assertEqual(int(ele.options["MAT"]), 11)
 
         self.assertIsInstance(ele, cls)
 

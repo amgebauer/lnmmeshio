@@ -1,9 +1,12 @@
 import io
-from typing import Dict
+from typing import IO, TYPE_CHECKING, Any, Dict, List, Optional
 
 import numpy as np
 
 from .fiber import Fiber
+
+if TYPE_CHECKING:
+    from .nodeset import PointNodeset, LineNodeset, SurfaceNodeset, VolumeNodeset
 
 
 class Node:
@@ -18,23 +21,23 @@ class Node:
         Args:
             coords: np.array((3)) Coordinates of the node
         """
-        self.id = None
+        self.id: Optional[int] = None
         self.coords: np.ndarray = coords
         self.fibers: Dict[str, Fiber] = {}
 
-        self.pointnodesets = []
-        self.linenodesets = []
-        self.surfacenodesets = []
-        self.volumenodesets = []
-        self.data = {}
+        self.pointnodesets: List[PointNodeset] = []
+        self.linenodesets: List[LineNodeset] = []
+        self.surfacenodesets: List[SurfaceNodeset] = []
+        self.volumenodesets: List[VolumeNodeset] = []
+        self.data: Dict[str, Any] = {}
 
-    def reset(self):
+    def reset(self) -> None:
         """
         Sets the id to None
         """
         self.id = None
 
-    def get_line(self):
+    def get_line(self) -> str:
         """
         Returns the line definition in the dat file
         """
@@ -57,7 +60,7 @@ class Node:
 
         return dest.getvalue()
 
-    def write(self, dest):
+    def write(self, dest: IO) -> None:
         """
         Writes the corresponding line in to the stream variable
 

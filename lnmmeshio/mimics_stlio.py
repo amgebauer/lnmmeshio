@@ -10,8 +10,7 @@ from meshio import Mesh
 
 
 def read(filename):
-    """Reads a Gmsh msh file.
-    """
+    """Reads a Gmsh msh file."""
     with open(filename, "rb") as f:
         out = read_buffer(f)
     return out

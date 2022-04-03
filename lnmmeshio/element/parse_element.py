@@ -1,12 +1,10 @@
 import re
-from typing import List
+from typing import List, Optional
 
 from ..fiber import Fiber
 from ..ioutils import (
-    read_next_key,
-    read_next_option,
-    read_next_value,
-    read_option_item,
+    read_key_values,
+    read_option_items,
     write_option,
     write_option_list,
     write_title,
@@ -32,7 +30,7 @@ RegExEle = re.compile(r"^[ ]*([0-9]+)[ ]+(\S+)[ ]+(\S+)[ ]+")
 
 def create_element(
     ele_type: str, ele_shape: str, ele_nodes: List[Node], throw_if_unknown=False
-):
+) -> Element:
     """
     Creates an element from a given element shape
 
@@ -46,6 +44,7 @@ def create_element(
         Element of the specific type
     """
 
+    ele: Optional[Element] = None
     if ele_shape == Vertex.ShapeName:
         ele = Vertex(ele_type, ele_nodes)
     elif ele_shape == Line2.ShapeName:
@@ -101,7 +100,7 @@ def parse(line: str, nodes: List[Node], throw_if_unknown=False):
     ele_type = ele_match.group(2)
     ele_shape = ele_match.group(3)
 
-    node_ids_str, span = read_option_item(
+    node_ids_str, span = read_option_items(
         line, ele_shape, Element.num_nodes_by_shape(ele_shape)
     )
     ele_nodes = [nodes[int(i) - 1] for i in node_ids_str]
@@ -118,20 +117,13 @@ def parse(line: str, nodes: List[Node], throw_if_unknown=False):
     # read remaining options
     # assume only one value per option, which must not be the case in general
     line = line[span[1] :]
-    while True:
-        line, key = read_next_key(line)
-        if line is None:
-            break
 
-        num = 1
-        if Fiber.get_fiber_type(key) is not None:
-            num = 3
-
-        line, value = read_next_value(line, num=num)
-
-        if line is None:
-            break
-
-        ele.options[key] = value
+    for key, values in read_key_values(
+        line, lambda key: 3 if Fiber.is_fiber_type(key) else 1
+    ):
+        if len(values) == 1:
+            ele.options[key] = values[0]
+        else:
+            ele.options[key] = values
 
     return ele

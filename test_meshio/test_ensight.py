@@ -2,9 +2,8 @@ import filecmp
 import os
 import unittest
 
-import numpy as np
-
 import lnmmeshio
+import numpy as np
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 
@@ -15,23 +14,22 @@ class TestEnsight(unittest.TestCase):
             os.makedirs(os.path.join(script_dir, "tmp"))
 
     def test_write_ensight_ascii(self):
-        dat: lnmmeshio.Datfile = lnmmeshio.Datfile()
-        dat.discretization: lnmmeshio.Discretization = lnmmeshio.read(
+        dis: lnmmeshio.Discretization = lnmmeshio.read(
             os.path.join(script_dir, "data", "dummy.dat")
-        ).discretization
-        dat.discretization.compute_ids(zero_based=False)
+        )
+        dis.compute_ids(zero_based=False)
 
-        for elelist in dat.discretization.elements.values():
+        for elelist in dis.elements.values():
             for ele in elelist:
                 ele.data["material"] = np.array(float(" ".join(ele.options["MAT"])))
 
-        for n in dat.discretization.nodes:
+        for n in dis.nodes:
             n.data["id"] = np.array([n.id])
 
         # write ensight
         lnmmeshio.ensightio.write_case(
             os.path.join(script_dir, "tmp", "ensight_ascii.case"),
-            dat,
+            dis,
             binary=False,
             override=True,
         )
@@ -39,23 +37,22 @@ class TestEnsight(unittest.TestCase):
         # how to check?
 
     def test_write_ensight_binary(self):
-        dat: lnmmeshio.Datfile = lnmmeshio.Datfile()
-        dat.discretization: lnmmeshio.Discretization = lnmmeshio.read(
+        dis: lnmmeshio.Discretization = lnmmeshio.read(
             os.path.join(script_dir, "data", "dummy.dat")
-        ).discretization
-        dat.discretization.compute_ids(zero_based=False)
+        )
+        dis.compute_ids(zero_based=False)
 
-        for elelist in dat.discretization.elements.values():
+        for elelist in dis.elements.values():
             for ele in elelist:
                 ele.data["material"] = np.array(float(" ".join(ele.options["MAT"])))
 
-        for n in dat.discretization.nodes:
+        for n in dis.nodes:
             n.data["id"] = np.array([n.id])
 
         # write ensight
         lnmmeshio.ensightio.write_case(
             os.path.join(script_dir, "tmp", "ensight_binary.case"),
-            dat,
+            dis,
             binary=True,
             override=True,
         )

@@ -1,15 +1,9 @@
+from collections import OrderedDict
+from typing import IO, Dict, Optional
+
 import numpy as np
 
-from .ioutils import (
-    line_option_list,
-    read_next_key,
-    read_next_option,
-    read_next_value,
-    read_option_item,
-    write_option,
-    write_option_list,
-    write_title,
-)
+from .ioutils import line_option_list, read_option_items
 
 
 class Fiber:
@@ -39,7 +33,7 @@ class Fiber:
         Args:
             fib: Unit vector pointing in fiber direction np.array((3))
         """
-        self.fiber = fib
+        self.fiber: np.ndarray = fib
 
     def get_line(self, inp_type):
         """
@@ -48,7 +42,7 @@ class Fiber:
         Args:
             inp_type: type of fiber (defined as static variable)
         """
-        ftype = None
+        ftype: Optional[str] = None
 
         if inp_type == Fiber.TypeFiber1:
             ftype = "FIBER1"
@@ -79,9 +73,9 @@ class Fiber:
         else:
             raise ValueError("Unknown fiber type {0}".format(inp_type))
 
-        return line_option_list({ftype: self.fiber})
+        return line_option_list(OrderedDict({ftype: self.fiber}))
 
-    def write(self, dest, inp_type):
+    def write(self, dest: IO, inp_type: str) -> None:
         """
         Writes the corresponding section in the dat file into the stream type variable dest
 
@@ -92,7 +86,38 @@ class Fiber:
         dest.write(self.get_line(inp_type))
 
     @staticmethod
-    def get_fiber_type(fstr: str):
+    def is_fiber_type(ftype: str) -> bool:
+        if ftype == "FIBER1":
+            return True
+        elif ftype == "FIBER2":
+            return True
+        elif ftype == "FIBER3":
+            return True
+        elif ftype == "FIBER4":
+            return True
+        elif ftype == "FIBER5":
+            return True
+        elif ftype == "FIBER6":
+            return True
+        elif ftype == "FIBER7":
+            return True
+        elif ftype == "FIBER8":
+            return True
+        elif ftype == "FIBER9":
+            return True
+        elif ftype == "CIR":
+            return True
+        elif ftype == "TAN":
+            return True
+        elif ftype == "AXI":
+            return True
+        elif ftype == "RAD":
+            return True
+
+        return False
+
+    @staticmethod
+    def get_fiber_type(fstr: str) -> str:
         """
         Returns the corresponding fiber type enum from the definition in the dat file
 
@@ -128,11 +153,11 @@ class Fiber:
             return Fiber.TypeAxi
         elif fstr == "RAD":
             return Fiber.TypeRad
-        else:
-            return None
+
+        raise RuntimeError("Unknown fiber type")
 
     @staticmethod
-    def parse_fibers(line: str) -> dict:
+    def parse_fibers(line: str) -> Dict[str, "Fiber"]:
         """
         Parses the fibers from the line and returns a dict of fiber objects
 
@@ -145,67 +170,85 @@ class Fiber:
         fibs: dict = {}
         if "FIBER1" in line:
             fibs[Fiber.TypeFiber1] = Fiber(
-                np.array([float(i) for i in read_option_item(line, "FIBER1", num=3)[0]])
+                np.array(
+                    [float(i) for i in read_option_items(line, "FIBER1", num=3)[0]]
+                )
             )
 
         if "FIBER2" in line:
             fibs[Fiber.TypeFiber2] = Fiber(
-                np.array([float(i) for i in read_option_item(line, "FIBER2", num=3)[0]])
+                np.array(
+                    [float(i) for i in read_option_items(line, "FIBER2", num=3)[0]]
+                )
             )
 
         if "FIBER3" in line:
             fibs[Fiber.TypeFiber3] = Fiber(
-                np.array([float(i) for i in read_option_item(line, "FIBER3", num=3)[0]])
+                np.array(
+                    [float(i) for i in read_option_items(line, "FIBER3", num=3)[0]]
+                )
             )
 
         if "FIBER4" in line:
             fibs[Fiber.TypeFiber4] = Fiber(
-                np.array([float(i) for i in read_option_item(line, "FIBER4", num=3)[0]])
+                np.array(
+                    [float(i) for i in read_option_items(line, "FIBER4", num=3)[0]]
+                )
             )
 
         if "FIBER5" in line:
             fibs[Fiber.TypeFiber5] = Fiber(
-                np.array([float(i) for i in read_option_item(line, "FIBER5", num=3)[0]])
+                np.array(
+                    [float(i) for i in read_option_items(line, "FIBER5", num=3)[0]]
+                )
             )
 
         if "FIBER6" in line:
             fibs[Fiber.TypeFiber6] = Fiber(
-                np.array([float(i) for i in read_option_item(line, "FIBER6", num=3)[0]])
+                np.array(
+                    [float(i) for i in read_option_items(line, "FIBER6", num=3)[0]]
+                )
             )
 
         if "FIBER7" in line:
             fibs[Fiber.TypeFiber7] = Fiber(
-                np.array([float(i) for i in read_option_item(line, "FIBER7", num=3)[0]])
+                np.array(
+                    [float(i) for i in read_option_items(line, "FIBER7", num=3)[0]]
+                )
             )
 
         if "FIBER8" in line:
             fibs[Fiber.TypeFiber8] = Fiber(
-                np.array([float(i) for i in read_option_item(line, "FIBER8", num=3)[0]])
+                np.array(
+                    [float(i) for i in read_option_items(line, "FIBER8", num=3)[0]]
+                )
             )
 
         if "FIBER9" in line:
             fibs[Fiber.TypeFiber9] = Fiber(
-                np.array([float(i) for i in read_option_item(line, "FIBER9", num=3)[0]])
+                np.array(
+                    [float(i) for i in read_option_items(line, "FIBER9", num=3)[0]]
+                )
             )
 
         if "CIR" in line:
             fibs[Fiber.TypeCir] = Fiber(
-                np.array([float(i) for i in read_option_item(line, "CIR", num=3)[0]])
+                np.array([float(i) for i in read_option_items(line, "CIR", num=3)[0]])
             )
 
         if "TAN" in line:
             fibs[Fiber.TypeTan] = Fiber(
-                np.array([float(i) for i in read_option_item(line, "TAN", num=3)[0]])
+                np.array([float(i) for i in read_option_items(line, "TAN", num=3)[0]])
             )
 
         if "RAD" in line:
             fibs[Fiber.TypeRad] = Fiber(
-                np.array([float(i) for i in read_option_item(line, "RAD", num=3)[0]])
+                np.array([float(i) for i in read_option_items(line, "RAD", num=3)[0]])
             )
 
         if "AXI" in line:
             fibs[Fiber.TypeAxi] = Fiber(
-                np.array([float(i) for i in read_option_item(line, "AXI", num=3)[0]])
+                np.array([float(i) for i in read_option_items(line, "AXI", num=3)[0]])
             )
 
         return fibs

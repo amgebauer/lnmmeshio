@@ -1,9 +1,15 @@
 import time
+from typing import Iterable, Iterator, Sized, Union, overload
 
 from progress import bar, spinner
 
 
-def progress(iterator, out=True, label=None, btype="bar"):
+def progress(
+    iterator: Union[Iterable, Sized],
+    out: bool = True,
+    label: str = None,
+    btype: str = "bar",
+) -> Union[Iterable, Sized]:
 
     max_val = 0
     try:

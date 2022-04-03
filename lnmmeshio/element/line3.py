@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 import numpy as np
 
@@ -13,7 +13,7 @@ class Line3(Element1D):
 
     ShapeName: str = "LINE3"
 
-    def __init__(self, el_type: str, nodes: List[Node]):
+    def __init__(self, el_type: Optional[str], nodes: List[Node]):
         """
         Base constructor of a line3 element
         """
