@@ -374,8 +374,6 @@ def discretization2mesh(dis: Discretization) -> meshio.Mesh:
                 )
 
     # store nodesets
-    print("Exporting of nodesets from dat to other file formats does not work")
-
     cells_new = [(cell["type"], cell["arr"]) for cell in cells]
 
     mesh: meshio.Mesh = meshio.Mesh(
