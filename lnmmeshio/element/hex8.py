@@ -112,6 +112,53 @@ class Hex8(ElementHex):
         )
 
     @staticmethod
+    def shape_fcns_derivs(xi):
+        """
+        Returns the value of the derivatives of the shape functions with respect to the local coordinates at the local coordinate xi
+
+        +-                                  -+
+        |  dN_1 / dxi_1   dN_2 / dxi_1, ...  |
+        |  dN_1 / dxi_2   dN_2 / dxi_2, ...  |
+        |  dN_1 / dxi_3   dN_2 / dxi_3, ...  |
+        +-                                  -+
+        """
+
+        return np.array(
+            [
+                [
+                    0.125 * (-1 + xi[1] + xi[2] - xi[1] * xi[2]),
+                    0.125 * (+1 - xi[1] - xi[2] + xi[1] * xi[2]),
+                    0.125 * (+1 + xi[1] - xi[2] - xi[1] * xi[2]),
+                    0.125 * (-1 - xi[1] + xi[2] + xi[1] * xi[2]),
+                    0.125 * (-1 + xi[1] - xi[2] + xi[1] * xi[2]),
+                    0.125 * (+1 - xi[1] + xi[2] - xi[1] * xi[2]),
+                    0.125 * (+1 + xi[1] + xi[2] + xi[1] * xi[2]),
+                    0.125 * (-1 - xi[1] - xi[2] - xi[1] * xi[2]),
+                ],
+                [
+                    0.125 * (-1 + xi[0] + xi[2] - xi[0] * xi[2]),
+                    0.125 * (-1 - xi[0] + xi[2] + xi[0] * xi[2]),
+                    0.125 * (+1 + xi[0] - xi[2] - xi[0] * xi[2]),
+                    0.125 * (+1 - xi[0] - xi[2] + xi[0] * xi[2]),
+                    0.125 * (-1 + xi[0] - xi[2] + xi[0] * xi[2]),
+                    0.125 * (-1 - xi[0] - xi[2] - xi[0] * xi[2]),
+                    0.125 * (+1 + xi[0] + xi[2] + xi[0] * xi[2]),
+                    0.125 * (+1 - xi[0] + xi[2] - xi[0] * xi[2]),
+                ],
+                [
+                    0.125 * (-1 + xi[1] + xi[0] - xi[0] * xi[1]),
+                    0.125 * (-1 + xi[1] - xi[0] + xi[0] * xi[1]),
+                    0.125 * (-1 - xi[1] - xi[0] - xi[0] * xi[1]),
+                    0.125 * (-1 - xi[1] + xi[0] + xi[0] * xi[1]),
+                    0.125 * (+1 - xi[1] - xi[0] + xi[0] * xi[1]),
+                    0.125 * (+1 - xi[1] + xi[0] - xi[0] * xi[1]),
+                    0.125 * (+1 + xi[1] + xi[0] + xi[0] * xi[1]),
+                    0.125 * (+1 + xi[1] - xi[0] - xi[0] * xi[1]),
+                ],
+            ]
+        )
+
+    @staticmethod
     def nodal_reference_coordinates():
         return np.array(
             [

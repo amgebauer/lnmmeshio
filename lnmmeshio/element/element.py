@@ -558,3 +558,11 @@ class ElementHex(Element3D):
                 num_points
             )
         )
+
+    @staticmethod
+    def int_weights(num_points):
+        """
+        Returns the integration weights for the integration points
+        """
+        if num_points == 8:
+            return np.ones(8)
