@@ -1,17 +1,7 @@
 import io
 import re
 import struct
-from typing import (
-    IO,
-    Any,
-    Callable,
-    Iterable,
-    Iterator,
-    List,
-    Optional,
-    OrderedDict,
-    Tuple,
-)
+from typing import IO, Any, Callable, Dict, Iterable, Iterator, List, Optional, Tuple
 
 import numpy as np
 
@@ -217,7 +207,12 @@ def write_option(
     )
 
 
-def line_option_list(list: OrderedDict[str, np.ndarray]) -> str:
+def line_option_list(list: Dict[str, np.ndarray]) -> str:
+    """
+    Return a line with the options and values asa defined in the dictionary
+
+    Hint: This function accepts an ordered dict. Unfortunately, Python 3.6 - 3.7.2, we cannot set this as the type.
+    """
     line = io.StringIO()
     first_entry: bool = True
     for key, value in list.items():
@@ -235,7 +230,9 @@ def line_option_list(list: OrderedDict[str, np.ndarray]) -> str:
     return line.getvalue()
 
 
-def write_option_list(dest: IO, options: OrderedDict, newline: bool = True) -> None:
+def write_option_list(
+    dest: IO, options: Dict[str, np.ndarray], newline: bool = True
+) -> None:
     dest.write("{0}{1}".format(line_option_list(options), "\n" if newline else ""))
 
 
