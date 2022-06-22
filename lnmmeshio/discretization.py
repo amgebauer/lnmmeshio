@@ -103,6 +103,28 @@ class Discretization:
 
         return arr
 
+    def get_dline_elements(self, id: int) -> List[Element1D]:
+        """
+        Returns a list of line elements that belong to a dline
+        """
+        edge_elements: List[Element1D] = []
+        added_edges: Set[str] = set()
+
+        self.compute_ids(True)
+        nodeset_ids: Set[int] = set([n.id for n in self.linenodesets[id]])
+
+        for ele in self.elements.structure:
+
+            for edge in ele.get_edges():
+                node_ids = [n.id for n in edge.nodes]
+                if all([node_id in nodeset_ids for node_id in node_ids]):
+                    edge_id = "/".join(sorted([str(nid) for nid in node_ids]))
+                    if edge_id not in added_edges:
+                        edge_elements.append(edge)
+                        added_edges.add(edge_id)
+
+        return edge_elements
+
     def get_dsurf_elements(self, id: int) -> List[Element2D]:
         """
         Returns a list of surface elements that belong to a dsurf

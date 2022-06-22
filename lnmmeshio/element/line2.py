@@ -57,3 +57,14 @@ class Line2(Element1D):
         Returns the value of the shape functions at the local coordinate xi
         """
         return np.array([(1 - xi) / 2.0, (1 + xi) / 2.0])
+
+    @staticmethod
+    def shape_fcns_derivs(xi):
+        """
+        Returns the value of the derivatives of the shape functions with respect to the local coordinates at the local coordinate xi
+
+        +-                             -+
+        |  dN_1 / dxi_1   dN_2 / dxi_1  |
+        +-                             -+
+        """
+        return np.array([-0.5, 0.5])
