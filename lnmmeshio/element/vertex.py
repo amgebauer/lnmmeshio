@@ -24,7 +24,8 @@ class Vertex(Element0D):
                 )
             )
 
-    def get_num_nodes(self) -> int:
+    @classmethod
+    def get_num_nodes(cls) -> int:
         """
         Get number of nodes of a VERTEX element
 

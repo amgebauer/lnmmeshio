@@ -44,7 +44,8 @@ class Element:
         self.fibers: Dict[str, Fiber] = {}
         self.data: Dict[str, Union[np.ndarray, int, float]] = {}
 
-    def get_num_nodes(self) -> int:
+    @classmethod
+    def get_num_nodes(cls) -> int:
         """
         Get number of nodes of the element
 

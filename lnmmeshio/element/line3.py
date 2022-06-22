@@ -24,7 +24,8 @@ class Line3(Element1D):
                 "You tried to created a LINE3 element with {0} nodes".format(len(nodes))
             )
 
-    def get_num_nodes(self) -> int:
+    @classmethod
+    def get_num_nodes(cls) -> int:
         """
         Get number of nodes of a LINE3 element
 

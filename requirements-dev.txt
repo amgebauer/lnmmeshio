@@ -14,3 +14,4 @@ isort==4.3.21
 sympy==1.6.2
 pdoc==7.0.0
 mypy==0.931
+parameterized==0.8.1

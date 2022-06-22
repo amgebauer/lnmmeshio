@@ -26,7 +26,8 @@ class Quad4(ElementQuad):
                 "You tried to created a QUAD4 element with {0} nodes".format(len(nodes))
             )
 
-    def get_num_nodes(self) -> int:
+    @classmethod
+    def get_num_nodes(cls) -> int:
         """
         Get number of nodes of a QUAD4 element
 
