@@ -23,6 +23,17 @@ class TestMeshio2Discretization(unittest.TestCase):
             sorted([n.id for n in surface_elements[0].nodes]), [0, 1, 2]
         )
 
+    def test_get_dline_elements(self):
+        dis: lnmmeshio.Discretization = lnmmeshio.read_discr(
+            os.path.join(script_dir, "data", "dummy2.dat")
+        )
+
+        line_elements = dis.get_dline_elements(0)
+
+        self.assertEqual(len(line_elements), 1)
+        self.assertIsInstance(line_elements[0], lnmmeshio.Line2)
+        self.assertListEqual(sorted([n.id for n in line_elements[0].nodes]), [0, 1])
+
     def test_get_nodes(self):
         dis: lnmmeshio.Discretization = lnmmeshio.read(
             os.path.join(script_dir, "data", "dummy2.dat")

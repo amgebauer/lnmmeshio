@@ -3,11 +3,11 @@ from typing import List
 import numpy as np
 
 from ..node import Node
-from .element import Element2D
+from .element import ElementQuad
 from .line3 import Line3
 
 
-class Quad9(Element2D):
+class Quad9(ElementQuad):
     """
     Implementation of a quad9 element
     """
@@ -25,7 +25,8 @@ class Quad9(Element2D):
                 "You tried to created a QUAD9 element with {0} nodes".format(len(nodes))
             )
 
-    def get_num_nodes(self) -> int:
+    @classmethod
+    def get_num_nodes(cls) -> int:
         """
         Get number of nodes of a QUAD9 element
 

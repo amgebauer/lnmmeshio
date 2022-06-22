@@ -25,6 +25,7 @@ from lnmmeshio import (
 from lnmmeshio.element.parse_element import parse as parse_ele
 from lnmmeshio.node import Node
 from lnmmeshio.nodeset import LineNodeset, PointNodeset, SurfaceNodeset, VolumeNodeset
+from parameterized import parameterized
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 
@@ -260,58 +261,99 @@ class TestEles(unittest.TestCase):
             else:
                 self.assertAlmostEqual(constant, cur_result)
 
-    def test_shape_fcns(self):
-        self.__test_shape_functions_sum(Hex8)
-        self.__test_shape_functions_sum(Hex20)
-        self.__test_shape_functions_sum(Hex27)
-        self.__test_shape_functions_sum(Tet4)
-        self.__test_shape_functions_sum(Tet10)
-        self.__test_shape_functions_sum(Line2)
-        self.__test_shape_functions_sum(Line3)
-        self.__test_shape_functions_sum(Quad4)
-        self.__test_shape_functions_sum(Quad8)
-        self.__test_shape_functions_sum(Quad9)
-        self.__test_shape_functions_sum(Tri3)
-        self.__test_shape_functions_sum(Tri6)
+    @parameterized.expand(
+        [
+            [Hex8],
+            [Hex20],
+            [Hex27],
+            [Tet4],
+            [Tet10],
+            [Line2],
+            [Line3],
+            [Quad4],
+            [Quad8],
+            [Quad9],
+            [Tri3],
+            [Tri6],
+        ]
+    )
+    def test_shape_fcns(self, ele):
+        self.__test_shape_functions_sum(ele)
 
-    def test_space_dim(self):
-        self.__test_shape_functions_sum(Hex8)
-        self.__test_shape_functions_sum(Hex20)
-        self.__test_shape_functions_sum(Hex27)
-        self.__test_shape_functions_sum(Tet4)
-        self.__test_shape_functions_sum(Tet10)
-        self.__test_shape_functions_sum(Line2)
-        self.__test_shape_functions_sum(Line3)
-        self.__test_shape_functions_sum(Quad4)
-        self.__test_shape_functions_sum(Quad8)
-        self.__test_shape_functions_sum(Quad9)
-        self.__test_shape_functions_sum(Tri3)
-        self.__test_shape_functions_sum(Tri6)
+    @parameterized.expand(
+        [
+            [Hex8],
+            [Tet4],
+            [Tet10],
+            [Line2],
+            [Quad4],
+            [Tri3],
+            [Tri6],
+        ]
+    )
+    def test_shape_fcns_derivs(self, ele):
+        # check whether the sum of all shape functions is 1 everywhere
+        if issubclass(ele, Element1D):
+            xi = sp.symbols("xi_1")
+            num_xis = 1
+        elif issubclass(ele, Element2D):
+            xi = np.array([sp.symbols("xi_1"), sp.symbols("xi_2")])
+            num_xis = 2
+        elif issubclass(ele, Element3D):
+            xi = np.array([sp.symbols("xi_1"), sp.symbols("xi_2"), sp.symbols("xi_3")])
+            num_xis = 3
+        else:
+            raise NotImplementedError("Unknown number of dimension: {0}".format(ele))
+        shapefcns = ele.shape_fcns(xi)
+        shapefcnsderivs = ele.shape_fcns_derivs(xi).reshape(num_xis, -1)
+        for i in range(num_xis):
+            # compute symbolic derivative
+            for n in range(ele.get_num_nodes()):
+                analytic_deriv = sp.diff(shapefcns[n], xi[i] if num_xis > 1 else xi)
+                self.assertTrue(
+                    sp.simplify(shapefcnsderivs[i, n] - analytic_deriv) == 0
+                )
 
-        self.assertEqual(Hex8.get_space_dim(), 3)
-        self.assertEqual(Hex20.get_space_dim(), 3)
-        self.assertEqual(Hex27.get_space_dim(), 3)
-        self.assertEqual(Tet4.get_space_dim(), 3)
-        self.assertEqual(Tet10.get_space_dim(), 3)
-        self.assertEqual(Line2.get_space_dim(), 1)
-        self.assertEqual(Line3.get_space_dim(), 1)
-        self.assertEqual(Quad4.get_space_dim(), 2)
-        self.assertEqual(Quad8.get_space_dim(), 2)
-        self.assertEqual(Quad9.get_space_dim(), 2)
-        self.assertEqual(Tri3.get_space_dim(), 2)
-        self.assertEqual(Tri6.get_space_dim(), 2)
+    @parameterized.expand(
+        [
+            [Hex8, 3],
+            [Hex20, 3],
+            [Hex27, 3],
+            [Tet4, 3],
+            [Tet10, 3],
+            [Line2, 1],
+            [Line3, 1],
+            [Quad4, 2],
+            [Quad8, 2],
+            [Quad9, 2],
+            [Tri3, 2],
+            [Tri6, 2],
+        ]
+    )
+    def test_space_dim(self, ele, dim):
+        self.assertEqual(ele.get_space_dim(), dim)
 
-    def test_nodal_reference_coordinates(self):
-        self.__test_nodal_reference_coordinates(Hex8)
-        self.__test_nodal_reference_coordinates(Tet4)
-        self.__test_nodal_reference_coordinates(Tet10)
+    @parameterized.expand(
+        [
+            [Hex8],
+            [Tet4],
+            [Tet10],
+        ]
+    )
+    def test_nodal_reference_coordinates(self, ele):
+        self.__test_nodal_reference_coordinates(ele)
 
-    def test_is_in_ref(self):
-        self.__test_point_in_ref(Hex8)
-        self.__test_point_in_ref(Hex20)
-        self.__test_point_in_ref(Hex27)
-        self.__test_point_in_ref(Tet4)
-        self.__test_point_in_ref(Tet10)
+    @parameterized.expand(
+        [
+            [Hex8],
+            [Hex20],
+            [Hex27],
+            [Tet4],
+            [Tet10],
+        ]
+    )
+    def test_is_in_ref(self, ele):
+        self.__test_point_in_ref(ele)
 
     def test_hex8(self):
         FACES = [

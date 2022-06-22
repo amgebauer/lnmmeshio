@@ -44,7 +44,8 @@ class Element:
         self.fibers: Dict[str, Fiber] = {}
         self.data: Dict[str, Union[np.ndarray, int, float]] = {}
 
-    def get_num_nodes(self) -> int:
+    @classmethod
+    def get_num_nodes(cls) -> int:
         """
         Get number of nodes of the element
 
@@ -218,8 +219,8 @@ class Element:
 
         dest.write("\n")
 
-    @staticmethod
-    def get_space_dim():
+    @classmethod
+    def get_space_dim(cls):
         """
         Returns the number of space dimensions
 
@@ -242,8 +243,8 @@ class Element:
         """
         raise NotImplementedError("This is currently not implemented for all elements")
 
-    @staticmethod
-    def is_in_ref(xi, include_boundary=True):
+    @classmethod
+    def is_in_ref(cls, xi, include_boundary=True):
         """
         Checkes whether a point in reference coordinates is within the element
 
@@ -316,8 +317,8 @@ class Element:
             "Integration is currently not implemented for all elements"
         )
 
-    @staticmethod
-    def num_nodes_by_shape(shape: str):
+    @classmethod
+    def num_nodes_by_shape(cls, shape: str):
         """
         Returns the number of nodes from the shapes
 
@@ -350,15 +351,15 @@ class Element:
 
         return shape_dict[shape]
 
-    @staticmethod
-    def shape_fcns(xi):
+    @classmethod
+    def shape_fcns(cls, xi):
         """
         Returns the value of the shape functions at the local coordinate xi
         """
         raise NotImplementedError("This element has not implemented shape functions")
 
-    @staticmethod
-    def int_points(num_points):
+    @classmethod
+    def int_points(cls, num_points):
         """
         Returns the position of the integration points for a given number of integration points
         """
@@ -366,8 +367,8 @@ class Element:
 
 
 class Element0D(Element):
-    @staticmethod
-    def get_space_dim():
+    @classmethod
+    def get_space_dim(cls):
         """
         Returns the number of space dimensions
 
@@ -378,8 +379,8 @@ class Element0D(Element):
 
 
 class Element1D(Element):
-    @staticmethod
-    def get_space_dim():
+    @classmethod
+    def get_space_dim(cls):
         """
         Returns the number of space dimensions
 
@@ -390,8 +391,8 @@ class Element1D(Element):
 
 
 class Element2D(Element):
-    @staticmethod
-    def get_space_dim():
+    @classmethod
+    def get_space_dim(cls):
         """
         Returns the number of space dimensions
 
@@ -402,8 +403,8 @@ class Element2D(Element):
 
 
 class Element3D(Element):
-    @staticmethod
-    def get_space_dim():
+    @classmethod
+    def get_space_dim(cls):
         """
         Returns the number of space dimensions
 
@@ -414,8 +415,8 @@ class Element3D(Element):
 
 
 class ElementTri(Element2D):
-    @staticmethod
-    def int_points(num_points: int) -> np.ndarray:
+    @classmethod
+    def int_points(cls, num_points: int) -> np.ndarray:
         """
         Returns the position of the integration points for a given number of integration points
         """
@@ -431,8 +432,8 @@ class ElementTri(Element2D):
             )
         )
 
-    @staticmethod
-    def int_weights(num_points: int) -> np.ndarray:
+    @classmethod
+    def int_weights(cls, num_points: int) -> np.ndarray:
         if num_points == 1:
             return np.array([0.5])
         elif num_points == 3:
@@ -444,9 +445,49 @@ class ElementTri(Element2D):
         )
 
 
+class ElementQuad(Element2D):
+    @classmethod
+    def int_weights(cls, num_points: int) -> np.ndarray:
+        """
+        Returns the integration weights for the integration points
+        """
+        if num_points == 1:
+            return np.array([2])
+        elif num_points == 4:
+            return np.array([1.0, 1.0, 1.0, 1.0])
+
+        raise RuntimeError(
+            "The number of integration points provided ({0}) is not supported for TET elements".format(
+                num_points
+            )
+        )
+
+    @classmethod
+    def int_points(cls, num_points: int) -> np.ndarray:
+        """
+        Returns the position of the integration points for a given number of integration points
+        """
+        if num_points == 1:
+            return np.array([[0.0, 0.0]])
+        if num_points == 4:
+            return np.array(
+                [
+                    [-0.5773502691896, -0.5773502691896],
+                    [0.5773502691896, -0.5773502691896],
+                    [-0.5773502691896, 0.5773502691896],
+                    [0.5773502691896, 0.5773502691896],
+                ]
+            )
+        raise RuntimeError(
+            "The number of integration points provided ({0}) is not supported for TET elements".format(
+                num_points
+            )
+        )
+
+
 class ElementTet(Element3D):
-    @staticmethod
-    def is_in_ref(xi, include_boundary=True):
+    @classmethod
+    def is_in_ref(cls, xi, include_boundary=True):
         if include_boundary:
 
             def lop(x, y):
@@ -471,8 +512,8 @@ class ElementTet(Element3D):
 
         return True
 
-    @staticmethod
-    def int_weights(num_points):
+    @classmethod
+    def int_weights(cls, num_points):
         """
         Returns the integration weights for the integration points
         """
@@ -483,8 +524,8 @@ class ElementTet(Element3D):
                 [1.0 / 6.0 / 4.0, 1.0 / 6.0 / 4.0, 1.0 / 6.0 / 4.0, 1.0 / 6.0 / 4.0]
             )
 
-    @staticmethod
-    def int_points(num_points):
+    @classmethod
+    def int_points(cls, num_points):
         """
         Returns the position of the integration points for a given number of integration points
         """
@@ -510,8 +551,8 @@ class ElementTet(Element3D):
 
 
 class ElementHex(Element3D):
-    @staticmethod
-    def is_in_ref(xi, include_boundary=True):
+    @classmethod
+    def is_in_ref(cls, xi, include_boundary=True):
         if include_boundary:
 
             def lop(x, y):
@@ -530,8 +571,8 @@ class ElementHex(Element3D):
 
         return True
 
-    @staticmethod
-    def int_points(num_points):
+    @classmethod
+    def int_points(cls, num_points):
         """
         Returns the position of the integration points for a given number of integration points
         """
@@ -559,8 +600,8 @@ class ElementHex(Element3D):
             )
         )
 
-    @staticmethod
-    def int_weights(num_points):
+    @classmethod
+    def int_weights(cls, num_points):
         """
         Returns the integration weights for the integration points
         """

@@ -26,7 +26,8 @@ class Tri6(ElementTri):
                 "You tried to created a TRI6 element with {0} nodes".format(len(nodes))
             )
 
-    def get_num_nodes(self) -> int:
+    @classmethod
+    def get_num_nodes(cls) -> int:
         """
         Get number of nodes of a TRI6 element
 

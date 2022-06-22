@@ -33,7 +33,8 @@ class Tet4(ElementTet):
                 "You tried to created a TET4 element with {0} nodes".format(len(nodes))
             )
 
-    def get_num_nodes(self) -> int:
+    @classmethod
+    def get_num_nodes(cls) -> int:
         """
         Get number of nodes of a TET4 element
 

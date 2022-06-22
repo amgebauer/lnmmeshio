@@ -27,6 +27,7 @@ from .element.element import (
     Element2D,
     Element3D,
     ElementHex,
+    ElementQuad,
     ElementTet,
     ElementTri,
 )
