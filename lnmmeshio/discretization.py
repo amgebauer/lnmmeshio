@@ -134,16 +134,16 @@ class Discretization:
 
         self.compute_ids(True)
         nodeset_ids: Set[int] = set([n.id for n in self.surfacenodesets[id]])
+        for element_container in self.elements.values():
+            for ele in element_container:
 
-        for ele in self.elements.structure:
-
-            for face in ele.get_faces():
-                node_ids = [n.id for n in face.nodes]
-                if all([node_id in nodeset_ids for node_id in node_ids]):
-                    face_id = "/".join(sorted([str(nid) for nid in node_ids]))
-                    if face_id not in added_faces:
-                        face_elements.append(face)
-                        added_faces.add(face_id)
+                for face in ele.get_faces():
+                    node_ids = [n.id for n in face.nodes]
+                    if all([node_id in nodeset_ids for node_id in node_ids]):
+                        face_id = "/".join(sorted([str(nid) for nid in node_ids]))
+                        if face_id not in added_faces:
+                            face_elements.append(face)
+                            added_faces.add(face_id)
 
         return face_elements
 
@@ -157,17 +157,18 @@ class Discretization:
         self.compute_ids(True)
         nodeset_ids: Set[int] = set([n.id for n in self.volumenodesets[id]])
 
-        for ele in self.elements.structure:
+        for element_container in self.elements.values():
+            for ele in element_container:
 
-            if not isinstance(ele, Element3D):
-                continue
+                if not isinstance(ele, Element3D):
+                    continue
 
-            node_ids = [n.id for n in ele.nodes]
-            if all([node_id in nodeset_ids for node_id in node_ids]):
-                vol_id = "/".join(sorted([str(nid) for nid in node_ids]))
-                if vol_id not in added_vols:
-                    vol_elements.append(ele)
-                    added_vols.add(vol_id)
+                node_ids = [n.id for n in ele.nodes]
+                if all([node_id in nodeset_ids for node_id in node_ids]):
+                    vol_id = "/".join(sorted([str(nid) for nid in node_ids]))
+                    if vol_id not in added_vols:
+                        vol_elements.append(ele)
+                        added_vols.add(vol_id)
         return vol_elements
 
     def get_sections(self, out=True) -> Dict[str, List[str]]:
