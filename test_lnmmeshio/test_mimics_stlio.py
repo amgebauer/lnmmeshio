@@ -15,7 +15,6 @@ class TestMimicsStlIO(unittest.TestCase):
             os.makedirs(os.path.join(script_dir, "tmp"))
 
     def test_read_mimics_stl(self):
-
         mesh = lnmmeshio.read_mesh(
             os.path.join(script_dir, "data", "dummy.stl"), file_format="mimicsstl"
         )
@@ -32,7 +31,6 @@ class TestMimicsStlIO(unittest.TestCase):
         self.assertEqual(np.sum(mesh.cell_data["medit:ref"][0] == 3), 5706)
 
     def test_write_mimics_stl(self):
-
         points = np.array(
             [
                 [0, 0, 0],

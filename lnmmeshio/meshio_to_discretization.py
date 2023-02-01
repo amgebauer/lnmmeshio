@@ -168,7 +168,6 @@ ele_node_order_vtk2baci = {
 
 
 def mesh2Discretization(mesh: meshio.Mesh) -> Discretization:
-
     # create empty discretization
     disc = Discretization()
 
@@ -305,7 +304,6 @@ def discretization2mesh(dis: Discretization) -> meshio.Mesh:
     point_data = {}
 
     for i, n in enumerate(dis.nodes):
-
         for k, v in n.data.items():
             if k not in point_data:
                 point_data[k] = np.zeros(

@@ -13,7 +13,6 @@ class TestFibers(unittest.TestCase):
         pass
 
     def test_tri3_integration(self):
-
         tri3 = lnmmeshio.Tri3(
             "T3",
             [
@@ -60,7 +59,6 @@ class TestFibers(unittest.TestCase):
         )
 
     def test_tri6_integration(self):
-
         tri6 = lnmmeshio.Tri6(
             "T6",
             [
@@ -112,7 +110,6 @@ class TestFibers(unittest.TestCase):
         )
 
     def test_tri3_integration_x_xi(self):
-
         tri3 = lnmmeshio.Tri3(
             "T3",
             [
@@ -143,7 +140,6 @@ class TestFibers(unittest.TestCase):
         )
 
     def test_tri6_integration_x_xi(self):
-
         tri6 = lnmmeshio.Tri6(
             "T6",
             [

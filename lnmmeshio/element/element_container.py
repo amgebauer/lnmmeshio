@@ -337,7 +337,6 @@ class ElementContainer:
             fieldtype = "Elements"
 
         for line in progress(lines, out=out, label=fieldtype):
-
             ele = parse_ele(line, nodes)
 
             if ele is None:

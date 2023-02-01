@@ -151,7 +151,6 @@ class TestEles(unittest.TestCase):
 
         shapefcns = ele.shape_fcns(xi)
         for i, ref_coords in enumerate(ele.nodal_reference_coordinates()):
-
             for j, shapefcn in enumerate(shapefcns):
                 self.assertEqual(
                     sp.simplify(self._subs(shapefcn, xi, ref_coords)),
@@ -170,7 +169,6 @@ class TestEles(unittest.TestCase):
     def __test_ele(
         self, shape, cls, nnodes, faces, facetype, edges, edgetype, test_get_xi=False
     ):
-
         ele = parse_ele(
             "1 ELENAME {0} {1} MAT 11 KINEM nonlinear TYPE Std".format(
                 shape, " ".join([str(i) for i in range(1, nnodes + 1)])
@@ -225,7 +223,6 @@ class TestEles(unittest.TestCase):
                     self.assertAlmostEqual(a, b)
 
     def _test_ele_shpfcns(self, cls, xis):
-
         for i, xi in enumerate(xis):
             if not isinstance(xi, np.ndarray):
                 xis[i] = np.array(xi).reshape((-1))

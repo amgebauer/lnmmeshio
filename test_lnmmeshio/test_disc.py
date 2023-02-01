@@ -73,7 +73,6 @@ class TestDiscretizationIO(unittest.TestCase):
         self.assertListEqual([ns.id for ns in disc.nodes[147].surfacenodesets], [6])
 
     def test_write_new(self):
-
         # build dummy discretization
         d: lnmmeshio.Discretization = lnmmeshio.Discretization()
         d.nodes = [

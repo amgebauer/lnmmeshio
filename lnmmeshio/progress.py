@@ -10,7 +10,6 @@ def progress(
     label: str = None,
     btype: str = "bar",
 ) -> Union[Iterable, Sized]:
-
     max_val = 0
     try:
         max_val = len(iterator)

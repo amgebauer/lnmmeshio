@@ -87,7 +87,6 @@ def write_case(
                 ele_cur_count[eletype] = 0
 
             for varname, data in ele.data.items():
-
                 data = np.array(data)
                 if len(data.shape) == 0:
                     data = data.reshape((1))
@@ -175,7 +174,6 @@ def _write_case(
     ele_vars_props: Dict[str, Dict[str, Any]],
     nodal_vars_props: Dict[str, Dict[str, Any]],
 ) -> None:
-
     sets = {1: 1}
     dim_to_type = {1: "scalar", 3: "vector", 6: "tensor symm"}
 
@@ -312,7 +310,6 @@ def write_element_variable(
     ts = None
 
     for key, edata in data.items():
-
         if len(edata.shape) > 3:
             raise RuntimeError("This kind of data is not supported. To many dimensions")
 

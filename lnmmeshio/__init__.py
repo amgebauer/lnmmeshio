@@ -37,6 +37,7 @@ from .element.hex20 import Hex20
 from .element.hex27 import Hex27
 from .element.line2 import Line2
 from .element.line3 import Line3
+from .element.pyramid5 import Pyramid5
 from .element.quad4 import Quad4
 from .element.quad8 import Quad8
 from .element.quad9 import Quad9
@@ -45,6 +46,7 @@ from .element.tet10 import Tet10
 from .element.tri3 import Tri3
 from .element.tri6 import Tri6
 from .element.vertex import Vertex
+from .element.wedge6 import Wedge6
 from .fiber import Fiber
 from .node import Node
 from .nodeset import LineNodeset, PointNodeset, SurfaceNodeset, VolumeNodeset

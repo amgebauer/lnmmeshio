@@ -3,44 +3,35 @@ image: python:3.7
 variables:
   PACKAGE_NAME: lnmmeshio
 
-before_script:
-  - python3.8 -m venv venv
-  - . venv/bin/activate
-
 .test: &test
   stage: test
   variables:
-    PYTHON_VERSION: ""
+    PYTHON_EXECUTABLE: ""
   script:
-  - pip install tox
-  - rm -rf .tox/
-  - rm -rf junit.xml
-  - tox -e $PYTHON_VERSION
-  coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
+    - if [ -d "testvenv" ]; then rm -rf testvenv; fi
+    - $PYTHON_EXECUTABLE -m venv testvenv
+    - . testvenv/bin/activate
+    - pip install wheel
+    - pip install  --index-url=https://pypi.python.org/simple/ --extra-index-url=https://lnm-heartgroup.pages.gitlab.lrz.de/packages/ -r requirements-dev.txt
+    - pytest --cache-clear
+  coverage: "/TOTAL.+ ([0-9]{1,3}%)/"
   rules:
     - when: always
   artifacts:
     reports:
       junit: junit.xml
 
-test_python_3.7:
-  <<: *test
-  variables:
-    PYTHON_VERSION: "py37"
-  rules:
-    - when: always
-
 test_python_3.8:
   <<: *test
   variables:
-    PYTHON_VERSION: "py38"
+    PYTHON_EXECUTABLE: "python3.8"
   rules:
     - when: always
 
 test_python_3.9:
   <<: *test
   variables:
-    PYTHON_VERSION: "py39"
+    PYTHON_EXECUTABLE: "python3.9"
   rules:
     - when: always
 
@@ -56,7 +47,6 @@ version_check:
     - if: '$CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "merge_request_event"'
       when: on_success
     - when: never
-
 
 pages:
   stage: deploy

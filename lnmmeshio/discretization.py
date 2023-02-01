@@ -114,7 +114,6 @@ class Discretization:
         nodeset_ids: Set[int] = set([n.id for n in self.linenodesets[id]])
 
         for ele in self.elements.structure:
-
             for edge in ele.get_edges():
                 node_ids = [n.id for n in edge.nodes]
                 if all([node_id in nodeset_ids for node_id in node_ids]):
@@ -136,7 +135,6 @@ class Discretization:
         nodeset_ids: Set[int] = set([n.id for n in self.surfacenodesets[id]])
         for element_container in self.elements.values():
             for ele in element_container:
-
                 for face in ele.get_faces():
                     node_ids = [n.id for n in face.nodes]
                     if all([node_id in nodeset_ids for node_id in node_ids]):
@@ -159,7 +157,6 @@ class Discretization:
 
         for element_container in self.elements.values():
             for ele in element_container:
-
                 if not isinstance(ele, Element3D):
                     continue
 
