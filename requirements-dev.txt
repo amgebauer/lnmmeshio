@@ -9,3 +9,4 @@ black==23.1.0
 pre-commit==3.0.2
 parameterized==0.8.1
 coverage==5.2.1
+pdoc==12.3.1
