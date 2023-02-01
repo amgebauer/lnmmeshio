@@ -70,61 +70,46 @@ class TestMeshio2Discretization(unittest.TestCase):
         self.assertEqual(dis.elements.get_num_thermo(), dis2.elements.get_num_thermo())
 
         if dis.elements.get_num_structure() > 0:
-
             for ele1, ele2 in zip(dis.elements.structure, dis2.elements.structure):
-
                 # check, whether nodes are the same within the element
                 self.assertEqual(ele1.shape, ele2.shape)
                 self.assertEqual(len(ele1.nodes), len(ele2.nodes))
 
                 for n1, n2 in zip(ele1.nodes, ele2.nodes):
-
                     self.assertEqual(n1.id, n2.id)
 
         if dis.elements.get_num_ale() > 0:
-
             for ele1, ele2 in zip(dis.elements.ale, dis2.elements.ale):
-
                 # check, whether nodes are the same within the element
                 self.assertEqual(ele1.shape, ele2.shape)
                 self.assertEqual(len(ele1.nodes), len(ele2.nodes))
 
                 for n1, n2 in zip(ele1.nodes, ele2.nodes):
-
                     self.assertEqual(n1.id, n2.id)
 
         if dis.elements.get_num_fluid() > 0:
-
             for ele1, ele2 in zip(dis.elements.fluid, dis2.elements.fluid):
-
                 # check, whether nodes are the same within the element
                 self.assertEqual(ele1.shape, ele2.shape)
                 self.assertEqual(len(ele1.nodes), len(ele2.nodes))
 
                 for n1, n2 in zip(ele1.nodes, ele2.nodes):
-
                     self.assertEqual(n1.id, n2.id)
 
         if dis.elements.get_num_transport() > 0:
-
             for ele1, ele2 in zip(dis.elements.transport, dis2.elements.transport):
-
                 # check, whether nodes are the same within the element
                 self.assertEqual(ele1.shape, ele2.shape)
                 self.assertEqual(len(ele1.nodes), len(ele2.nodes))
 
                 for n1, n2 in zip(ele1.nodes, ele2.nodes):
-
                     self.assertEqual(n1.id, n2.id)
 
         if dis.elements.get_num_thermo() > 0:
-
             for ele1, ele2 in zip(dis.elements.thermo, dis2.elements.thermo):
-
                 # check, whether nodes are the same within the element
                 self.assertEqual(ele1.shape, ele2.shape)
                 self.assertEqual(len(ele1.nodes), len(ele2.nodes))
 
                 for n1, n2 in zip(ele1.nodes, ele2.nodes):
-
                     self.assertEqual(n1.id, n2.id)

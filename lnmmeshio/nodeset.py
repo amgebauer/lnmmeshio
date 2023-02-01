@@ -61,7 +61,6 @@ class Nodeset:
 
         next_number = 0
         for line in progress(lines, out=out, label="dnode topology"):
-
             nodeid_str, _ = read_option_item(line, "NODE")
             if nodeid_str is None or nodeid_str == "":
                 # this is not a node, probably a comment
@@ -192,7 +191,6 @@ class NodesetBuilder:
         self.nodesets[self.id2pos[id]].add_node(node)
 
     def get_unused_id(self):
-
         nsid = 1
         while nsid in self.id2pos.keys():
             nsid += 1
