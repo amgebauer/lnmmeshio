@@ -3,15 +3,17 @@ image: python:3.7
 variables:
   PACKAGE_NAME: lnmmeshio
 
+before_script:
+  - if [ -d "testvenv" ]; then rm -rf testvenv; fi
+  - $PYTHON_EXECUTABLE -m venv testvenv
+  - . testvenv/bin/activate
+  - pip install wheel
+
 .test: &test
   stage: test
   variables:
     PYTHON_EXECUTABLE: ""
   script:
-    - if [ -d "testvenv" ]; then rm -rf testvenv; fi
-    - $PYTHON_EXECUTABLE -m venv testvenv
-    - . testvenv/bin/activate
-    - pip install wheel
     - pip install  --index-url=https://pypi.python.org/simple/ --extra-index-url=https://lnm-heartgroup.pages.gitlab.lrz.de/packages/ -r requirements-dev.txt
     - pytest --cache-clear
   coverage: "/TOTAL.+ ([0-9]{1,3}%)/"
@@ -37,6 +39,8 @@ test_python_3.9:
 
 version_check:
   stage: test
+  variables:
+    PYTHON_EXECUTABLE: "python3.9"
   script:
     - echo "Check whether version already exists"
     - VERSION=$(cat VERSION)
@@ -50,6 +54,8 @@ version_check:
 
 pages:
   stage: deploy
+  variables:
+    PYTHON_EXECUTABLE: "python3.9"
   script:
     - mkdir -p public
     - mkdir -p public/coverage
