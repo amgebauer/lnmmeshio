@@ -1,5 +1,7 @@
 # Meshio for BACI
 
+[![pipeline](https://github.com/amgebauer/lnmmeshio/actions/workflows/ci.yml/badge.svg)](https://github.com/amgebauer/lnmmeshio/actions/workflows/ci.yml)
+
 Relies on meshio: https://github.com/nschloe/meshio
 
 ## Install

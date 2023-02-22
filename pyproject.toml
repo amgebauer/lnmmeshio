@@ -22,3 +22,7 @@ dependencies = [
     "python-utils>=2.3.0",
     "meshio>=4, <5.1.0",
 ]
+
+[project.urls]
+"Homepage" = "https://github.com/amgebauer/lnmmeshio"
+"Bug Tracker" = "https://github.com/amgebauer/lnmmeshio/issues"
