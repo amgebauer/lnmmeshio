@@ -11,7 +11,7 @@ class TestMeshio2Discretization(unittest.TestCase):
         pass
 
     def test_get_dsurf_elements(self):
-        dis: lnmmeshio.Discretization = lnmmeshio.read_discr(
+        dis: lnmmeshio.Discretization = lnmmeshio.read(
             os.path.join(script_dir, "data", "dummy2.dat")
         )
 
@@ -24,7 +24,7 @@ class TestMeshio2Discretization(unittest.TestCase):
         )
 
     def test_get_dline_elements(self):
-        dis: lnmmeshio.Discretization = lnmmeshio.read_discr(
+        dis: lnmmeshio.Discretization = lnmmeshio.read(
             os.path.join(script_dir, "data", "dummy2.dat")
         )
 
