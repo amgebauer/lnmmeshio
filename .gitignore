@@ -11,3 +11,4 @@ htmlcov
 junit.xml
 docs/
 test_lnmmeshio/tmp
+pip-wheel-metadata
