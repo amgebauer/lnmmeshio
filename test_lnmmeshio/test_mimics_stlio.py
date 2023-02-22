@@ -21,8 +21,8 @@ class TestMimicsStlIO(unittest.TestCase):
 
         # check, whether everything is ok
         self.assertEqual(len(mesh.cells), 1)
-        self.assertEqual(mesh.cells[0][0], "triangle")
-        self.assertEqual(mesh.cells[0][1].shape, (18562, 3))
+        self.assertEqual(mesh.cells[0].type, "triangle")
+        self.assertEqual(mesh.cells[0].data.shape, (18562, 3))
         self.assertEqual(mesh.points.shape, (9283, 3))
 
         # check, whether material is recognized
