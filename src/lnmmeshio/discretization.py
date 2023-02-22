@@ -96,8 +96,7 @@ class Discretization:
         """
         arr: np.ndarray = np.zeros((len(self.nodes), 3))
 
-        i: int = 0
-        for node in self.nodes:
+        for i, node in enumerate(self.nodes):
             arr[i, :] = node.coords
             i += 1
 

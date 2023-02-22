@@ -70,7 +70,7 @@ def _read_binary(f):
 
 def write(filename, mesh):
     assert (
-        len(mesh.cells) == 1 and mesh.cells[0][0] == "triangle"
+        len(mesh.cells) == 1 and mesh.cells[0].type == "triangle"
     ), "STL can only write triangle cells."
 
     if mesh.points.shape[1] == 2:
@@ -98,8 +98,8 @@ def _write_binary(filename, points, cells, cell_data=None):
     pts = None
     attrs = None
     for i, t in enumerate(cells):
-        if t[0] == "triangle":
-            pts = points[t[1]]
+        if t.type == "triangle":
+            pts = points[t.data]
 
             if cell_data is not None and "medit:ref" in cell_data:
                 attrs = cell_data["medit:ref"][i].astype(numpy.uint16)
@@ -119,7 +119,7 @@ def _write_binary(filename, points, cells, cell_data=None):
         msg += (79 - len(msg)) * "X"
         msg += "\n"
         fh.write(msg.encode("utf-8"))
-        fh.write(numpy.uint32(len(cells[0][1])))
+        fh.write(numpy.uint32(len(cells[0].data)))
         for pt, normal, attr in zip(pts, normals, attrs):
             fh.write(normal.astype(numpy.float32))
             fh.write(pt.astype(numpy.float32))

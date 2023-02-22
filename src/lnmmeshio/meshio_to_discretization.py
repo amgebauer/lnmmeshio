@@ -4,7 +4,7 @@
 # This is the interface between the meshio package and our Discretization description
 # May not work perfectly
 #
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import meshio
 import numpy as np
@@ -31,6 +31,7 @@ from .progress import progress
 cell_nodes = {
     "vertex": 1,
     "line": 2,
+    "line3": 3,
     "triangle": 3,
     "triangle6": 6,
     "tetra": 4,
@@ -48,6 +49,7 @@ cell_nodes = {
 cell_disc_eles = {
     "vertex": "UNKNOWN",
     "line": "UNKNOWN",
+    "line3": "UNKNOWN",
     "triangle": "UNKNOWN",
     "triangle6": "UNKNOWN",
     "tetra": "SOLIDT4",
@@ -64,6 +66,7 @@ cell_disc_eles = {
 cell_disc_shape = {
     "vertex": "VERTEX1",
     "line": "LINE2",
+    "line3": "LINE3",
     "triangle": "TRI3",
     "triangle6": "TRI6",
     "tetra": "TET4",
@@ -104,6 +107,7 @@ cell_to_dim = {
 ele_node_order_vtk2baci = {
     "VERTEX1": list(range(0, 1)),
     "LINE2": list(range(0, 2)),
+    "LINE3": list(range(0, 2)),
     "TRI3": list(range(0, 3)),
     "TRI6": list(range(0, 6)),
     "TET4": list(range(0, 4)),
@@ -185,7 +189,7 @@ def mesh2Discretization(mesh: meshio.Mesh) -> Discretization:
         disc.nodes.append(n)
 
     # get the maximum element dimension, which is the dimension of the mesh
-    maxdim = max([cell_to_dim[cells[0]] for cells in mesh.cells])
+    maxdim = max([cell_to_dim[cell_block.type] for cell_block in mesh.cells])
 
     # create Elements from cells
     disc.elements.structure = []
@@ -194,15 +198,13 @@ def mesh2Discretization(mesh: meshio.Mesh) -> Discretization:
     surfnsbuilder = SurfaceNodesetBuilder()
     volumensbuilder = VolumeNodesetBuilder()
 
-    for cellgroupid, (celltype, cells) in enumerate(mesh.cells):
-        if celltype not in cell_nodes:
+    for cellgroupid, cellblock in enumerate(mesh.cells):
+        if cellblock.type not in cell_nodes:
             raise Exception(
-                "The cell type {0} is currently not implemented".format(celltype)
+                "The cell type {0} is currently not implemented".format(cellblock.type)
             )
 
-        for cellid, cell in enumerate(
-            progress(cells, label="Create {0} elements".format(celltype))
-        ):
+        for cellid, cell in enumerate(cellblock.data):
             # read nodes that belong to the cells
             nodes = []
 
@@ -215,22 +217,24 @@ def mesh2Discretization(mesh: meshio.Mesh) -> Discretization:
             # cells with the same dimension as the mesh dimensions are normal cells
             # cells with a lower dimension are treated as surface, line or node
             # definitions
-            eledim = cell_to_dim[celltype]
-            if maxdim == eledim:
+            element_dim = cell_to_dim[cellblock.type]
+            if maxdim == element_dim:
                 # this is a normal element
                 ele = create_element(
-                    cell_disc_eles[celltype],
-                    cell_disc_shape[celltype],
+                    cell_disc_eles[cellblock.type],
+                    cell_disc_shape[cellblock.type],
                     # also need to reorder nodes in a few element types
                     [
                         nodes[i]
-                        for i in ele_node_order_vtk2baci[cell_disc_shape[celltype]]
+                        for i in ele_node_order_vtk2baci[
+                            cell_disc_shape[cellblock.type]
+                        ]
                     ],
                 )
                 disc.elements.structure.append(ele)
 
                 # extract material info from cell data
-                matid: int = _get_material_from_cell_data(
+                matid: Optional[int] = _get_material_from_cell_data(
                     mesh.cell_data, cellgroupid, cellid
                 )
                 if matid == None:
@@ -241,32 +245,33 @@ def mesh2Discretization(mesh: meshio.Mesh) -> Discretization:
                 for key, data in mesh.cell_data.items():
                     ele.data[key] = data[cellgroupid][cellid]
 
-                # # create surface-nodesets
+                # create surface-nodesets
                 if maxdim == 2 and len(mesh.cell_data) > 0:
-                    nsid: int = int(
-                        _get_nodesetid_from_cell_data(
-                            mesh.cell_data, cellgroupid, cellid
-                        )
+                    nsid: Optional[int] = _get_nodesetid_from_cell_data(
+                        mesh.cell_data, cellgroupid, cellid
                     )
-                    for node in nodes:
-                        surfnsbuilder.add(node, nsid)
+
+                    if nsid is not None:
+                        for node in nodes:
+                            surfnsbuilder.add(node, nsid)
 
             else:
                 # this is a lower-dimensional element
                 # treat as surface-, line- or point-nodeset definition
 
                 # extract nodeset info from cell data
-                nsid: int = int(
-                    _get_nodesetid_from_cell_data(mesh.cell_data, cellgroupid, cellid)
+                nsid: Optional[int] = _get_nodesetid_from_cell_data(
+                    mesh.cell_data, cellgroupid, cellid
                 )
 
-                for node in nodes:
-                    if eledim == 0:
-                        pointnsbuilder.add(node, nsid)
-                    elif eledim == 1:
-                        linensbuilder.add(node, nsid)
-                    elif eledim == 2:
-                        surfnsbuilder.add(node, nsid)
+                if nsid is not None:
+                    for node in nodes:
+                        if element_dim == 0:
+                            pointnsbuilder.add(node, nsid)
+                        elif element_dim == 1:
+                            linensbuilder.add(node, nsid)
+                        elif element_dim == 2:
+                            surfnsbuilder.add(node, nsid)
 
     # go through nodesets
     for name, nodes in mesh.point_sets.items():
@@ -315,67 +320,53 @@ def discretization2mesh(dis: Discretization) -> meshio.Mesh:
     cells = []
     cell_data = {}
 
-    # store elements
+    id_to_index = {}
+
+    # store cells
     for eletype in dis.elements.values():
         for ele in eletype:
             celltype = disc_shape_cell[ele.shape]
 
             newgroup = False
 
-            if len(cells) == 0 or cells[-1]["type"] != celltype:
-                cells.append(
-                    {
-                        "type": celltype,
-                        "arr": np.zeros((0, len(ele.nodes)), dtype=int),
-                    }
-                )
+            if len(cells) == 0 or cells[-1][0] != celltype:
+                cell_nodes = []
+                cells.append((celltype, cell_nodes))
                 newgroup = True
+            else:
+                cell_nodes = cells[-1][1]
 
-            cells[-1]["arr"] = np.append(
-                cells[-1]["arr"],
-                np.array([n.id for n in ele.nodes]).reshape((1, -1)),
-                axis=0,
-            )
-            # store material id
+            cell_nodes.append([n.id for n in ele.nodes])
+            id_to_index[ele.id] = (len(cells) - 1, len(cell_nodes) - 1)
+
+    # go again through the elements to store element data
+    for eletype in dis.elements.values():
+        for ele in eletype:
+            block_id, cell_id = id_to_index[ele.id]
+
             if "MAT" in ele.options:
-                for variable_name in _cell_data_id_names:
-                    if variable_name not in cell_data:
-                        cell_data[variable_name] = []
-
-                    if newgroup:
-                        cell_data[variable_name].append(np.array([], dtype=int))
-
-                    cell_data[variable_name][-1] = np.append(
-                        cell_data[variable_name][-1],
-                        int(
-                            ele.options["MAT"][0]
-                            if _isiter(ele.options["MAT"])
-                            else ele.options["MAT"]
-                        ),
+                if "material" not in cell_data:
+                    cell_data["material"] = _create_cell_variable(
+                        cells, tuple([1]), int
                     )
+
+                cell_data["material"][block_id][cell_id] = int(
+                    ele.options["MAT"][0]
+                    if _isiter(ele.options["MAT"])
+                    else ele.options["MAT"]
+                )
 
             for variable_name, value in ele.data.items():
                 value_reshaped = np.array(value).reshape((-1))
+
                 if variable_name not in cell_data:
-                    cell_data[variable_name] = []
-
-                if newgroup:
-                    cell_data[variable_name].append(
-                        np.zeros(
-                            tuple([0] + list(value_reshaped.shape)),
-                            dtype=value_reshaped.dtype,
-                        )
+                    cell_data[variable_name] = _create_cell_variable(
+                        cells, value_reshaped.shape, value_reshaped.dtype
                     )
-
-                cell_data[variable_name][-1] = np.append(
-                    cell_data[variable_name][-1], value_reshaped.reshape(1, -1), axis=0
-                )
-
-    # store nodesets
-    cells_new = [(cell["type"], cell["arr"]) for cell in cells]
+                    cell_data["material"][block_id][cell_id] = value_reshaped
 
     mesh: meshio.Mesh = meshio.Mesh(
-        points, cells_new, cell_data=cell_data, point_data=point_data
+        points, cells, cell_data=cell_data, point_data=point_data
     )
 
     dis.reset()
@@ -383,14 +374,28 @@ def discretization2mesh(dis: Discretization) -> meshio.Mesh:
     return mesh
 
 
+def _create_cell_variable(
+    cells: List[Tuple[str, List[int]]], shape: Tuple[int], dtype
+) -> List[np.ndarray]:
+    data = []
+
+    for block in cells:
+        new_shape = tuple([len(block[1])] + list(shape))
+        if len(shape) == 1 and shape[0] == 1:
+            new_shape = tuple([len(block[1])])
+        data.append(np.zeros(new_shape, dtype=dtype))
+
+    return data
+
+
 def _get_material_from_cell_data(
     celldata: Dict[str, List[List[Any]]], cellgroupid: int, cellid: int
-) -> int:
+) -> Optional[int]:
     for name in _cell_data_id_names:
         if name in celldata:
             return int(celldata[name][cellgroupid][cellid])
 
-    return cellgroupid
+    return None
 
 
 def _get_nodesetid_from_cell_data(
