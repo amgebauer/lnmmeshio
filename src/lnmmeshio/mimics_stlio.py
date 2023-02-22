@@ -1,4 +1,8 @@
 """
+This file is mainly based on the stl-reader by meshio (https://github.com/nschloe/meshio).
+
+Copyright (c) 2015-2021 Nico Schlömer et al.
+
 I/O for the STL format, cf.
 <https://en.wikipedia.org/wiki/STL_(file_format)>.
 """

@@ -237,7 +237,7 @@ def write_mesh(
     mesh: Mesh,
     file_format: Optional[str] = None,
     override: bool = True,
-    **kwargs
+    **kwargs,
 ) -> None:
     """
     Writes an unstructured mesh with added data from meshio raw data

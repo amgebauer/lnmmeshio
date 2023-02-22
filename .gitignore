@@ -10,3 +10,4 @@ htmlcov
 .pytest_cache
 junit.xml
 docs/
+test_lnmmeshio/tmp
