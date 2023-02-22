@@ -49,6 +49,7 @@ jobs:
   version_check:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - name: Check Version
         run: |
           VERSION=$(sed -n 's/^ *version.*=.*"\([^"]*\)".*/\1/p' pyproject.toml)
