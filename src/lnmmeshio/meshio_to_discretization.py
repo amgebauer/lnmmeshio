@@ -363,7 +363,7 @@ def discretization2mesh(dis: Discretization) -> meshio.Mesh:
                     cell_data[variable_name] = _create_cell_variable(
                         cells, value_reshaped.shape, value_reshaped.dtype
                     )
-                    cell_data["material"][block_id][cell_id] = value_reshaped
+                    cell_data[variable_name][block_id][cell_id] = value_reshaped
 
     mesh: meshio.Mesh = meshio.Mesh(
         points, cells, cell_data=cell_data, point_data=point_data

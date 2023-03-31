@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "lnmmeshio"
-version = "5.2.1"
+version = "5.2.2"
 authors = [
   { name="Amadeus Gebauer", email="amadeus.gebauer@tum.de" },
 ]
