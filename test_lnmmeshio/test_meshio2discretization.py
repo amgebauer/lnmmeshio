@@ -113,3 +113,26 @@ class TestMeshio2Discretization(unittest.TestCase):
 
                 for n1, n2 in zip(ele1.nodes, ele2.nodes):
                     self.assertEqual(n1.id, n2.id)
+
+    def test_2D_mesh_element_data(self):
+        dis = lnmmeshio.Discretization()
+
+        dis.nodes = [
+            lnmmeshio.Node(np.array([1.0, 0.0, 0.0])),
+            lnmmeshio.Node(np.array([1.0, 0.0, 0.0])),
+            lnmmeshio.Node(np.array([1.0, 0.0, 0.0])),
+            lnmmeshio.Node(np.array([1.0, 0.0, 0.0])),
+            lnmmeshio.Node(np.array([1.0, 0.0, 0.0])),
+        ]
+
+        dis.elements.structure = [
+            lnmmeshio.Tri3(None, [dis.nodes[0], dis.nodes[1], dis.nodes[2]]),
+            lnmmeshio.Tri3(None, [dis.nodes[0], dis.nodes[3], dis.nodes[4]]),
+        ]
+
+        dis.elements.structure[0].data["test"] = 1
+        dis.elements.structure[1].data["test"] = 2
+
+        mesh = lnmmeshio.meshio_to_discretization.discretization2mesh(dis)
+
+        self.assertListEqual(list(mesh.cell_data["test"][0]), [1, 2])
