@@ -183,33 +183,6 @@ class Discretization:
         problem_size.append(line_option("MATERIALS", 9999))  # Write dummy value
         sections["PROBLEM SIZE"] = problem_size
 
-        # write design description
-        design_description = []
-        design_description.append(
-            line_option(
-                "NDPOINT",
-                len(self.pointnodesets) if self.pointnodesets is not None else 0,
-            )
-        )
-        design_description.append(
-            line_option(
-                "NDLINE", len(self.linenodesets) if self.linenodesets is not None else 0
-            )
-        )
-        design_description.append(
-            line_option(
-                "NDSURF",
-                len(self.surfacenodesets) if self.surfacenodesets is not None else 0,
-            )
-        )
-        design_description.append(
-            line_option(
-                "NDVOL",
-                len(self.volumenodesets) if self.volumenodesets is not None else 0,
-            )
-        )
-        sections["DESIGN DESCRIPTION"] = design_description
-
         # write topology
         for ns in [
             self.pointnodesets,
