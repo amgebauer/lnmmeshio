@@ -102,6 +102,24 @@ class Discretization:
 
         return arr
 
+    def get_ele_center_coords(self) -> np.ndarray:
+        """
+        Returns an np.array((num_node, 3)) with the center coordinates of each structure element
+        """
+        arr: np.ndarray = np.zeros((len(self.elements.structure), 3))
+
+        i: int = 0
+        for ele in self.elements.structure:
+            node_coords = ele.get_node_coords()
+
+            # Calculate the average coordinates
+            average_center_coords = np.mean(node_coords, axis=0)
+
+            arr[i, :] = average_center_coords
+            i += 1
+
+        return arr
+
     def get_dline_elements(self, id: int) -> List[Element1D]:
         """
         Returns a list of line elements that belong to a dline
