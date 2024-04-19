@@ -141,9 +141,9 @@ class ElementContainer:
         """
         d = OrderedDict()
         for key, elements in self.items():
-            d[
-                ElementContainer.get_section_name(key)
-            ] = ElementContainer.__get_section_lines(elements, out=out)
+            d[ElementContainer.get_section_name(key)] = (
+                ElementContainer.__get_section_lines(elements, out=out)
+            )
 
         return d
 
