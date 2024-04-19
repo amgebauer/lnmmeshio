@@ -17,6 +17,7 @@ class ElementContainer:
     ElementContainer.ale
     ElementContainer.transport
     ElementContainer.thermo
+    ElementContainer.artery
     """
 
     TypeStructure: str = "structure"
@@ -24,6 +25,7 @@ class ElementContainer:
     TypeALE: str = "ale"
     TypeTransport: str = "transport"
     TypeThermo: str = "thermo"
+    TypeArtery: str = "artery"
 
     def __init__(self):
         """
@@ -34,6 +36,7 @@ class ElementContainer:
         self.ale: Optional[List[Element]] = None
         self.transport: Optional[List[Element]] = None
         self.thermo: Optional[List[Element]] = None
+        self.artery: Optional[List[Element]] = None
 
     def get_num_structure(self) -> int:
         """
@@ -95,6 +98,18 @@ class ElementContainer:
 
         return len(self.thermo)
 
+    def get_num_artery(self) -> int:
+        """
+        Returns the number of artery elements in the discretization
+
+        Returns:
+            int: Number of artery parameters in the discretization
+        """
+        if self.artery is None:
+            return 0
+
+        return len(self.artery)
+
     def write(self, dest):
         """
         Write the corresponding sections into the stream like variable dest
@@ -117,15 +132,18 @@ class ElementContainer:
         if self.thermo is not None:
             ElementContainer.__write_section(dest, "THERMO ELEMENTS", self.thermo)
 
+        if self.artery is not None:
+            ElementContainer.__write_section(dest, "ARTERY ELEMENTS", self.artery)
+
     def get_sections(self, out=True):
         """
         Returns an ordereddict of sections with the corresponding lines
         """
         d = OrderedDict()
         for key, elements in self.items():
-            d[
-                ElementContainer.get_section_name(key)
-            ] = ElementContainer.__get_section_lines(elements, out=out)
+            d[ElementContainer.get_section_name(key)] = (
+                ElementContainer.__get_section_lines(elements, out=out)
+            )
 
         return d
 
@@ -148,6 +166,8 @@ class ElementContainer:
             ele_list.append(self.transport)
         if self.thermo is not None:
             ele_list.append(self.thermo)
+        if self.artery is not None:
+            ele_list.append(self.artery)
 
         return ele_list
 
@@ -179,6 +199,8 @@ class ElementContainer:
             ele_keys.append(self.TypeTransport)
         if self.thermo is not None:
             ele_keys.append(self.TypeThermo)
+        if self.artery is not None:
+            ele_keys.append(self.TypeArtery)
 
         return ele_keys
 
@@ -202,6 +224,8 @@ class ElementContainer:
             return self.transport
         elif key == self.TypeThermo and self.thermo is not None:
             return self.thermo
+        elif key == self.TypeArtery and self.artery is not None:
+            return self.artery
 
         raise KeyError("Key not found: {0}".format(key))
 
@@ -225,6 +249,8 @@ class ElementContainer:
             return True
         elif key == self.TypeThermo and self.thermo is not None:
             return True
+        elif key == self.TypeArtery and self.artery is not None:
+            return True
 
         return False
 
@@ -246,6 +272,8 @@ class ElementContainer:
             self.transport = value
         elif key == self.TypeThermo:
             self.thermo = value
+        elif key == self.TypeArtery:
+            self.artery = value
         else:
             raise KeyError("Key not found: {0}".format(key))
 
@@ -317,6 +345,11 @@ class ElementContainer:
                 nodes, sections["THERMO ELEMENTS"], out=out, fieldtype="Thermo elements"
             )
 
+        if "ARTERY ELEMENTS" in sections:
+            elec.thermo = ElementContainer.__read_elements(
+                nodes, sections["ARTERY ELEMENTS"], out=out, fieldtype="Artery elements"
+            )
+
         return elec
 
     @staticmethod
@@ -375,3 +408,5 @@ class ElementContainer:
             return "TRANSPORT ELEMENTS"
         if fieldtype == ElementContainer.TypeThermo:
             return "THERMO ELEMENTS"
+        if fieldtype == ElementContainer.TypeArtery:
+            return "ARTERY ELEMENTS"

@@ -6,6 +6,7 @@ Copyright (c) 2015-2021 Nico Schlömer et al.
 I/O for the STL format, cf.
 <https://en.wikipedia.org/wiki/STL_(file_format)>.
 """
+
 import io
 import logging
 import struct
