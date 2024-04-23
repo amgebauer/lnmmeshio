@@ -108,7 +108,7 @@ class TestDiscretizationIO(unittest.TestCase):
         for i in range(0, 4):
             d.volumenodesets[0].add_node(d.nodes[i])
 
-        d.elements.structure = [lnmmeshio.Element("SOLIDT4SCATRA", "TET4", d.nodes)]
+        d.elements.structure = [lnmmeshio.Element("SOLIDSCATRA", "TET4", d.nodes)]
         d.elements.structure[0].options = {
             "MAT": 1,
             "KINEM": "nonlinear",
@@ -167,7 +167,7 @@ class TestDiscretizationIO(unittest.TestCase):
             [[0, 1, 2, 3]],
         )
 
-        self.assertEqual(d_new.elements.structure[0].type, "SOLIDT4SCATRA")
+        self.assertEqual(d_new.elements.structure[0].type, "SOLIDSCATRA")
         self.assertEqual(d_new.elements.structure[0].shape, "TET4")
         self.assertListEqual(d_new.elements.structure[0].nodes, d_new.nodes)
         self.assertEqual(d_new.elements.structure[0].options["MAT"], "1")
