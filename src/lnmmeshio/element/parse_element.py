@@ -35,7 +35,7 @@ def create_element(
     Creates an element from a given element shape
 
     Args:
-        elename: name of the element (e.g. SOLIDH8)
+        elename: name of the element (e.g. SOLID)
         shape: str shape of the element (e.g. HEX8)
         nodes: nodes of the element
         throw_if_unknown: bool Throw an exception, if element type is not known
