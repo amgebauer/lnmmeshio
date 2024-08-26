@@ -11,15 +11,7 @@ from meshio import Mesh
 from meshio import read as _meshioread
 from meshio import write as _meshiowrite
 
-from . import (
-    element,
-    ensightio,
-    ioutils,
-    meshio_to_discretization,
-    mimics_stlio,
-    node,
-    nodeset,
-)
+from . import element, ensightio, ioutils, mimics_stlio, node, nodeset
 from .discretization import Discretization
 from .element.element import (
     Element,
@@ -245,8 +237,27 @@ def read_sections(filename: str) -> Dict[str, List[str]]:
 
 
 def from_mesh(mesh: Mesh) -> Discretization:
+    """
+    Converts a meshio.Mesh to a discretization
+    """
+    from . import meshio_to_discretization
+
     return meshio_to_discretization.mesh2Discretization(mesh)
 
 
 def to_mesh(mesh: Discretization) -> Mesh:
+    """
+    Converts a discretization to a meshio.Mesh
+    """
+    from . import meshio_to_discretization
+
     return meshio_to_discretization.discretization2mesh(mesh)
+
+
+def to_pyvista(dis: Discretization):
+    """
+    Converts a discretization to a pyvista unstructured grid
+    """
+    import pyvista
+
+    return pyvista.from_meshio(to_mesh(dis))
