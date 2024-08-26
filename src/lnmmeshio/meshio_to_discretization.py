@@ -1,6 +1,4 @@
 #
-# Maintainer: Amadeus Gebauer
-#
 # This is the interface between the meshio package and our Discretization description
 # May not work perfectly
 #
