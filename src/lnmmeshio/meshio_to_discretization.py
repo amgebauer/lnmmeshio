@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import meshio
 import numpy as np
+from tqdm import tqdm
 
 from .discretization import Discretization, Node
 from .element.line2 import Line2
@@ -24,7 +25,6 @@ from .nodeset import (
     VolumeNodeset,
     VolumeNodesetBuilder,
 )
-from .progress import progress
 
 cell_nodes = {
     "vertex": 1,
@@ -178,7 +178,7 @@ def mesh2Discretization(mesh: meshio.Mesh) -> Discretization:
     # node_sets -> are stored in disc.nodes
 
     # create Nodes from points
-    for i, coord in progress(enumerate(mesh.points), label="Create nodes"):
+    for i, coord in tqdm(enumerate(mesh.points), desc="Create nodes"):
         n = Node(coord)
 
         for key, v in mesh.point_data.items():

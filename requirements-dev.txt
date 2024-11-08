@@ -9,5 +9,6 @@ black==24.3.0
 pre-commit==3.0.2
 parameterized==0.8.1
 coverage==5.2.1
-pdoc==12.3.1
+pdoc==14.5.1
 pyvista==0.44.1
+sympy==1.13.3
