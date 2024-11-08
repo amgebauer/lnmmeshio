@@ -4,8 +4,7 @@ import struct
 from typing import IO, Any, Callable, Dict, Iterable, Iterator, List, Optional, Tuple
 
 import numpy as np
-
-from .progress import progress
+from tqdm import tqdm
 
 
 def read_dat_sections(origin):
@@ -24,7 +23,7 @@ def read_dat_sections(origin):
 
     current_section = ""
     content[current_section] = []
-    for line in progress(origin, label="Read input"):
+    for line in tqdm(origin, desc="Read input"):
         line_no_comment = line.split("//", 1)[0].strip()
         match_title = re_title.match(line_no_comment)
         if match_title:

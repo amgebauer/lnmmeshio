@@ -2,6 +2,7 @@ from collections import OrderedDict
 from typing import IO, TYPE_CHECKING, Dict, List, Set
 
 import numpy as np
+from tqdm import tqdm
 
 from .element.element import Element1D, Element2D, Element3D
 from .element.element_container import ElementContainer
@@ -9,7 +10,6 @@ from .fiber import Fiber
 from .ioutils import line_option, read_option_item, read_option_items, write_title
 from .node import Node
 from .nodeset import LineNodeset, PointNodeset, SurfaceNodeset, VolumeNodeset
-from .progress import progress
 
 
 class Discretization:
@@ -190,8 +190,8 @@ class Discretization:
             self.surfacenodesets,
             self.volumenodesets,
         ]:
-            for nsi in progress(
-                ns, out=out, label="Write Nodeset {0}".format(type(ns))
+            for nsi in tqdm(
+                ns, disable=not out, desc="Write Nodeset {0}".format(type(ns))
             ):
                 section_name = nsi.get_section()
                 if section_name not in sections:
@@ -201,7 +201,7 @@ class Discretization:
 
         # write nodes
         nodes = []
-        for node in progress(self.nodes, out=out, label="Write Nodes"):
+        for node in tqdm(self.nodes, disable=not out, desc="Write Nodes"):
             nodes.append(node.get_line())
         sections["NODE COORDS"] = nodes
 
@@ -219,7 +219,9 @@ class Discretization:
         """
         sections = self.get_sections(out=out)
 
-        for key, lines in progress(sections.items(), out=out, label="Write sections"):
+        for key, lines in tqdm(
+            sections.items(), disable=not out, desc="Write sections"
+        ):
             write_title(dest, key)
             for l in lines:
                 dest.write("{0}\n".format(l))
@@ -270,7 +272,7 @@ class Discretization:
         disc = Discretization()
 
         # read nodes
-        for line in progress(sections["NODE COORDS"], out=out, label="Nodes"):
+        for line in tqdm(sections["NODE COORDS"], disable=not out, desc="Nodes"):
             if "FNODE" in line:
                 # this is a fiber node
                 nodeid, _ = read_option_item(line, "FNODE")

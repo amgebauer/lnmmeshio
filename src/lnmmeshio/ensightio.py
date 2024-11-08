@@ -2,10 +2,10 @@ import os
 from typing import IO, Any, Dict, List, Tuple
 
 import numpy as np
+from tqdm import tqdm
 
 from . import ioutils as io
 from .discretization import Discretization
-from .progress import progress
 
 shape_to_eletype: Dict[str, str] = {
     "TET4": "tetra4",
@@ -75,7 +75,9 @@ def write_case(
     # build element variables
     ele_vars = {}
     ele_cur_count = {}
-    for eles in progress(dis.elements.values(), out=out, label="Prepare element data"):
+    for eles in tqdm(
+        dis.elements.values(), disable=not out, desc="Prepare element data"
+    ):
         for ele in eles:
             if ele.shape not in shape_to_eletype:
                 raise NotImplementedError(
@@ -104,8 +106,8 @@ def write_case(
 
     # write them finally
     ele_vars_props = {}
-    for varname, data in progress(
-        ele_vars.items(), out=out, label="Write element data"
+    for varname, data in tqdm(
+        ele_vars.items(), disable=not out, desc="Write element data"
     ):
         if override:
             varfile = os.path.join(
@@ -125,7 +127,9 @@ def write_case(
 
     # write nodal variables
     nodal_vars = {}
-    for i, node in progress(enumerate(dis.nodes), out=out, label="Prepare nodal data"):
+    for i, node in tqdm(
+        enumerate(dis.nodes), disable=not out, desc="Prepare nodal data"
+    ):
         for varname, data in node.data.items():
             # ensure that data is a np array
             data = np.array(data)
@@ -140,8 +144,8 @@ def write_case(
             nodal_vars[varname][i] = data
 
     nodal_vars_props = {}
-    for varname, data in progress(
-        nodal_vars.items(), out=out, label="Write nodal data"
+    for varname, data in tqdm(
+        nodal_vars.items(), disable=not out, desc="Write nodal data"
     ):
         if override:
             varfile = os.path.join(
@@ -272,8 +276,8 @@ def write_geometry(
 
     # build eletype array
     elegroups = {}
-    for eles in progress(
-        dis.elements.values(), out=out, label="Prepare element geometry"
+    for eles in tqdm(
+        dis.elements.values(), disable=not out, desc="Prepare element geometry"
     ):
         for ele in eles:
             if ele.shape not in shape_to_eletype:

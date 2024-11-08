@@ -118,7 +118,7 @@ class TestEles(unittest.TestCase):
             raise NotImplementedError("Unknown number of dimension: {0}".format(ele))
         shapefcns = ele.shape_fcns(xi)
 
-        self.assertEqual(sp.simplify(sum(shapefcns)), 1)
+        self.assertAlmostEqual(float(sp.simplify(sum(shapefcns))), 1.0)
 
     @staticmethod
     def _subs(expr, x, y):
@@ -152,8 +152,8 @@ class TestEles(unittest.TestCase):
         shapefcns = ele.shape_fcns(xi)
         for i, ref_coords in enumerate(ele.nodal_reference_coordinates()):
             for j, shapefcn in enumerate(shapefcns):
-                self.assertEqual(
-                    sp.simplify(self._subs(shapefcn, xi, ref_coords)),
+                self.assertAlmostEqual(
+                    float(sp.simplify(self._subs(shapefcn, xi, ref_coords))),
                     1 if i == j else 0,
                 )
 

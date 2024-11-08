@@ -1,9 +1,10 @@
 from collections import OrderedDict
 from typing import Dict, List, Optional
 
+from tqdm import tqdm
+
 from ..ioutils import write_title
 from ..node import Node
-from ..progress import progress
 from .element import Element
 from .parse_element import parse as parse_ele
 
@@ -303,7 +304,7 @@ class ElementContainer:
         """
         lines = []
         if elements is not None:
-            for ele in progress(elements, out=out, label="Write Element"):
+            for ele in tqdm(elements, disable=not out, desc="Write Element"):
                 lines.append(ele.get_line())
 
         return lines
@@ -369,7 +370,7 @@ class ElementContainer:
         if fieldtype is None:
             fieldtype = "Elements"
 
-        for line in progress(lines, out=out, label=fieldtype):
+        for line in tqdm(lines, disable=not out, desc=fieldtype):
             ele = parse_ele(line, nodes)
 
             if ele is None:

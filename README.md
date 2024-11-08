@@ -2,7 +2,7 @@
 
 [![pipeline](https://github.com/amgebauer/lnmmeshio/actions/workflows/build_and_test.yml/badge.svg)](https://github.com/amgebauer/lnmmeshio/actions/workflows/build_and_test.yml)
 
-Relies on meshio: https://github.com/nschloe/meshio
+Relies on meshio: <https://github.com/nschloe/meshio>
 
 ## Install
 
@@ -17,6 +17,7 @@ pip install lnmmeshio
 Does only read the discretization and currently completely ignores all other sections.
 
 Read/write a mesh into/from the Discretization class
+
 ```
 import lnmmeshio
 
@@ -50,7 +51,7 @@ for node in dis.surfacenodesets[0]:
 lnmmeshio.write('pathtofile.ext', dis)
 ```
 
-See also https://github.com/nschloe/meshio
+See also <https://github.com/nschloe/meshio>
 
 ## Make changes and upgrade
 
@@ -60,12 +61,3 @@ See also https://github.com/nschloe/meshio
 * Create a merge request from feature branch
 * Push changes to Gitlab and wait for the pipeline to pass
 * Once the MR is merged, the new version is available in the package repository
-
-## List of Contributors
-
-The following developers contributed to lnmmeshio (in alphabetical order):
-
- * Sebastian Brandstäter
- * Janina Datz
- * Amadeus Gebauer
- * Maire Henke

@@ -1,8 +1,10 @@
 from typing import IO, Iterator, List, Optional, Set
 
+from loguru import logger
+from tqdm import tqdm
+
 from .ioutils import read_option_item, write_title
 from .node import Node
-from .progress import progress
 
 
 class Nodeset:
@@ -60,7 +62,7 @@ class Nodeset:
         nodesets = []
 
         next_number = 0
-        for line in progress(lines, out=out, label="dnode topology"):
+        for line in tqdm(lines, disable=not out, desc="dnode topology"):
             nodeid_str, _ = read_option_item(line, "NODE")
             if nodeid_str is None or nodeid_str == "":
                 # this is not a node, probably a comment
@@ -69,7 +71,7 @@ class Nodeset:
             try:
                 nodeid = int(nodeid_str)
             except ValueError:
-                print("Could not read {0} as int".format(nodeid_str))
+                logger.warning(f"Could not read {nodeid_str} as int")
                 continue
             dpoint = int(
                 read_option_item(line, "D{0}".format(cls.get_typename_long()))[0]

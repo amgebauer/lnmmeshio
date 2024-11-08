@@ -51,7 +51,7 @@ class Node:
             raise RuntimeError("You have to compute ids before writing")
 
         dest.write(
-            " {0} COORD {1}".format(self.id, " ".join([repr(i) for i in self.coords]))
+            " {0} COORD {1}".format(self.id, " ".join([str(i) for i in self.coords]))
         )
 
         for k, f in self.fibers.items():
@@ -76,7 +76,7 @@ class Node:
             raise RuntimeError("You have to compute ids before writing")
 
         dest.write(
-            " {0} COORD {1}".format(self.id, " ".join([repr(i) for i in self.coords]))
+            " {0} COORD {1}".format(self.id, " ".join([str(i) for i in self.coords]))
         )
 
         for k, f in self.fibers.items():
