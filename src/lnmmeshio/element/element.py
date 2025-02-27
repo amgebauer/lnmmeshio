@@ -1,6 +1,5 @@
 import io
 import math
-from collections import OrderedDict
 from typing import Dict, List, Optional, Union
 
 import numpy as np
@@ -26,7 +25,7 @@ class Element:
         el_type: Optional[str],
         shape: str,
         nodes: List[Node],
-        options: Optional[OrderedDict] = None,
+        options: Optional[dict] = None,
     ):
         """
         Creates a new element of type ele_type, shape with nodes defined in nodes
@@ -40,7 +39,7 @@ class Element:
         self.type = el_type
         self.shape = shape
         self.nodes = nodes
-        self.options = options if options is not None else OrderedDict()
+        self.options = options if options is not None else {}
         self.fibers: Dict[str, Fiber] = {}
         self.data: Dict[str, Union[np.ndarray, int, float]] = {}
 
@@ -186,7 +185,7 @@ class Element:
 
         line.write("{0} {1} ".format(self.id, self.type))
 
-        options: OrderedDict = OrderedDict()
+        options: dict = {}
         options[self.shape] = [i.id for i in self.nodes]
         options.update(self.options)
 
@@ -207,7 +206,7 @@ class Element:
 
         dest.write("{0} {1} ".format(self.id, self.type))
 
-        options: OrderedDict = OrderedDict()
+        options: dict = {}
         options[self.shape] = [i.id for i in self.nodes]
         options.update(self.options)
 
