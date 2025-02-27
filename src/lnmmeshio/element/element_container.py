@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from typing import Dict, List, Optional
 
 from tqdm import tqdm
@@ -138,9 +137,9 @@ class ElementContainer:
 
     def get_sections(self, out=True):
         """
-        Returns an ordereddict of sections with the corresponding lines
+        Returns a dict of sections with the corresponding lines
         """
-        d = OrderedDict()
+        d = {}
         for key, elements in self.items():
             d[ElementContainer.get_section_name(key)] = (
                 ElementContainer.__get_section_lines(elements, out=out)

@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from typing import IO, Dict, Optional
 
 import numpy as np
@@ -73,7 +72,7 @@ class Fiber:
         else:
             raise ValueError("Unknown fiber type {0}".format(inp_type))
 
-        return line_option_list(OrderedDict({ftype: self.fiber}))
+        return line_option_list({ftype: self.fiber})
 
     def write(self, dest: IO, inp_type: str) -> None:
         """

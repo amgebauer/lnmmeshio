@@ -43,7 +43,8 @@ from .fiber import Fiber
 from .node import Node
 from .nodeset import LineNodeset, PointNodeset, SurfaceNodeset, VolumeNodeset
 
-__TYPE_BACI = 1
+__TYPE_LEGACY_DAT = 1
+__TYPE_FOUR_C_YAML = 2
 __TYPE_CASE = 3
 __TYPE_CASE_ASCII = 5
 __TYPE_MIMICS_STL = 4
@@ -56,17 +57,21 @@ def _get_type(filename: str, file_format: Optional[str] = None) -> int:
         _, extension = os.path.splitext(filename)
 
         if extension == ".dat":
-            return __TYPE_BACI
+            return __TYPE_LEGACY_DAT
         elif extension == ".dis":
-            return __TYPE_BACI
+            return __TYPE_LEGACY_DAT
+        elif extension == ".yaml" or extension == ".yml":
+            return __TYPE_FOUR_C_YAML
         elif extension == ".case":
             return __TYPE_CASE
         elif extension == ".mstl":
             return __TYPE_MIMICS_STL
     elif file_format == "dat":
-        return __TYPE_BACI
+        return __TYPE_LEGACY_DAT
     elif file_format == "dis":
-        return __TYPE_BACI
+        return __TYPE_LEGACY_DAT
+    elif file_format == "yaml" or file_format == "yml":
+        return __TYPE_FOUR_C_YAML
     elif file_format == "case" or file_format == "ensight":
         return __TYPE_CASE
     elif file_format == "case_ascii":
@@ -88,16 +93,20 @@ def read(
         file_format: The file format of the file
 
     Returns:
-        Discretization: Returns the discretization in BACI format
+        Discretization: Returns the discretization in 4C format
     """
     assert isinstance(filename, str)
 
     ftype: int = _get_type(filename, file_format=file_format)
 
-    if ftype == __TYPE_BACI:
-        # this is a BACI file format
+    if ftype == __TYPE_LEGACY_DAT:
+        # this is a legacy 4C dat file format
         with open(filename, "r") as f:
-            return read_baci_discr(f, out=out)
+            return read_legacy_four_c_dat(f, out=out)
+    elif ftype == __TYPE_FOUR_C_YAML:
+        # this is a 4C yaml file format
+        with open(filename, "r") as f:
+            return read_four_c_yaml(f, out=out)
     elif ftype == __TYPE_CASE:
         # this is ensight gold file format
         raise NotImplementedError("Case file reading is not implemented yet")
@@ -108,10 +117,16 @@ def read(
         return from_mesh(_meshioread(filename, file_format=file_format))
 
 
-def read_baci_discr(input_stream: IO, out: bool = True) -> Discretization:
+def read_legacy_four_c_dat(input_stream: IO, out: bool = True) -> Discretization:
     sections = ioutils.read_dat_sections(input_stream)
 
     return Discretization.read(sections, out=out)
+
+
+def read_four_c_yaml(input_stream: IO, out: bool = True) -> Discretization:
+    import yaml
+
+    return Discretization.read(yaml.safe_load(input_stream), out=out)
 
 
 def write(
@@ -136,10 +151,14 @@ def write(
 
     ftype: int = _get_type(filename, file_format=file_format)
 
-    if ftype == __TYPE_BACI:
+    if ftype == __TYPE_LEGACY_DAT:
+        # this is a legacy 4C dat discretization file format
+        with open(filename, "w") as f:
+            dis.write_legacy_dat(f, out=out)
+    elif ftype == __TYPE_FOUR_C_YAML:
         # this is a BACI discretization file format
         with open(filename, "w") as f:
-            dis.write(f, out=out)
+            dis.write_yaml(f, out=out)
     elif ftype == __TYPE_CASE:
         # this is ensight gold file format
         ensightio.write_case(filename, dis, out=out)
@@ -161,14 +180,17 @@ def read_mesh(filename: str, file_format: Optional[str] = None) -> Mesh:
         file_format: The file format of the file
 
     Returns:
-        Mesh: Returns the discretization in BACI format
+        Mesh: Returns the discretization in 4C format
     """
     assert isinstance(filename, str)
 
     ftype: int = _get_type(filename, file_format=file_format)
 
-    if ftype == __TYPE_BACI:
-        # this is a BACI file format
+    if ftype == __TYPE_LEGACY_DAT:
+        # this is a 4C file format
+        return to_mesh(read(filename, file_format=file_format))
+    elif ftype == __TYPE_FOUR_C_YAML:
+        # this is a 4C file format
         return to_mesh(read(filename, file_format=file_format))
     elif ftype == __TYPE_CASE:
         # this is ensight gold file format
@@ -203,7 +225,7 @@ def write_mesh(
     if not override and os.path.isfile(filename):
         raise FileExistsError("The file already exists")
 
-    if ftype == __TYPE_BACI:
+    if ftype == __TYPE_LEGACY_DAT or ftype == __TYPE_FOUR_C_YAML:
         dis = from_mesh(mesh)
         write(
             filename,

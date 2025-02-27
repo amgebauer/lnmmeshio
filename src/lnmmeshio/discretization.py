@@ -1,7 +1,7 @@
-from collections import OrderedDict
 from typing import IO, TYPE_CHECKING, Dict, List, Set
 
 import numpy as np
+import yaml
 from tqdm import tqdm
 
 from .element.element import Element1D, Element2D, Element3D
@@ -170,19 +170,7 @@ class Discretization:
     def get_sections(self, out=True) -> Dict[str, List[str]]:
         self.compute_ids(zero_based=False)
 
-        sections = OrderedDict()
-
-        # write problem size
-        num_ele = 0
-        for elelist in self.elements.values():
-            num_ele += len(elelist)
-        problem_size = []
-        problem_size.append(line_option("ELEMENTS", num_ele))
-        problem_size.append(line_option("NODES", len(self.nodes)))
-        problem_size.append(line_option("DIM", 3))
-        problem_size.append(line_option("MATERIALS", 9999))  # Write dummy value
-        sections["PROBLEM SIZE"] = problem_size
-
+        sections = {}
         # write topology
         for ns in [
             self.pointnodesets,
@@ -210,9 +198,9 @@ class Discretization:
 
         return sections
 
-    def write(self, dest: IO, out: bool = True) -> None:
+    def write_legacy_dat(self, dest: IO, out: bool = True) -> None:
         """
-        Writes the discretization related sections into the stream variable dest
+        Writes the discretization related sections into the stream variable dest in legacy dat format
 
         Args:
             dest: stream variable (could for example be: with open('file.dat', 'w') as dest: ...)
@@ -225,6 +213,16 @@ class Discretization:
             write_title(dest, key)
             for l in lines:
                 dest.write("{0}\n".format(l))
+
+    def write_yaml(self, dest: IO, out: bool = True) -> None:
+        """
+        Writes the discretization related sections into the stream variable dest in 4C yaml format
+
+        Args:
+            dest: stream variable (could for example be: with open('file.4C.yaml', 'w') as dest: ...)
+        """
+        sections = self.get_sections(out=out)
+        yaml.dump(sections, dest)
 
     def finalize(self) -> None:
         """

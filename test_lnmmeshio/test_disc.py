@@ -1,22 +1,61 @@
 import io
 import os
 import unittest
+from typing import Callable
 
 import lnmmeshio
 import numpy as np
+import yaml
 from lnmmeshio import ioutils
 from lnmmeshio.nodeset import LineNodeset, PointNodeset, SurfaceNodeset, VolumeNodeset
+from parameterized import parameterized
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
+
+
+def _yaml_unit_operation(dis: lnmmeshio.Discretization) -> lnmmeshio.Discretization:
+    dummy_file = io.StringIO()
+    dis.write_yaml(dummy_file)
+    dummy_file.seek(0)
+
+    return lnmmeshio.read_four_c_yaml(dummy_file)
+
+
+def _legacy_dat_unit_operation(
+    dis: lnmmeshio.Discretization,
+) -> lnmmeshio.Discretization:
+    dummy_file = io.StringIO()
+    dis.write_legacy_dat(dummy_file)
+    dummy_file.seek(0)
+
+    return lnmmeshio.read_legacy_four_c_dat(dummy_file)
 
 
 class TestDiscretizationIO(unittest.TestCase):
     def setUp(self):
         pass
 
-    def test_read(self):
+    def test_read_dat(self):
         # read dat file
         mesh = lnmmeshio.read_mesh(os.path.join(script_dir, "data", "dummy.dat"))
+
+        # check, whether all nodes are read correctly
+        self.assertEqual(mesh.points.shape, (224, 3))
+
+        # check, whether all tet elements were read correctly
+        self.assertEqual(mesh.get_cells_type("tetra").shape, (12, 4))
+        self.assertEqual(mesh.get_cells_type("tetra10").shape, (12, 10))
+        self.assertEqual(mesh.cell_data["material"][0][0], 1)
+        self.assertEqual(mesh.cell_data["material"][1][0], 4)
+        self.assertEqual(mesh.cell_data["material"][2][0], 5)
+        self.assertEqual(mesh.cell_data["material"][3][0], 6)
+
+        # check, whether all hex elements were read correctly
+        self.assertEqual(mesh.get_cells_type("hexahedron").shape, (65, 8))
+
+    def test_read_yaml(self):
+        # read dat file
+        mesh = lnmmeshio.read_mesh(os.path.join(script_dir, "data", "dummy.4C.yaml"))
 
         # check, whether all nodes are read correctly
         self.assertEqual(mesh.points.shape, (224, 3))
@@ -59,9 +98,39 @@ class TestDiscretizationIO(unittest.TestCase):
         for key in sections1.keys():
             self.assertListEqual(sorted(sections1[key]), sorted(sections2[key]))
 
-    def test_read_new(self):
+    def test_write_yaml(self):
+        # read dat file
+        mesh = lnmmeshio.read(
+            os.path.join(script_dir, "data", "dummy.4C.yaml"), out=True
+        )
+
+        if not os.path.isdir(os.path.join(script_dir, "tmp")):
+            os.makedirs(os.path.join(script_dir, "tmp"))
+
+        # write same dat file
+        lnmmeshio.write(os.path.join(script_dir, "tmp", "gen.4C.yaml"), mesh)
+
+        # check, whether both files are identical
+        # self.assertTrue(filecmp.cmp(os.path.join(script_dir, 'data', 'dummy.dat'),
+        #    os.path.join((script_dir), 'tmp', 'gen.dat')))
+
+        # check, whether both sections do coincide
+        with open(os.path.join(script_dir, "data", "dummy.4C.yaml"), "r") as f:
+            sections1 = yaml.safe_load(f)
+        with open(os.path.join(script_dir, "tmp", "gen.4C.yaml"), "r") as f:
+            sections2 = yaml.safe_load(f)
+
+        self.assertListEqual(
+            sorted(list(sections1.keys())), sorted(list(sections2.keys()))
+        )
+
+        for key in sections1.keys():
+            self.assertListEqual(sorted(sections1[key]), sorted(sections2[key]))
+
+    @parameterized.expand([("dummy.dat",), ("dummy.4C.yaml",)])
+    def test_read_new(self, file_name):
         # read discretization
-        disc = lnmmeshio.read(os.path.join(script_dir, "data", "dummy.dat"), out=True)
+        disc = lnmmeshio.read(os.path.join(script_dir, "data", file_name), out=True)
 
         disc.compute_ids(zero_based=False)
 
@@ -72,7 +141,11 @@ class TestDiscretizationIO(unittest.TestCase):
         self.assertListEqual([ns.id for ns in disc.nodes[47].surfacenodesets], [9])
         self.assertListEqual([ns.id for ns in disc.nodes[147].surfacenodesets], [6])
 
-    def test_write_new(self):
+    @parameterized.expand([(_yaml_unit_operation,), (_legacy_dat_unit_operation,)])
+    def test_write_new(
+        self,
+        unit_operation: Callable[[lnmmeshio.Discretization], lnmmeshio.Discretization],
+    ):
         # build dummy discretization
         d: lnmmeshio.Discretization = lnmmeshio.Discretization()
         d.nodes = [
@@ -115,12 +188,7 @@ class TestDiscretizationIO(unittest.TestCase):
             "TYPE": "Std",
         }
 
-        dummy_file = io.StringIO()
-        d.write(dummy_file)
-        dummy_file.seek(0)
-
-        # read dummy file
-        d_new = lnmmeshio.read_baci_discr(dummy_file)
+        d_new = unit_operation(d)
         d_new.compute_ids(zero_based=True)
 
         self.assertEqual(len(d_new.nodes), 4)
