@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "lnmmeshio"
-version = "5.6.0"
+version = "5.6.1"
 authors = [
   { name="Amadeus Gebauer", email="amadeus.gebauer@tum.de" },
 ]
@@ -22,6 +22,7 @@ dependencies = [
     "meshio>=5.3.5, <6",
     "loguru==0.7.2",
     "tqdm==4.66.5",
+    "PyYAML>=6.0.0, <7",
 ]
 
 [project.urls]
