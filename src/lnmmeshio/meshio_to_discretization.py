@@ -147,22 +147,22 @@ ele_node_order_vtk2baci = {
         9,
         10,
         11,
-        16,
-        17,
-        18,
-        19,
         12,
         13,
         14,
         15,
-        20,
+        16,
+        17,
+        18,
+        19,
         21,
-        22,
-        23,
-        24,
         25,
+        24,
         26,
-    ],  # verify ?
+        23,
+        22,
+        20,
+    ],
     "WEDGE6": list(range(0, 6)),
     "QUAD4": list(range(0, 4)),
     "QUAD9": list(range(0, 9)),
@@ -242,6 +242,9 @@ def mesh2Discretization(mesh: meshio.Mesh) -> Discretization:
                 # extract cell data
                 for key, data in mesh.cell_data.items():
                     ele.data[key] = data[cellgroupid][cellid]
+
+                # explicitly append the cell group id (block id) to the cell data
+                ele.data["GROUP_ID"] = cellgroupid
 
                 # create surface-nodesets
                 if maxdim == 2 and len(mesh.cell_data) > 0:
